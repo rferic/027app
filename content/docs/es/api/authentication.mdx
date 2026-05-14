@@ -1,0 +1,106 @@
+---
+title: Autenticación
+description: Cómo autenticar solicitudes a la REST API de 027Apps usando JWT o claves de API.
+---
+
+# Autenticación
+
+La API de 027Apps admite dos tipos de credenciales: **tokens JWT** emitidos por Supabase Auth y **claves de API** generadas desde el panel de administración.
+
+## JWT (token Bearer)
+
+Usa un JWT al construir un cliente en navegador o móvil donde un usuario ha iniciado sesión. El token identifica tanto al usuario como al grupo al que pertenece.
+
+### Obtener un token
+
+Inicia sesión a través de la página de inicio de sesión de la aplicación o directamente con la API de Supabase Auth. Tras un inicio de sesión exitoso, Supabase devuelve un `access_token`:
+
+```typescript
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+const { data, error } = await supabase.auth.signInWithPassword({
+  email: 'alice@example.com',
+  password: 'secret',
+})
+
+const token = data.session?.access_token
+```
+
+Los tokens expiran tras una hora. Usa `supabase.auth.refreshSession()` o el auto-refresco integrado del cliente de Supabase para obtener uno nuevo.
+
+### Usar el token
+
+Pasa el token en la cabecera `Authorization`:
+
+```bash
+curl https://example.com/api/v1/me \
+  -H "Authorization: Bearer <access_token>"
+```
+
+```typescript
+const res = await fetch('/api/v1/me', {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+})
+const user = await res.json()
+```
+
+## Clave de API
+
+Usa una clave de API para integraciones servidor a servidor donde no hay un usuario interactivo. Las claves de API son de larga duración y están asociadas al grupo.
+
+### Obtener una clave de API
+
+1. Inicia sesión como administrador.
+2. Ve a **Admin → Configuración → Claves de API**.
+3. Haz clic en **Nueva clave de API**, introduce un nombre y elige un alcance:
+   - **Grupo** — acceso máquina a máquina; sin contexto de usuario.
+   - **Usuario** — actúa en nombre de un usuario específico.
+4. Copia la clave inmediatamente. Se muestra **solo una vez** y nunca se almacena en texto plano.
+
+Las claves siguen el formato `sk_027_<32 caracteres aleatorios>` (p. ej. `sk_027_AbCdEfGhIjKlMnOpQrStUvWxYz012345`).
+
+### Usar una clave de API
+
+Pasa la clave en la cabecera `X-API-Key`:
+
+```bash
+curl https://example.com/api/v1/apps \
+  -H "X-API-Key: sk_027_AbCdEfGhIjKlMnOpQrStUvWxYz012345"
+```
+
+```typescript
+const res = await fetch('/api/v1/apps', {
+  headers: {
+    'X-API-Key': 'sk_027_AbCdEfGhIjKlMnOpQrStUvWxYz012345',
+  },
+})
+const apps = await res.json()
+```
+
+### Revocar una clave de API
+
+Ve a **Admin → Configuración → Claves de API** y haz clic en **Revocar** junto a la clave. Las claves revocadas son rechazadas de inmediato.
+
+## Elegir entre JWT y clave de API
+
+| Situación | Usar |
+|---|---|
+| Aplicación móvil o en navegador, usuario ha iniciado sesión | JWT |
+| Servicio backend o tarea programada | API Key (alcance de grupo) |
+| Actuar en nombre de un usuario específico sin autenticación interactiva | API Key (alcance de usuario) |
+| Leer datos públicos del grupo (idiomas) | Sin autenticación |
+
+## Respuestas de error
+
+| Escenario | HTTP | Código `error` |
+|---|---|---|
+| No se proporcionaron credenciales | 401 | `unauthorized` |
+| El token está expirado o mal formado | 401 | `unauthorized` |
+| El usuario no es miembro de ningún grupo | 403 | `forbidden` |
+| La clave de API está revocada o es desconocida | 401 | `unauthorized` |
+
+Consulta [Errores](/docs/api/errors) para la referencia completa de errores.

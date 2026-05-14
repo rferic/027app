@@ -1,0 +1,105 @@
+---
+title: Internacionalització
+description: Com 027Apps gestiona múltiples idiomes — idiomes, preferències d'usuari i fitxers de missatges.
+---
+
+# Internacionalització
+
+027Apps admet 6 idiomes al web públic, al tauler d'administració i a les respostes de l'API.
+
+## Idiomes compatibles
+
+| Codi | Idioma     | Predeterminat |
+|------|------------|---------------|
+| `en` | Anglès     | Sí     |
+| `es` | Espanyol   |         |
+| `it` | Italià     |         |
+| `ca` | Català     |         |
+| `fr` | Francès    |         |
+| `de` | Alemany    |         |
+
+## Resolució d'idioma
+
+Quan es renderitza una pàgina o es retorna una resposta localitzada, la plataforma resol l'idioma actiu en l'ordre següent:
+
+1. **Preferència de l'usuari** — `profiles.locale` per a l'usuari autenticat
+2. **Idioma predeterminat del grup** — `group_settings.default_locale` per al grup actual
+3. **Idioma de reserva** — `en`
+
+## Configuració del grup
+
+Cada grup emmagatzema la seva configuració d'idioma a la taula `group_settings`:
+
+| Columna | Tipus | Descripció |
+|---|---|---|
+| `active_locales` | `text[]` | Array de codis d'idioma habilitats per a aquest grup |
+| `default_locale` | `text` | Idioma usat quan no s'ha definit cap preferència d'usuari |
+
+Els administradors del grup poden configurar aquests valors al tauler d'administració a **Configuració → General**.
+
+## Estructura d'URL
+
+El web públic utilitza URLs amb prefix d'idioma:
+
+```
+/{locale}/...
+```
+
+Exemples:
+- `/en/` — inici en anglès
+- `/es/apps/calendar` — aplicació de calendari en espanyol
+- `/it/profile` — pàgina de perfil en italià
+
+L'idioma s'integra a la ruta de l'URL, no a les capçaleres de la sol·licitud.
+
+## GET /api/v1/locales
+
+Retorna els idiomes disponibles per al grup de l'usuari autenticat.
+
+**Auth:** `public` (no es requereix autenticació)
+
+**Resposta `200 OK`:**
+
+```json
+[
+  { "code": "en", "name": "Anglès", "is_default": true },
+  { "code": "es", "name": "Espanyol", "is_default": false },
+  { "code": "ca", "name": "Català", "is_default": false }
+]
+```
+
+Només es retornen els idiomes llistats a `group_settings.active_locales`. El camp `is_default` reflecteix `group_settings.default_locale`.
+
+## Idioma del perfil
+
+L'idioma preferit de l'usuari autenticat s'emmagatzema a `profiles.locale`. Quan està definit, té precedència sobre l'idioma predeterminat del grup.
+
+<Callout type="info">
+  L'actualització de l'idioma del perfil mitjançant l'API està planificada per a un sprint futur. Actualment es pot canviar des de la pàgina de perfil a la interfície web.
+</Callout>
+
+## Fitxers de missatges
+
+Les cadenes de la interfície s'emmagatzemen en fitxers JSON, un per idioma:
+
+```
+src/i18n/messages/
+  en.json
+  es.json
+  it.json
+  ca.json
+  fr.json
+  de.json
+```
+
+Els 6 fitxers han de tenir **claus idèntiques**. Les claus absents utilitzen `en` com a reserva. Els espais de noms de claus segueixen aquesta estructura:
+
+| Espai de noms | Àmbit |
+|---|---|
+| `auth` | Missatges d'inici de sessió, tancament de sessió i sessió |
+| `home` | Pàgina d'inici pública |
+| `nav` | Etiquetes de navegació |
+| `common` | Etiquetes d'interfície compartides (desa, cancel·la, etc.) |
+| `admin.*` | Seccions del tauler d'administració |
+| `user` | Cadenes del perfil d'usuari |
+| `profile` | Cadenes de la pàgina de perfil |

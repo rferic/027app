@@ -1,0 +1,1 @@
+-- No seed data. Use /install to create the first admin.

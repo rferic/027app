@@ -1,36 +1,134 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# apps027
+
+An open-source group apps platform. Whether you're managing a family, team, or any collective, apps027 provides a unified workspace where groups manage users, roles, and app permissions in one place.
+
+## Features
+
+**Multi-group & Auth**
+- Invitation-based user management with Supabase Auth
+- Group-scoped roles and permissions (admin / member)
+- Persistent JWT sessions (no expiry — users stay logged in until they sign out)
+- Block/unblock users
+
+**Backoffice (admin panel)**
+- Multilingual admin panel at `/{locale}/admin`
+- Collapsible vertical sidebar (state persisted across reloads)
+- Dashboard with group stats
+- User & administrator management with inline block/role actions
+- Invitation management (create, revoke, delete)
+- Profile editing with password change
+- Settings > General: configure active languages and default locale
+
+**Internationalization**
+- 6 supported locales: English, Spanish, Italian, Catalan, French, German
+- Per-user locale preference stored in the database
+- Per-group active locales configurable from the admin panel
+- All UI strings translated — no hardcoded English
+
+**App Permissions**
+- Per-app module access control
+- Role-based feature toggles
+- Extensible app architecture
+
+## Stack
+
+| Technology | Purpose |
+|-----------|---------|
+| Next.js 15 | Frontend framework (App Router) |
+| TypeScript | Strict typing |
+| Supabase | PostgreSQL + Auth |
+| shadcn/ui | Component library |
+| Tailwind CSS | Styling |
+| next-intl | i18n management |
+| Vitest | Unit testing |
+| Playwright | E2E testing |
+
+## Route Structure
+
+- **`/{locale}/admin`** – Multilingual backoffice for group and user management (admin role only)
+- **`/{locale}`** – Public web app with locale-aware routing (member role)
+
+## Visual Style
+
+- White sidebar with **rose/garnet** accent color (`rose-600` primary).
+- Gray page background (`bg-gray-100`), white content cards.
+- All action buttons are pill-shaped `<button>` elements — never plain text links.
+
+## Prerequisites
+
+- **Node.js** ≥ 18
+- **pnpm** (package manager)
+- **Supabase CLI** (for local development)
 
 ## Getting Started
 
-First, run the development server:
-
+### 1. Clone the repository
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/yourusername/apps027.git
+cd apps027
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Install dependencies
+```bash
+pnpm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Set up environment variables
+```bash
+cp .env.local.example .env.local
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Edit `.env.local`:
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
 
-## Learn More
+### 4. Start local Supabase
+```bash
+supabase start
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 5. Apply database migrations
+```bash
+# If supabase db push fails (remote already has earlier migrations), apply directly:
+docker exec -i supabase_db_027apps psql -U postgres -d postgres < supabase/migrations/<file>.sql
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 6. Generate Supabase types
+```bash
+supabase gen types typescript --local > src/types/supabase.ts
+# Remove "Connecting to db" line at the top if present
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 7. Start the development server
+```bash
+pnpm dev
+```
 
-## Deploy on Vercel
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Commands
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Command | Purpose |
+|---------|---------|
+| `pnpm dev` | Start development server |
+| `pnpm build` | Build for production |
+| `pnpm start` | Start production server |
+| `pnpm lint` | Run ESLint |
+| `pnpm test` | Run Vitest unit tests |
+| `pnpm test:e2e` | Run Playwright E2E tests |
+
+## How to Add a New App Module
+
+1. **Create the page** under `src/app/(app)/[locale]/apps/[module-name]/page.tsx`
+2. **Define permissions** in `app_permissions` table
+3. **Add i18n keys** to all 6 locale files in `src/i18n/messages/`
+4. **Register in backoffice** so admins can grant access
+
+## Contributing
+
+Follow the conventions in `CLAUDE.md`. Write tests for new features. Open an issue first for large changes.
+
+## License
+
+See `LICENSE` for details.

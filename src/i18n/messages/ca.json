@@ -1,0 +1,345 @@
+{
+  "auth": {
+    "login": "Inicia sessió",
+    "logout": "Tanca sessió",
+    "email": "Adreça electrònica",
+    "password": "Contrasenya",
+    "loginError": "Credencials incorrectes",
+    "blockedError": "El teu compte ha estat bloquejat. Contacta amb l'administrador.",
+    "blockedTitle": "Compte suspès",
+    "blockedDesc": "El teu compte ha estat suspès. Contacta amb l'administrador per recuperar l'accés.",
+    "adminOnly": "Només els administradors poden accedir a aquesta àrea",
+    "subtitle": "El teu grup, les teves apps."
+  },
+  "home": {
+    "noApps": "Encara no hi ha apps disponibles.",
+    "noAppsDesc": "Les teves apps apareixeran aquí quan l'administrador les configuri."
+  },
+  "nav": {
+    "dashboard": "Inici",
+    "backoffice": "Backoffice",
+    "docs": "Documentació"
+  },
+  "common": {
+    "loading": "Carregant...",
+    "error": "S'ha produït un error"
+  },
+  "admin": {
+    "title": "Panell de control",
+    "nav": {
+      "dashboard": "Inici",
+      "users": "Usuaris",
+      "members": "Membres",
+      "admins": "Administradors",
+      "invitations": "Invitacions",
+      "profile": "El meu perfil",
+      "settings": "Configuració",
+      "general": "General",
+      "api_keys": "Claus API",
+      "menu": "Menú",
+      "apps": "Aplicacions"
+    },
+    "dashboard": {
+      "title": "Inici",
+      "subtitle": "Visió general del grup",
+      "recentUsers": "Usuaris recents",
+      "recentInvitations": "Invitacions recents",
+      "viewAll": "Veure tots →",
+      "newInvitation": "+ Nova invitació",
+      "noUsers": "Encara no hi ha usuaris.",
+      "noInvitations": "Encara no hi ha invitacions.",
+      "statsUsers": "Usuaris",
+      "statsAdmins": "Admins",
+      "statsMembers": "Membres",
+      "statsPending": "Invitacions pendents"
+    },
+    "users": {
+      "title": "Membres",
+      "subtitle": "{count} usuari registrat",
+      "subtitlePlural": "{count} usuaris registrats"
+    },
+    "admins": {
+      "title": "Administradors",
+      "subtitle": "{count} administrador",
+      "subtitlePlural": "{count} administradors"
+    },
+    "invitations": {
+      "title": "Invitacions",
+      "subtitle": "{count} invitació",
+      "subtitlePlural": "{count} invitacions",
+      "new": "Nova invitació",
+      "newTitle": "Nova invitació",
+      "newSubtitle": "Crea un enllaç per convidar algú a la plataforma.",
+      "table": {
+        "title": "Títol",
+        "role": "Rol",
+        "email": "Correu",
+        "status": "Estat",
+        "expires": "Expira",
+        "copyLink": "Copiar enllaç",
+        "revoke": "Revocar",
+        "delete": "Eliminar",
+        "noInvitations": "Encara no hi ha invitacions.",
+        "any": "qualsevol",
+        "cancel": "Cancel·la",
+        "confirmRevokeTitle": "Revocar invitació?",
+        "confirmRevokeDesc": "Aquest enllaç d'invitació deixarà de funcionar.",
+        "confirmDeleteTitle": "Eliminar invitació?",
+        "confirmDeleteDesc": "Aquesta acció no es pot desfer."
+      },
+      "status": {
+        "pending": "Pendent",
+        "accepted": "Acceptada",
+        "expired": "Expirada",
+        "revoked": "Revocada"
+      },
+      "form": {
+        "titleLabel": "Títol",
+        "titlePlaceholder": "ex. Joan García — Frontend Dev",
+        "titleHelp": "Etiqueta interna per identificar aquesta invitació.",
+        "roleLabel": "Rol",
+        "roleMember": "Membre",
+        "roleAdmin": "Admin",
+        "emailLabel": "Correu",
+        "emailOptional": "(opcional)",
+        "emailPlaceholder": "Deixa en blanc per permetre qualsevol correu",
+        "emailHelp": "Si s'indica, només aquest correu podrà usar l'enllaç.",
+        "expiresLabel": "Data d'expiració",
+        "submit": "Crear invitació",
+        "submitting": "Creant…",
+        "cancel": "Cancel·lar",
+        "createdTitle": "Invitació creada",
+        "createdDesc": "Comparteix aquest enllaç amb la persona convidada:",
+        "copy": "Copiar",
+        "copyFailed": "Error en copiar",
+        "backToInvitations": "← Tornar a invitacions"
+      }
+    },
+    "profile": {
+      "title": "El meu perfil",
+      "subtitle": "Edita el teu nom i la preferència d'idioma.",
+      "personalInfo": "Informació personal",
+      "displayName": "Nom visible",
+      "language": "Preferència d'idioma",
+      "languageNote": "Defineix l'idioma per a l'àrea de l'app.",
+      "save": "Desar canvis",
+      "saving": "Desant…",
+      "saved": "Perfil actualitzat correctament.",
+      "changePassword": "Canviar contrasenya",
+      "newPassword": "Nova contrasenya",
+      "confirmPassword": "Confirmar nova contrasenya",
+      "changePasswordBtn": "Canviar contrasenya",
+      "changingPassword": "Canviant…",
+      "passwordChanged": "Contrasenya canviada correctament.",
+      "minPasswordChars": "Mín. 8 caràcters"
+    },
+    "table": {
+      "user": "Usuari",
+      "email": "Correu",
+      "role": "Rol",
+      "locale": "Idioma",
+      "lastLogin": "Últim accés",
+      "actions": "Accions",
+      "edit": "Editar",
+      "block": "Bloquejar",
+      "unblock": "Desbloquejar",
+      "makeAdmin": "Fer admin",
+      "makeMember": "Fer membre",
+      "noUsers": "Encara no hi ha usuaris.",
+      "blockedBadge": "bloquejat",
+      "cancel": "Cancel·la",
+      "confirmBlockTitle": "Bloquejar usuari?",
+      "confirmBlockDesc": "Aquest usuari no podrà iniciar sessió fins que es desbloquegi.",
+      "confirmMakeMemberTitle": "Eliminar accés d'admin?",
+      "confirmMakeMemberDesc": "Aquest usuari perdrà l'accés al panell d'administració.",
+      "delete": "Eliminar",
+      "confirmDeleteTitle": "Eliminar usuari?",
+      "confirmDeleteDesc": "Aquesta acció no es pot desfer. L'usuari i totes les seves dades s'eliminaran permanentment."
+    },
+    "settings": {
+      "title": "Configuració",
+      "api_keys": {
+        "title": "Claus API",
+        "subtitle": "Gestiona les claus API per a integracions de tercers.",
+        "new_key": "Nova clau API",
+        "no_keys": "Sense claus API encara.",
+        "create_modal_title": "Crear clau API",
+        "key_name_label": "Nom de la clau",
+        "key_name_placeholder": "ex. App mòbil",
+        "create_button": "Crear",
+        "created_title": "Clau API creada",
+        "created_warning": "Aquesta clau només es mostrarà una vegada. Copia-la ara.",
+        "copy_button": "Copiar",
+        "done_button": "Fet",
+        "revoke_button": "Revocar",
+        "revoke_confirm_title": "Revocar clau API",
+        "revoke_confirm_message": "Estàs segur? Aquesta acció no es pot desfer.",
+        "cancel_button": "Cancel·lar",
+        "scope_group": "Grup",
+        "scope_user": "Personal",
+        "prefix_label": "Prefix de la clau",
+        "created_at_label": "Creada",
+        "last_used_label": "Últim ús",
+        "never": "Mai"
+      },
+      "general": {
+        "title": "General",
+        "subtitle": "Configuració general de la plataforma.",
+        "languages": "Idiomes disponibles",
+        "languagesHelp": "Selecciona els idiomes disponibles per als usuaris.",
+        "defaultLocale": "Idioma per defecte",
+        "defaultLocaleHelp": "L'idioma per defecte per als nous usuaris.",
+        "save": "Desar",
+        "saving": "Desant…",
+        "saved": "Configuració desada.",
+        "atLeastOne": "Almenys un idioma ha d'estar actiu.",
+        "localeNames": {
+          "en": "Anglès",
+          "es": "Espanyol",
+          "it": "Italià",
+          "ca": "Català",
+          "fr": "Francès",
+          "de": "Alemany"
+        }
+      }
+    },
+    "editUser": {
+      "title": "Editar usuari",
+      "back": "← Usuaris",
+      "save": "Desar canvis",
+      "saving": "Desant…",
+      "saved": "Desat",
+      "displayName": "Nom visible",
+      "email": "Correu",
+      "role": "Rol",
+      "locale": "Idioma",
+      "localeNote": "L'usuari també pot canviar-ho des del seu propi perfil",
+      "roleNote": "(canvia el rol des de la taula d'usuaris)",
+      "joined": "Registrat",
+      "lastLogin": "Últim accés",
+      "status": "Estat",
+      "active": "Actiu",
+      "blocked": "Bloquejat"
+    },
+    "goToApp": "← App",
+    "apps": {
+      "title": "Aplicacions",
+      "subtitle": "Instal·la i gestiona mòduls d'aplicació",
+      "install": "Instal·lar",
+      "uninstall": "Desinstal·lar",
+      "configure": "Configurar",
+      "saveConfig": "Desar",
+      "cancel": "Cancel·lar",
+      "processing": "Processant...",
+      "empty": "No hi ha aplicacions disponibles.",
+      "noConfig": "Aquesta aplicació no té opcions configurables.",
+      "boolTrue": "Sí",
+      "boolFalse": "No",
+      "configSaved": "Desat",
+      "uninstall_confirm_title": "Desinstal·lar l'aplicació?",
+      "uninstall_confirm_description": "Aquesta acció és irreversible. Totes les dades de l'aplicació s'eliminaran permanentment i no podran recuperar-se.",
+      "uninstall_confirm_button": "Sí, desinstal·la",
+      "visibility": {
+        "label": "Visibilitat",
+        "public": "Pública",
+        "private": "Privada"
+      },
+      "status": {
+        "active": "Activa",
+        "installing": "Instal·lant",
+        "uninstalling": "Desinstal·lant",
+        "error": "Error"
+      },
+      "permissions": {
+        "title": "Accés",
+        "visibility_public": "Pública",
+        "visibility_private": "Privada",
+        "visibility_description_public": "Tots els membres del grup hi poden accedir",
+        "visibility_description_private": "Només els membres amb accés explícit",
+        "grant_access": "Donar accés",
+        "revoke_access": "Revocar",
+        "has_access": "Amb accés",
+        "no_members": "No hi ha membres al grup",
+        "visibility_updated": "Visibilitat actualitzada",
+        "access_granted": "Accés concedit",
+        "access_revoked": "Accés revocat"
+      }
+    }
+  },
+  "user": {
+    "editProfile": "Editar perfil",
+    "signOut": "Tancar sessió"
+  },
+  "apps": {
+    "title": "Aplicacions",
+    "install": "Instal·lar",
+    "uninstall": "Desinstal·lar",
+    "configure": "Configurar",
+    "status": {
+      "active": "Activa",
+      "installing": "Instal·lant...",
+      "uninstalling": "Desinstal·lant...",
+      "error": "Error",
+      "invalid": "No vàlida",
+      "not_installed": "No instal·lada"
+    },
+    "errors": {
+      "missing_manifest": "No s'ha trobat manifest.json",
+      "missing_view": "Falta el fitxer view.tsx declarat al manifest",
+      "missing_admin": "Falta el fitxer admin.tsx declarat al manifest",
+      "missing_widget": "Falta el fitxer widget.tsx declarat al manifest",
+      "dependency_not_installed": "L'app \"{dep}\" s'ha d'instal·lar primer",
+      "extension_point_not_found": "L'app \"{base}\" no exposa el punt d'extensió \"{point}\"",
+      "install_failed": "Error durant la instal·lació",
+      "uninstall_blocked": "No es pot desinstal·lar: altres apps en depenen",
+      "prefix_conflict": "El prefix de taula '{prefix}' ja està en ús per l'app '{slug}'",
+      "table_prefix_mismatch": "La taula '{table}' a migrations.sql no fa servir el prefix '{prefix}' declarat al manifest",
+      "uninstall_prefix_mismatch": "L'arxiu uninstall.sql opera sobre '{table}', que no pertany a aquesta app (prefix: '{prefix}')",
+      "migration_pending": "Hi ha una migració de base de dades pendents. Executa la migració pendent a l'editor SQL de Supabase abans d'instal·lar aquesta app."
+    },
+    "todo": {
+      "title": "Tasques",
+      "pending_label": "{count} pendent(s)",
+      "done_label": "{count} completada(es)",
+      "add_placeholder": "Nova tasca...",
+      "add_button": "Afegir",
+      "limit_reached": "Límit assolit ({max} tasques)",
+      "empty": "Encara no tens tasques",
+      "all_done": "Tot completat!",
+      "more_tasks": "{count} tasca(ques) més",
+      "open": "Obrir",
+      "admin_title": "Gestió de tasques",
+      "admin_subtitle": "{total} tasques: {pending} pendents, {done} completades",
+      "admin_empty": "No hi ha tasques al sistema"
+    },
+    "permissions": {
+      "title": "Accés",
+      "visibility_public": "Pública",
+      "visibility_private": "Privada",
+      "visibility_description_public": "Tots els membres del grup hi poden accedir",
+      "visibility_description_private": "Només els membres amb accés explícit",
+      "grant_access": "Donar accés",
+      "revoke_access": "Revocar",
+      "has_access": "Té accés",
+      "no_members": "No hi ha membres al grup",
+      "visibility_updated": "Visibilitat actualitzada",
+      "access_granted": "Accés concedit",
+      "access_revoked": "Accés revocat"
+    }
+  },
+  "app": {
+    "nav": {
+      "home": "Inici",
+      "profile": "Perfil",
+      "more": "Més"
+    },
+    "dashboard": {
+      "welcome_title": "Benvingut",
+      "welcome_subtitle": "El teu grup encara no té apps actives.",
+      "widgets_loading": "Carregant..."
+    },
+    "header": {
+      "open_menu": "Obre el menú"
+    }
+  }
+}

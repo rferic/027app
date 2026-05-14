@@ -1,0 +1,172 @@
+---
+title: Fehler
+description: Standard-Fehlercodes, HTTP-Statuscodes und Antwortformat für die REST API von 027Apps.
+---
+
+# Fehler
+
+Alle Fehlerantworten verwenden dieselbe JSON-Hülle:
+
+```json
+{
+  "error": "error_code",
+  "message": "Human-readable description"
+}
+```
+
+Validierungsfehler enthalten zusätzlich ein `fields`-Objekt, das jeden ungültigen Feldnamen einer Fehlermeldung zuordnet:
+
+```json
+{
+  "error": "validation_failed",
+  "message": "Input is invalid",
+  "fields": {
+    "email": "must be a valid email address",
+    "role": "must be 'admin' or 'member'"
+  }
+}
+```
+
+## Fehlercodes
+
+### 400 — `validation_failed`
+
+Der Anfragekörper oder die Abfrageparameter haben die Validierung nicht bestanden. Das `fields`-Objekt gibt an, welche Felder ungültig sind und warum.
+
+```json
+{
+  "error": "validation_failed",
+  "message": "Input is invalid",
+  "fields": {
+    "slug": "slug is required"
+  }
+}
+```
+
+**Was tun:** Korrigieren Sie die in `fields` aufgeführten Felder und versuchen Sie es erneut.
+
+---
+
+### 401 — `unauthorized`
+
+Die Anfrage enthielt keine gültigen Anmeldedaten, oder die angegebenen Anmeldedaten sind abgelaufen, widerrufen oder fehlerhaft.
+
+```json
+{
+  "error": "unauthorized",
+  "message": "Invalid or expired token"
+}
+```
+
+Häufige Ursachen:
+
+- Fehlender `Authorization`- oder `X-API-Key`-Header bei einem geschützten Endpoint.
+- JWT ist abgelaufen — aktualisieren Sie die Sitzung und versuchen Sie es erneut.
+- API-Schlüssel wurde widerrufen.
+
+**Was tun:** Holen Sie sich neue Anmeldedaten und versuchen Sie es erneut. Siehe [Authentifizierung](/docs/api/authentication).
+
+---
+
+### 403 — `forbidden`
+
+Die Anmeldedaten sind gültig, aber die authentifizierte Identität hat keine Berechtigung, auf die Ressource zuzugreifen.
+
+```json
+{
+  "error": "forbidden",
+  "message": "User is not a member of any group"
+}
+```
+
+**Was tun:** Stellen Sie sicher, dass der Benutzer die erforderliche Rolle oder App-Berechtigung hat. Wenden Sie sich an den Gruppenadministrator, wenn Zugriff gewährt werden soll.
+
+---
+
+### 404 — `not_found`
+
+Die angeforderte Ressource existiert nicht.
+
+```json
+{
+  "error": "not_found",
+  "message": "App not found"
+}
+```
+
+**Was tun:** Überprüfen Sie den Ressourcenbezeichner. Die Ressource wurde möglicherweise gelöscht oder die ID ist falsch.
+
+---
+
+### 409 — `conflict`
+
+Die Anfrage steht im Widerspruch zum aktuellen Zustand der Ressource.
+
+```json
+{
+  "error": "conflict",
+  "message": "A key with this name already exists"
+}
+```
+
+**Was tun:** Lösen Sie den Konflikt (z. B. verwenden Sie einen anderen Namen oder löschen Sie die vorhandene Ressource) und versuchen Sie es erneut.
+
+---
+
+### 422 — `unprocessable`
+
+Die Anfrage ist syntaktisch gültig, aber der Server kann sie aufgrund von Geschäftslogik-Einschränkungen nicht verarbeiten.
+
+```json
+{
+  "error": "unprocessable",
+  "message": "Cannot revoke the last active admin key"
+}
+```
+
+**Was tun:** Lesen Sie das `message`-Feld — es beschreibt die spezifische Einschränkung, die verletzt wurde.
+
+---
+
+### 429 — `rate_limited`
+
+Der Client hat in kurzer Zeit zu viele Anfragen gesendet.
+
+```json
+{
+  "error": "rate_limited",
+  "message": "Too many requests"
+}
+```
+
+**Was tun:** Warten Sie und versuchen Sie es nach einer Verzögerung erneut. Die Antwort kann einen `Retry-After`-Header enthalten, der angibt, wie viele Sekunden gewartet werden soll.
+
+---
+
+### 500 — `internal_error`
+
+Ein unerwarteter serverseitiger Fehler ist aufgetreten.
+
+```json
+{
+  "error": "internal_error",
+  "message": "An unexpected error occurred"
+}
+```
+
+**Was tun:** Wiederholen Sie die Anfrage. Wenn der Fehler anhält, melden Sie ihn dem Plattformadministrator.
+
+---
+
+## Zusammenfassungstabelle
+
+| HTTP | `error` | Ursache |
+|---|---|---|
+| 400 | `validation_failed` | Ungültige Eingabe; prüfen Sie `fields` |
+| 401 | `unauthorized` | Fehlende, abgelaufene oder widerrufene Anmeldedaten |
+| 403 | `forbidden` | Authentifiziert, aber keine Berechtigung |
+| 404 | `not_found` | Ressource existiert nicht |
+| 409 | `conflict` | Zustandskonflikt |
+| 422 | `unprocessable` | Geschäftslogik-Einschränkung |
+| 429 | `rate_limited` | Zu viele Anfragen |
+| 500 | `internal_error` | Unerwarteter Serverfehler |

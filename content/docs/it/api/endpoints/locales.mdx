@@ -1,0 +1,79 @@
+---
+title: GET /api/v1/locales
+description: Restituisce le lingue attive configurate per il gruppo. Non richiede autenticazione.
+---
+
+# GET /api/v1/locales
+
+Restituisce le lingue attive per il gruppo, insieme alla lingua predefinita del gruppo.
+
+Questo endpoint è pubblico — non è richiesta autenticazione. È pensato per i client che devono conoscere le lingue disponibili prima che l'utente abbia effettuato l'accesso (es. una pagina di login o una vista pubblica).
+
+## Autenticazione
+
+**Nessuna** — questo endpoint è accessibile pubblicamente.
+
+## Richiesta
+
+```
+GET /api/v1/locales
+```
+
+Non sono richiesti header, parametri di query né corpo della richiesta.
+
+## Risposta
+
+**200 OK**
+
+```typescript
+type LocalesResponse = {
+  default: string    // The group's default locale (e.g. "en")
+  active: string[]   // All active locale codes, including the default
+}
+```
+
+I codici lingua seguono il formato [IETF language tag](https://en.wikipedia.org/wiki/IETF_language_tag). La piattaforma supporta: `en`, `es`, `it`, `ca`, `fr`, `de`.
+
+Esempio:
+
+```json
+{
+  "default": "en",
+  "active": ["en", "es", "ca"]
+}
+```
+
+## Errori
+
+| HTTP | `error` | Causa |
+|---|---|---|
+| 404 | `not_found` | Il gruppo non è configurato (non dovrebbe verificarsi in un'installazione corretta) |
+| 500 | `internal_error` | Errore imprevisto del server |
+
+## Esempi
+
+### curl
+
+```bash
+curl https://example.com/api/v1/locales
+```
+
+### fetch (TypeScript)
+
+```typescript
+type LocalesResponse = {
+  default: string
+  active: string[]
+}
+
+const res = await fetch('/api/v1/locales')
+
+if (!res.ok) {
+  const err = await res.json()
+  throw new Error(err.message)
+}
+
+const locales: LocalesResponse = await res.json()
+console.log(locales.default)  // "en"
+console.log(locales.active)   // ["en", "es", "ca"]
+```

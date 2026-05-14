@@ -1,0 +1,39 @@
+---
+title: To-Do App
+description: Simple task list — create, complete, and remove to-do items.
+---
+
+# To-Do App
+
+A minimal task management app for individuals within a group. Each user manages their own private list of to-do items.
+
+## Prerequisites
+
+- Platform version ≥ 1.0.0
+- No dependencies on other apps
+
+## Installation
+
+Install from the admin panel at `/admin/apps`. The system will:
+
+1. Create the `todo_items` table with RLS policies
+2. Enable per-user row isolation automatically
+
+## Configuration
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `max_items` | number | 50 | Maximum tasks per user (1–1000) |
+
+## Views
+
+| View | URL | Description |
+|------|-----|-------------|
+| Public | `/apps/todo` | Full task list with add/complete/delete |
+| Admin | `/admin/apps/todo` | Read-only view of all users' tasks |
+| Widget | Dashboard | Pending count + 3 most recent tasks |
+| Native | Mobile screen | Full task list with FlatList |
+
+## Uninstallation
+
+Uninstalling removes the `todo_items` table and **all associated data permanently**.

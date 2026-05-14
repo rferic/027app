@@ -1,0 +1,65 @@
+---
+title: To-Do API
+description: REST endpoints for the To-Do app.
+---
+
+# To-Do API Reference
+
+Base path: `/api/v1/apps/todo`  
+Auth: JWT (`Authorization: Bearer <token>`)
+
+## Schema
+
+```typescript
+interface TodoItem {
+  id: string        // UUID
+  title: string
+  completed: boolean
+  created_at: string // ISO 8601
+}
+```
+
+## Endpoints
+
+### `GET /api/v1/apps/todo`
+
+List current user's tasks, ordered by `created_at` descending.
+
+**Query params (admin only):** `?all=true` — returns all users' tasks including `user_id`.
+
+```bash
+curl /api/v1/apps/todo \
+  -H "Authorization: Bearer <token>"
+```
+
+---
+
+### `POST /api/v1/apps/todo`
+
+Create a task.
+
+**Body:**
+```json
+{ "title": "Buy groceries" }
+```
+
+Returns `201` with the created `TodoItem`.
+
+---
+
+### `PUT /api/v1/apps/todo/:id`
+
+Update a task (title and/or completed status).
+
+**Body:**
+```json
+{ "completed": true }
+```
+
+Returns the updated `TodoItem`.
+
+---
+
+### `DELETE /api/v1/apps/todo/:id`
+
+Delete a task. Returns `{ "deleted": true }`.

@@ -1,0 +1,172 @@
+---
+title: Errors
+description: Codis d'error estàndard, codis d'estat HTTP i format de resposta per a la REST API de 027Apps.
+---
+
+# Errors
+
+Totes les respostes d'error utilitzen el mateix embolcall JSON:
+
+```json
+{
+  "error": "error_code",
+  "message": "Human-readable description"
+}
+```
+
+Els errors de validació inclouen a més un objecte `fields` que mapeja cada nom de camp no vàlid a un missatge d'error:
+
+```json
+{
+  "error": "validation_failed",
+  "message": "Input is invalid",
+  "fields": {
+    "email": "must be a valid email address",
+    "role": "must be 'admin' or 'member'"
+  }
+}
+```
+
+## Codis d'error
+
+### 400 — `validation_failed`
+
+El cos de la sol·licitud o els paràmetres de consulta no han superat la validació. L'objecte `fields` indica quins camps no són vàlids i per quin motiu.
+
+```json
+{
+  "error": "validation_failed",
+  "message": "Input is invalid",
+  "fields": {
+    "slug": "slug is required"
+  }
+}
+```
+
+**Què fer:** Corregeix els camps indicats a `fields` i torna-ho a intentar.
+
+---
+
+### 401 — `unauthorized`
+
+La sol·licitud no incloïa credencials vàlides, o les credencials proporcionades han caducat, estan revocades o són malformades.
+
+```json
+{
+  "error": "unauthorized",
+  "message": "Invalid or expired token"
+}
+```
+
+Causes habituals:
+
+- Manca la capçalera `Authorization` o `X-API-Key` en un endpoint protegit.
+- El JWT ha caducat — actualitza la sessió i torna-ho a intentar.
+- La clau d'API ha estat revocada.
+
+**Què fer:** Obtén credencials noves i torna-ho a intentar. Consulta [Autenticació](/docs/api/authentication).
+
+---
+
+### 403 — `forbidden`
+
+Les credencials són vàlides, però la identitat autenticada no té permís per accedir al recurs.
+
+```json
+{
+  "error": "forbidden",
+  "message": "User is not a member of any group"
+}
+```
+
+**Què fer:** Verifica que l'usuari tingui el rol o el permís d'aplicació requerit. Contacta l'administrador del grup si s'ha de concedir l'accés.
+
+---
+
+### 404 — `not_found`
+
+El recurs sol·licitat no existeix.
+
+```json
+{
+  "error": "not_found",
+  "message": "App not found"
+}
+```
+
+**Què fer:** Comprova l'identificador del recurs. Pot ser que hagi estat eliminat o que l'ID sigui incorrecte.
+
+---
+
+### 409 — `conflict`
+
+La sol·licitud entra en conflicte amb l'estat actual del recurs.
+
+```json
+{
+  "error": "conflict",
+  "message": "A key with this name already exists"
+}
+```
+
+**Què fer:** Resol el conflicte (p. ex. utilitza un nom diferent, o elimina el recurs existent) i torna-ho a intentar.
+
+---
+
+### 422 — `unprocessable`
+
+La sol·licitud és sintàcticament vàlida, però el servidor no la pot processar a causa de restriccions de lògica de negoci.
+
+```json
+{
+  "error": "unprocessable",
+  "message": "Cannot revoke the last active admin key"
+}
+```
+
+**Què fer:** Llegeix el camp `message` — descriu la restricció específica que s'ha vulnerat.
+
+---
+
+### 429 — `rate_limited`
+
+El client ha enviat massa sol·licituds en un curt període.
+
+```json
+{
+  "error": "rate_limited",
+  "message": "Too many requests"
+}
+```
+
+**Què fer:** Espera i torna-ho a intentar després d'un retard. La resposta pot incloure una capçalera `Retry-After` que indica quants segons esperar.
+
+---
+
+### 500 — `internal_error`
+
+S'ha produït un error inesperat al costat del servidor.
+
+```json
+{
+  "error": "internal_error",
+  "message": "An unexpected error occurred"
+}
+```
+
+**Què fer:** Torna a intentar la sol·licitud. Si l'error persisteix, informa l'administrador de la plataforma.
+
+---
+
+## Taula resum
+
+| HTTP | `error` | Causa |
+|---|---|---|
+| 400 | `validation_failed` | Entrada no vàlida; revisa `fields` |
+| 401 | `unauthorized` | Credencials absents, caducades o revocades |
+| 403 | `forbidden` | Autenticat però sense permís |
+| 404 | `not_found` | El recurs no existeix |
+| 409 | `conflict` | Conflicte d'estat |
+| 422 | `unprocessable` | Restricció de lògica de negoci |
+| 429 | `rate_limited` | Massa sol·licituds |
+| 500 | `internal_error` | Error inesperat del servidor |

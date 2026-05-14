@@ -1,0 +1,43 @@
+{
+  "slug": "todo",
+  "tablePrefix": "todo_",
+  "name": "To-Do",
+  "version": "1.0.0",
+  "description": "Simple task list — create, complete, and remove to-do items.",
+  "logo": "logo.svg",
+  "primaryColor": "#4F46E5",
+  "secondaryColor": "#EEF2FF",
+  "author": {
+    "name": "027Apps",
+    "url": "https://027apps.com"
+  },
+  "minPlatformVersion": "1.0.0",
+  "views": {
+    "public": true,
+    "admin": true,
+    "widget": true,
+    "native": true
+  },
+  "api": true,
+  "dependencies": [],
+  "notifications": false,
+  "i18n": true,
+  "config": [
+    {
+      "key": "max_items",
+      "type": "number",
+      "label": {
+        "en": "Max items per user",
+        "es": "Máximo de tareas por usuario",
+        "it": "Elementi massimi per utente",
+        "ca": "Màxim d'elements per usuari",
+        "fr": "Éléments maximum par utilisateur",
+        "de": "Maximale Einträge pro Benutzer"
+      },
+      "required": false,
+      "default": 50,
+      "min": 1,
+      "max": 1000
+    }
+  ]
+}

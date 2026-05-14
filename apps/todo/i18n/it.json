@@ -1,0 +1,16 @@
+{
+  "title": "Da fare",
+  "add_placeholder": "Nuovo compito…",
+  "add_button": "Aggiungi",
+  "pending_label": "{count, plural, one {# in sospeso} other {# in sospeso}}",
+  "done_label": "{count, plural, one {# completato} other {# completati}}",
+  "empty": "Nessun compito ancora.",
+  "all_done": "Tutto fatto!",
+  "open": "Apri →",
+  "loading": "Caricamento…",
+  "more_tasks": "+{count} altro",
+  "admin_title": "Da fare — Admin",
+  "admin_subtitle": "{total} totale · {pending} in sospeso · {done} completati",
+  "admin_empty": "Nessun compito trovato.",
+  "limit_reached": "Hai raggiunto il massimo di {max} compiti."
+}

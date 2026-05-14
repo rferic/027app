@@ -1,0 +1,26 @@
+---
+title: Endpoint
+description: Tutti gli endpoint disponibili della REST API v1 con requisiti di autenticazione e descrizioni.
+---
+
+# Endpoint
+
+Tutti i percorsi sono relativi all'URL base `/api/v1`.
+
+## Endpoint disponibili
+
+| Metodo | Percorso | Auth | Descrizione |
+|---|---|---|---|
+| `GET` | `/api/v1` | Pubblico | [Verifica dello stato](/docs/api) — restituisce versione e stato |
+| `GET` | [`/api/v1/me`](/docs/api/endpoints/me) | JWT | Informazioni utente autenticato, appartenenza al gruppo e profilo |
+| `GET` | [`/api/v1/apps`](/docs/api/endpoints/apps) | JWT o API Key | Applicazioni disponibili per il gruppo (o filtrate per permessi utente) |
+| `GET` | [`/api/v1/locales`](/docs/api/endpoints/locales) | Pubblico | Lingue attive configurate per il gruppo |
+
+## Livelli di autenticazione
+
+- **Pubblico** — Nessun header `Authorization` o `X-API-Key` necessario.
+- **JWT** — Richiede `Authorization: Bearer <token>`. Il token deve appartenere a un membro attivo del gruppo.
+- **API Key** — Richiede `X-API-Key: sk_027_...`. La chiave deve essere attiva (non revocata).
+- **JWT o API Key** — Viene accettato entrambi i tipi di credenziale; la risposta potrebbe differire a seconda di quale viene usato.
+
+Consulta [Autenticazione](/docs/api/authentication) per sapere come ottenere le credenziali.

@@ -1,0 +1,172 @@
+---
+title: Errors
+description: Standard error codes, HTTP status codes, and response format for the 027Apps REST API.
+---
+
+# Errors
+
+All error responses use the same JSON envelope:
+
+```json
+{
+  "error": "error_code",
+  "message": "Human-readable description"
+}
+```
+
+Validation errors additionally include a `fields` object mapping each invalid field name to an error message:
+
+```json
+{
+  "error": "validation_failed",
+  "message": "Input is invalid",
+  "fields": {
+    "email": "must be a valid email address",
+    "role": "must be 'admin' or 'member'"
+  }
+}
+```
+
+## Error codes
+
+### 400 — `validation_failed`
+
+The request body or query parameters did not pass validation. The `fields` object indicates which fields are invalid and why.
+
+```json
+{
+  "error": "validation_failed",
+  "message": "Input is invalid",
+  "fields": {
+    "slug": "slug is required"
+  }
+}
+```
+
+**What to do:** Fix the fields listed in `fields` and retry.
+
+---
+
+### 401 — `unauthorized`
+
+The request did not include valid credentials, or the provided credentials are expired, revoked, or malformed.
+
+```json
+{
+  "error": "unauthorized",
+  "message": "Invalid or expired token"
+}
+```
+
+Common causes:
+
+- Missing `Authorization` or `X-API-Key` header on a protected endpoint.
+- JWT has expired — refresh the session and retry.
+- API key has been revoked.
+
+**What to do:** Obtain fresh credentials and retry. See [Authentication](/docs/api/authentication).
+
+---
+
+### 403 — `forbidden`
+
+Credentials are valid, but the authenticated identity does not have permission to access the resource.
+
+```json
+{
+  "error": "forbidden",
+  "message": "User is not a member of any group"
+}
+```
+
+**What to do:** Verify the user has the required role or app permission. Contact the group administrator if access should be granted.
+
+---
+
+### 404 — `not_found`
+
+The requested resource does not exist.
+
+```json
+{
+  "error": "not_found",
+  "message": "App not found"
+}
+```
+
+**What to do:** Check the resource identifier. The resource may have been deleted or the ID may be incorrect.
+
+---
+
+### 409 — `conflict`
+
+The request conflicts with the current state of the resource.
+
+```json
+{
+  "error": "conflict",
+  "message": "A key with this name already exists"
+}
+```
+
+**What to do:** Resolve the conflict (e.g. use a different name, or delete the existing resource) and retry.
+
+---
+
+### 422 — `unprocessable`
+
+The request is syntactically valid, but the server cannot process it due to business logic constraints.
+
+```json
+{
+  "error": "unprocessable",
+  "message": "Cannot revoke the last active admin key"
+}
+```
+
+**What to do:** Read the `message` field — it describes the specific constraint that was violated.
+
+---
+
+### 429 — `rate_limited`
+
+The client has sent too many requests in a short period.
+
+```json
+{
+  "error": "rate_limited",
+  "message": "Too many requests"
+}
+```
+
+**What to do:** Back off and retry after a delay. The response may include a `Retry-After` header indicating how many seconds to wait.
+
+---
+
+### 500 — `internal_error`
+
+An unexpected server-side error occurred.
+
+```json
+{
+  "error": "internal_error",
+  "message": "An unexpected error occurred"
+}
+```
+
+**What to do:** Retry the request. If the error persists, report it to the platform administrator.
+
+---
+
+## Summary table
+
+| HTTP | `error` | Cause |
+|---|---|---|
+| 400 | `validation_failed` | Invalid input; check `fields` |
+| 401 | `unauthorized` | Missing, expired, or revoked credentials |
+| 403 | `forbidden` | Authenticated but not permitted |
+| 404 | `not_found` | Resource does not exist |
+| 409 | `conflict` | State conflict |
+| 422 | `unprocessable` | Business logic constraint |
+| 429 | `rate_limited` | Too many requests |
+| 500 | `internal_error` | Unexpected server error |

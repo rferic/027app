@@ -1,0 +1,16 @@
+{
+  "title": "Aufgaben",
+  "add_placeholder": "Neue Aufgabe…",
+  "add_button": "Hinzufügen",
+  "pending_label": "{count, plural, one {# ausstehend} other {# ausstehend}}",
+  "done_label": "{count, plural, one {# erledigt} other {# erledigt}}",
+  "empty": "Noch keine Aufgaben.",
+  "all_done": "Alles erledigt!",
+  "open": "Öffnen →",
+  "loading": "Laden…",
+  "more_tasks": "+{count} weitere",
+  "admin_title": "Aufgaben — Admin",
+  "admin_subtitle": "{total} gesamt · {pending} ausstehend · {done} erledigt",
+  "admin_empty": "Keine Aufgaben gefunden.",
+  "limit_reached": "Sie haben das Maximum von {max} Aufgaben erreicht."
+}

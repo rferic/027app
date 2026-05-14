@@ -1,0 +1,16 @@
+{
+  "title": "Tasques",
+  "add_placeholder": "Nova tasca…",
+  "add_button": "Afegir",
+  "pending_label": "{count, plural, one {# pendent} other {# pendents}}",
+  "done_label": "{count, plural, one {# completada} other {# completades}}",
+  "empty": "Encara no hi ha tasques.",
+  "all_done": "Tot fet!",
+  "open": "Obrir →",
+  "loading": "Carregant…",
+  "more_tasks": "+{count} més",
+  "admin_title": "Tasques — Admin",
+  "admin_subtitle": "{total} total · {pending} pendents · {done} completades",
+  "admin_empty": "No s'han trobat tasques.",
+  "limit_reached": "Has assolit el màxim de {max} tasques."
+}

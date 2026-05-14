@@ -1,0 +1,41 @@
+---
+title: 027Apps Documentation
+description: Open-source platform for group apps — API reference, guides, and integration docs.
+---
+
+# 027Apps Docs
+
+Platform documentation for developers building with or integrating 027Apps.
+
+027Apps is an open-source platform for group apps — for families, teams, or any collective. Each group manages its own users, roles, and app permissions.
+
+## Getting started
+
+The platform exposes a REST API for authentication, user management, app access, and locale configuration. All endpoints are versioned under `/api/v1/`.
+
+Start with [Authentication](/doc/api/authentication) to obtain a session token, then explore the available endpoints.
+
+## Sections
+
+<Cards>
+  <Card
+    title="REST API"
+    href="/doc/api"
+    description="Full reference for the 027Apps HTTP API — authentication, users, apps, and locales."
+  />
+  <Card
+    title="Internationalization"
+    href="/doc/api/i18n"
+    description="6 supported locales. User preferences, group settings, URL structure, and message files."
+  />
+  <Card
+    title="Core Endpoints"
+    href="/doc/api/endpoints"
+    description="Endpoints for users, apps, and locales — request/response schemas and examples."
+  />
+  <Card
+    title="Errors"
+    href="/doc/api/errors"
+    description="Error codes, HTTP status reference, and field-level validation error format."
+  />
+</Cards>

@@ -1,0 +1,100 @@
+---
+title: Panoramica della REST API
+description: REST API v1 di 027Apps — concetti base, versionamento e formato delle risposte.
+---
+
+# REST API v1
+
+La REST API di 027Apps consente alle applicazioni esterne e al client mobile di interagire con la piattaforma in modo programmatico.
+
+**URL Base**
+
+```
+/api/v1
+```
+
+Tutti gli endpoint sono relativi a questo percorso base. L'API è versionata tramite il prefisso URL; i cambiamenti incompatibili introdurranno una nuova versione (`/api/v2`).
+
+## Verifica dello stato
+
+```bash
+GET /api/v1
+```
+
+Restituisce la versione corrente dell'API e il suo stato. Non richiede autenticazione.
+
+```json
+{
+  "version": "v1",
+  "status": "ok"
+}
+```
+
+## Autenticazione
+
+L'API supporta tre livelli di autenticazione:
+
+| Livello | Header | Quando usarlo |
+|---|---|---|
+| Pubblico | — | Endpoint che espongono dati non sensibili del gruppo |
+| API Key | `X-API-Key: sk_027_...` | Integrazioni server-to-server |
+| JWT | `Authorization: Bearer <token>` | App mobile e client browser |
+
+Consulta [Autenticazione](/docs/api/authentication) per i dettagli su come ottenere le credenziali e il comportamento di ciascun metodo.
+
+## Formato delle risposte
+
+Le risposte di successo restituiscono la risorsa direttamente — senza envelope esterno:
+
+```json
+{ "id": "abc123", "name": "Alice" }
+```
+
+Gli endpoint di lista restituiscono un array JSON:
+
+```json
+[
+  { "slug": "calendar", "enabled": true },
+  { "slug": "tasks", "enabled": true }
+]
+```
+
+Le risposte di lista paginate includono un header `Link` (RFC 5988) quando ci sono pagine aggiuntive:
+
+```
+Link: </api/v1/items?page=2>; rel="next"
+```
+
+Le risposte di errore utilizzano sempre lo stesso envelope:
+
+```json
+{
+  "error": "not_found",
+  "message": "User not found"
+}
+```
+
+Gli errori di validazione includono un oggetto `fields`:
+
+```json
+{
+  "error": "validation_failed",
+  "message": "Input is invalid",
+  "fields": {
+    "email": "must be a valid email address"
+  }
+}
+```
+
+Consulta [Errori](/docs/api/errors) per il riferimento completo degli errori.
+
+## Endpoint
+
+| Metodo | Percorso | Auth | Descrizione |
+|---|---|---|---|
+| `GET` | `/api/v1` | Pubblico | Verifica dello stato |
+| `GET` | `/api/v1/me` | JWT | Informazioni sull'utente autenticato |
+| `GET` | `/api/v1/apps` | JWT o API Key | Applicazioni del gruppo |
+| `GET` | `/api/v1/locales` | Pubblico | Lingue attive per il gruppo |
+
+Consulta [Endpoint](/docs/api/endpoints) per il riferimento completo.

@@ -1,0 +1,105 @@
+---
+title: Internacionalización
+description: Cómo 027Apps gestiona múltiples idiomas — idiomas, preferencias de usuario y archivos de mensajes.
+---
+
+# Internacionalización
+
+027Apps admite 6 idiomas en la web pública, el panel de administración y las respuestas de la API.
+
+## Idiomas compatibles
+
+| Código | Idioma   | Predeterminado |
+|--------|----------|----------------|
+| `en` | Inglés    | Sí     |
+| `es` | Español   |         |
+| `it` | Italiano  |         |
+| `ca` | Catalán   |         |
+| `fr` | Francés   |         |
+| `de` | Alemán    |         |
+
+## Resolución de idioma
+
+Al renderizar una página o devolver una respuesta localizada, la plataforma resuelve el idioma activo en el siguiente orden:
+
+1. **Preferencia del usuario** — `profiles.locale` para el usuario autenticado
+2. **Idioma predeterminado del grupo** — `group_settings.default_locale` para el grupo actual
+3. **Idioma de reserva** — `en`
+
+## Configuración del grupo
+
+Cada grupo almacena su configuración de idioma en la tabla `group_settings`:
+
+| Columna | Tipo | Descripción |
+|---|---|---|
+| `active_locales` | `text[]` | Array de códigos de idioma habilitados para este grupo |
+| `default_locale` | `text` | Idioma usado cuando no hay preferencia de usuario definida |
+
+Los administradores del grupo pueden configurar estos valores en el panel de administración en **Configuración → General**.
+
+## Estructura de URL
+
+La web pública usa URLs con prefijo de idioma:
+
+```
+/{locale}/...
+```
+
+Ejemplos:
+- `/en/` — inicio en inglés
+- `/es/apps/calendar` — aplicación de calendario en español
+- `/it/profile` — página de perfil en italiano
+
+El idioma está integrado en la ruta de la URL, no en las cabeceras de la solicitud.
+
+## GET /api/v1/locales
+
+Devuelve los idiomas disponibles para el grupo del usuario autenticado.
+
+**Auth:** `public` (no se requiere autenticación)
+
+**Respuesta `200 OK`:**
+
+```json
+[
+  { "code": "en", "name": "Inglés", "is_default": true },
+  { "code": "es", "name": "Español", "is_default": false },
+  { "code": "ca", "name": "Catalán", "is_default": false }
+]
+```
+
+Solo se devuelven los idiomas listados en `group_settings.active_locales`. El campo `is_default` refleja `group_settings.default_locale`.
+
+## Idioma del perfil
+
+El idioma preferido del usuario autenticado se almacena en `profiles.locale`. Cuando está definido, tiene precedencia sobre el idioma predeterminado del grupo.
+
+<Callout type="info">
+  La actualización del idioma del perfil mediante la API está planificada para un sprint futuro. Actualmente se puede cambiar desde la página de perfil en la interfaz web.
+</Callout>
+
+## Archivos de mensajes
+
+Las cadenas de la interfaz se almacenan en archivos JSON, uno por idioma:
+
+```
+src/i18n/messages/
+  en.json
+  es.json
+  it.json
+  ca.json
+  fr.json
+  de.json
+```
+
+Los 6 archivos deben tener **claves idénticas**. Las claves faltantes usan `en` como reserva. Los espacios de nombres de claves siguen esta estructura:
+
+| Espacio de nombres | Ámbito |
+|---|---|
+| `auth` | Mensajes de inicio de sesión, cierre de sesión y sesión |
+| `home` | Página de inicio pública |
+| `nav` | Etiquetas de navegación |
+| `common` | Etiquetas de interfaz compartidas (guardar, cancelar, etc.) |
+| `admin.*` | Secciones del panel de administración |
+| `user` | Cadenas del perfil de usuario |
+| `profile` | Cadenas de la página de perfil |

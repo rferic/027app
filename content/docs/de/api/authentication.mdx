@@ -1,0 +1,106 @@
+---
+title: Authentifizierung
+description: So authentifizieren Sie Anfragen an die REST API von 027Apps mit JWT oder API-Schlüsseln.
+---
+
+# Authentifizierung
+
+Die API von 027Apps unterstützt zwei Arten von Anmeldedaten: **JWT-Token**, die von Supabase Auth ausgestellt werden, und **API-Schlüssel**, die über das Administrationsbereich generiert werden.
+
+## JWT (Bearer-Token)
+
+Verwenden Sie ein JWT, wenn Sie einen Browser- oder mobilen Client entwickeln, bei dem ein Benutzer angemeldet ist. Der Token identifiziert sowohl den Benutzer als auch die Gruppe, zu der er gehört.
+
+### Token erhalten
+
+Melden Sie sich über die Login-Seite der App oder direkt über die Supabase Auth API an. Nach einer erfolgreichen Anmeldung gibt Supabase ein `access_token` zurück:
+
+```typescript
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+const { data, error } = await supabase.auth.signInWithPassword({
+  email: 'alice@example.com',
+  password: 'secret',
+})
+
+const token = data.session?.access_token
+```
+
+Token laufen nach einer Stunde ab. Verwenden Sie `supabase.auth.refreshSession()` oder die integrierte automatische Erneuerung des Supabase-Clients, um einen neuen zu erhalten.
+
+### Den Token verwenden
+
+Übergeben Sie den Token im `Authorization`-Header:
+
+```bash
+curl https://example.com/api/v1/me \
+  -H "Authorization: Bearer <access_token>"
+```
+
+```typescript
+const res = await fetch('/api/v1/me', {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+})
+const user = await res.json()
+```
+
+## API-Schlüssel
+
+Verwenden Sie einen API-Schlüssel für Server-zu-Server-Integrationen, bei denen kein interaktiver Benutzer vorhanden ist. API-Schlüssel sind langlebig und auf die Gruppe beschränkt.
+
+### API-Schlüssel erhalten
+
+1. Melden Sie sich als Administrator an.
+2. Gehen Sie zu **Admin → Einstellungen → API-Schlüssel**.
+3. Klicken Sie auf **Neuer API-Schlüssel**, geben Sie einen Namen ein und wählen Sie einen Geltungsbereich:
+   - **Gruppe** — Machine-to-Machine-Zugriff; kein Benutzerkontext.
+   - **Benutzer** — handelt im Namen eines bestimmten Benutzers.
+4. Kopieren Sie den Schlüssel sofort. Er wird **nur einmal** angezeigt und nie im Klartext gespeichert.
+
+Schlüssel folgen dem Format `sk_027_<32 zufällige Zeichen>` (z. B. `sk_027_AbCdEfGhIjKlMnOpQrStUvWxYz012345`).
+
+### Den API-Schlüssel verwenden
+
+Übergeben Sie den Schlüssel im `X-API-Key`-Header:
+
+```bash
+curl https://example.com/api/v1/apps \
+  -H "X-API-Key: sk_027_AbCdEfGhIjKlMnOpQrStUvWxYz012345"
+```
+
+```typescript
+const res = await fetch('/api/v1/apps', {
+  headers: {
+    'X-API-Key': 'sk_027_AbCdEfGhIjKlMnOpQrStUvWxYz012345',
+  },
+})
+const apps = await res.json()
+```
+
+### API-Schlüssel widerrufen
+
+Gehen Sie zu **Admin → Einstellungen → API-Schlüssel** und klicken Sie neben dem Schlüssel auf **Widerrufen**. Widerrufene Schlüssel werden sofort abgelehnt.
+
+## Wahl zwischen JWT und API-Schlüssel
+
+| Situation | Verwenden |
+|---|---|
+| Mobile oder Browser-App, Benutzer ist angemeldet | JWT |
+| Backend-Dienst oder geplanter Job | API Key (Gruppenbereich) |
+| Im Namen eines bestimmten Benutzers ohne interaktive Authentifizierung handeln | API Key (Benutzerbereich) |
+| Öffentliche Gruppendaten lesen (Sprachen) | Keine Authentifizierung |
+
+## Fehlerantworten
+
+| Szenario | HTTP | `error`-Code |
+|---|---|---|
+| Keine Anmeldedaten angegeben | 401 | `unauthorized` |
+| Token ist abgelaufen oder fehlerhaft | 401 | `unauthorized` |
+| Benutzer ist kein Mitglied einer Gruppe | 403 | `forbidden` |
+| API-Schlüssel ist widerrufen oder unbekannt | 401 | `unauthorized` |
+
+Die vollständige Fehlerreferenz finden Sie unter [Fehler](/docs/api/errors).

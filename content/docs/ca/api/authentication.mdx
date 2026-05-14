@@ -1,0 +1,106 @@
+---
+title: Autenticació
+description: Com autenticar les sol·licituds a la REST API de 027Apps amb JWT o claus d'API.
+---
+
+# Autenticació
+
+L'API de 027Apps admet dos tipus de credencials: **tokens JWT** emesos per Supabase Auth i **claus d'API** generades des del tauler d'administració.
+
+## JWT (token Bearer)
+
+Utilitza un JWT quan construeixis un client de navegador o mòbil on un usuari ha iniciat sessió. El token identifica tant l'usuari com el grup al qual pertany.
+
+### Obtenir un token
+
+Inicia sessió mitjançant la pàgina d'inici de sessió de l'aplicació o directament amb l'API de Supabase Auth. Després d'un inici de sessió correcte, Supabase retorna un `access_token`:
+
+```typescript
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+const { data, error } = await supabase.auth.signInWithPassword({
+  email: 'alice@example.com',
+  password: 'secret',
+})
+
+const token = data.session?.access_token
+```
+
+Els tokens caduquen al cap d'una hora. Utilitza `supabase.auth.refreshSession()` o la renovació automàtica integrada del client de Supabase per obtenir-ne un de nou.
+
+### Usar el token
+
+Passa el token a la capçalera `Authorization`:
+
+```bash
+curl https://example.com/api/v1/me \
+  -H "Authorization: Bearer <access_token>"
+```
+
+```typescript
+const res = await fetch('/api/v1/me', {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+})
+const user = await res.json()
+```
+
+## Clau d'API
+
+Utilitza una clau d'API per a integracions servidor a servidor on no hi ha cap usuari interactiu. Les claus d'API tenen una llarga durada i estan associades al grup.
+
+### Obtenir una clau d'API
+
+1. Inicia sessió com a administrador.
+2. Ves a **Admin → Configuració → Claus d'API**.
+3. Fes clic a **Nova clau d'API**, introdueix un nom i tria un àmbit:
+   - **Grup** — accés màquina a màquina; sense context d'usuari.
+   - **Usuari** — actua en nom d'un usuari específic.
+4. Copia la clau immediatament. Es mostra **només una vegada** i no s'emmagatzema mai en text pla.
+
+Les claus segueixen el format `sk_027_<32 caràcters aleatoris>` (p. ex. `sk_027_AbCdEfGhIjKlMnOpQrStUvWxYz012345`).
+
+### Usar una clau d'API
+
+Passa la clau a la capçalera `X-API-Key`:
+
+```bash
+curl https://example.com/api/v1/apps \
+  -H "X-API-Key: sk_027_AbCdEfGhIjKlMnOpQrStUvWxYz012345"
+```
+
+```typescript
+const res = await fetch('/api/v1/apps', {
+  headers: {
+    'X-API-Key': 'sk_027_AbCdEfGhIjKlMnOpQrStUvWxYz012345',
+  },
+})
+const apps = await res.json()
+```
+
+### Revocar una clau d'API
+
+Ves a **Admin → Configuració → Claus d'API** i fes clic a **Revocar** al costat de la clau. Les claus revocades es rebutgen immediatament.
+
+## Triar entre JWT i clau d'API
+
+| Situació | Usar |
+|---|---|
+| Aplicació mòbil o de navegador, usuari ha iniciat sessió | JWT |
+| Servei backend o tasca programada | API Key (àmbit de grup) |
+| Actuar en nom d'un usuari específic sense autenticació interactiva | API Key (àmbit d'usuari) |
+| Llegir dades públiques del grup (idiomes) | Sense autenticació |
+
+## Respostes d'error
+
+| Escenari | HTTP | Codi `error` |
+|---|---|---|
+| No s'han proporcionat credencials | 401 | `unauthorized` |
+| El token ha caducat o és malformat | 401 | `unauthorized` |
+| L'usuari no és membre de cap grup | 403 | `forbidden` |
+| La clau d'API està revocada o és desconeguda | 401 | `unauthorized` |
+
+Consulta [Errors](/docs/api/errors) per a la referència completa d'errors.

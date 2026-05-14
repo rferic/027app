@@ -1,0 +1,100 @@
+---
+title: Vue d'ensemble de la REST API
+description: REST API v1 de 027Apps — concepts de base, versionnage et format des réponses.
+---
+
+# REST API v1
+
+La REST API de 027Apps permet aux applications externes et au client mobile d'interagir avec la plateforme de manière programmatique.
+
+**URL de base**
+
+```
+/api/v1
+```
+
+Tous les endpoints sont relatifs à ce chemin de base. L'API est versionnée via le préfixe d'URL ; les changements incompatibles introduiront une nouvelle version (`/api/v2`).
+
+## Vérification de l'état
+
+```bash
+GET /api/v1
+```
+
+Retourne la version actuelle de l'API et son statut. Aucune authentification requise.
+
+```json
+{
+  "version": "v1",
+  "status": "ok"
+}
+```
+
+## Authentification
+
+L'API prend en charge trois niveaux d'authentification :
+
+| Niveau | En-tête | Quand l'utiliser |
+|---|---|---|
+| Public | — | Endpoints exposant des données non sensibles du groupe |
+| API Key | `X-API-Key: sk_027_...` | Intégrations serveur à serveur |
+| JWT | `Authorization: Bearer <token>` | Application mobile et clients navigateur |
+
+Consultez [Authentification](/docs/api/authentication) pour plus de détails sur la façon d'obtenir des identifiants et le comportement de chaque méthode.
+
+## Format des réponses
+
+Les réponses de succès retournent la ressource directement — sans enveloppe externe :
+
+```json
+{ "id": "abc123", "name": "Alice" }
+```
+
+Les endpoints de liste retournent un tableau JSON :
+
+```json
+[
+  { "slug": "calendar", "enabled": true },
+  { "slug": "tasks", "enabled": true }
+]
+```
+
+Les réponses de liste paginées incluent un en-tête `Link` (RFC 5988) lorsqu'il y a des pages supplémentaires :
+
+```
+Link: </api/v1/items?page=2>; rel="next"
+```
+
+Les réponses d'erreur utilisent toujours la même enveloppe :
+
+```json
+{
+  "error": "not_found",
+  "message": "User not found"
+}
+```
+
+Les erreurs de validation incluent un objet `fields` :
+
+```json
+{
+  "error": "validation_failed",
+  "message": "Input is invalid",
+  "fields": {
+    "email": "must be a valid email address"
+  }
+}
+```
+
+Consultez [Erreurs](/docs/api/errors) pour la référence complète des erreurs.
+
+## Endpoints
+
+| Méthode | Chemin | Auth | Description |
+|---|---|---|---|
+| `GET` | `/api/v1` | Public | Vérification de l'état |
+| `GET` | `/api/v1/me` | JWT | Informations sur l'utilisateur authentifié |
+| `GET` | `/api/v1/apps` | JWT ou API Key | Applications du groupe |
+| `GET` | `/api/v1/locales` | Public | Langues actives du groupe |
+
+Consultez [Endpoints](/docs/api/endpoints) pour la référence complète.

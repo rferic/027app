@@ -1,0 +1,345 @@
+{
+  "auth": {
+    "login": "Anmelden",
+    "logout": "Abmelden",
+    "email": "E-Mail-Adresse",
+    "password": "Passwort",
+    "loginError": "Falsche Anmeldedaten",
+    "blockedError": "Dein Konto wurde gesperrt. Bitte wende dich an den Administrator.",
+    "blockedTitle": "Konto gesperrt",
+    "blockedDesc": "Dein Konto wurde gesperrt. Wende dich an den Administrator, um den Zugang wiederherzustellen.",
+    "adminOnly": "Nur Administratoren können auf diesen Bereich zugreifen",
+    "subtitle": "Deine Gruppe, deine Apps."
+  },
+  "home": {
+    "noApps": "Noch keine Apps verfügbar.",
+    "noAppsDesc": "Deine Apps erscheinen hier, sobald der Administrator sie eingerichtet hat."
+  },
+  "nav": {
+    "dashboard": "Startseite",
+    "backoffice": "Backoffice",
+    "docs": "Dokumentation"
+  },
+  "common": {
+    "loading": "Laden...",
+    "error": "Ein Fehler ist aufgetreten"
+  },
+  "admin": {
+    "title": "Kontrollzentrum",
+    "nav": {
+      "dashboard": "Dashboard",
+      "users": "Benutzer",
+      "members": "Mitglieder",
+      "admins": "Administratoren",
+      "invitations": "Einladungen",
+      "profile": "Mein Profil",
+      "settings": "Einstellungen",
+      "general": "Allgemein",
+      "api_keys": "API-Schlüssel",
+      "menu": "Menü",
+      "apps": "Apps"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "subtitle": "Übersicht der Gruppe",
+      "recentUsers": "Neueste Benutzer",
+      "recentInvitations": "Neueste Einladungen",
+      "viewAll": "Alle anzeigen →",
+      "newInvitation": "+ Neue Einladung",
+      "noUsers": "Noch keine Benutzer.",
+      "noInvitations": "Noch keine Einladungen.",
+      "statsUsers": "Benutzer",
+      "statsAdmins": "Admins",
+      "statsMembers": "Mitglieder",
+      "statsPending": "Ausstehende Einladungen"
+    },
+    "users": {
+      "title": "Mitglieder",
+      "subtitle": "{count} registrierter Benutzer",
+      "subtitlePlural": "{count} registrierte Benutzer"
+    },
+    "admins": {
+      "title": "Administratoren",
+      "subtitle": "{count} Administrator",
+      "subtitlePlural": "{count} Administratoren"
+    },
+    "invitations": {
+      "title": "Einladungen",
+      "subtitle": "{count} Einladung",
+      "subtitlePlural": "{count} Einladungen",
+      "new": "Neue Einladung",
+      "newTitle": "Neue Einladung",
+      "newSubtitle": "Erstelle einen Link, um jemanden zur Plattform einzuladen.",
+      "table": {
+        "title": "Titel",
+        "role": "Rolle",
+        "email": "E-Mail",
+        "status": "Status",
+        "expires": "Läuft ab",
+        "copyLink": "Link kopieren",
+        "revoke": "Widerrufen",
+        "delete": "Löschen",
+        "noInvitations": "Noch keine Einladungen.",
+        "any": "beliebig",
+        "cancel": "Abbrechen",
+        "confirmRevokeTitle": "Einladung widerrufen?",
+        "confirmRevokeDesc": "Dieser Einladungslink wird nicht mehr funktionieren.",
+        "confirmDeleteTitle": "Einladung löschen?",
+        "confirmDeleteDesc": "Diese Aktion kann nicht rückgängig gemacht werden."
+      },
+      "status": {
+        "pending": "Ausstehend",
+        "accepted": "Angenommen",
+        "expired": "Abgelaufen",
+        "revoked": "Widerrufen"
+      },
+      "form": {
+        "titleLabel": "Titel",
+        "titlePlaceholder": "z.B. Hans Müller — Frontend Dev",
+        "titleHelp": "Internes Label zur Identifizierung dieser Einladung.",
+        "roleLabel": "Rolle",
+        "roleMember": "Mitglied",
+        "roleAdmin": "Admin",
+        "emailLabel": "E-Mail",
+        "emailOptional": "(optional)",
+        "emailPlaceholder": "Leer lassen für beliebige E-Mail",
+        "emailHelp": "Wenn angegeben, kann nur diese E-Mail den Link verwenden.",
+        "expiresLabel": "Ablaufdatum",
+        "submit": "Einladung erstellen",
+        "submitting": "Erstellen…",
+        "cancel": "Abbrechen",
+        "createdTitle": "Einladung erstellt",
+        "createdDesc": "Teile diesen Link mit dem Eingeladenen:",
+        "copy": "Kopieren",
+        "copyFailed": "Kopieren fehlgeschlagen",
+        "backToInvitations": "← Zurück zu Einladungen"
+      }
+    },
+    "profile": {
+      "title": "Mein Profil",
+      "subtitle": "Bearbeite deinen Namen und deine Sprachpräferenz.",
+      "personalInfo": "Persönliche Informationen",
+      "displayName": "Anzeigename",
+      "language": "Sprachpräferenz",
+      "languageNote": "Legt die Sprache für den App-Bereich fest.",
+      "save": "Änderungen speichern",
+      "saving": "Speichern…",
+      "saved": "Profil erfolgreich aktualisiert.",
+      "changePassword": "Passwort ändern",
+      "newPassword": "Neues Passwort",
+      "confirmPassword": "Neues Passwort bestätigen",
+      "changePasswordBtn": "Passwort ändern",
+      "changingPassword": "Ändern…",
+      "passwordChanged": "Passwort erfolgreich geändert.",
+      "minPasswordChars": "Mind. 8 Zeichen"
+    },
+    "table": {
+      "user": "Benutzer",
+      "email": "E-Mail",
+      "role": "Rolle",
+      "locale": "Sprache",
+      "lastLogin": "Letzte Anmeldung",
+      "actions": "Aktionen",
+      "edit": "Bearbeiten",
+      "block": "Sperren",
+      "unblock": "Entsperren",
+      "makeAdmin": "Admin machen",
+      "makeMember": "Mitglied machen",
+      "noUsers": "Noch keine Benutzer.",
+      "blockedBadge": "gesperrt",
+      "cancel": "Abbrechen",
+      "confirmBlockTitle": "Benutzer sperren?",
+      "confirmBlockDesc": "Dieser Benutzer kann sich erst nach dem Entsperren wieder anmelden.",
+      "confirmMakeMemberTitle": "Admin-Zugang entfernen?",
+      "confirmMakeMemberDesc": "Dieser Benutzer verliert den Zugang zum Adminbereich.",
+      "delete": "Löschen",
+      "confirmDeleteTitle": "Benutzer löschen?",
+      "confirmDeleteDesc": "Diese Aktion kann nicht rückgängig gemacht werden. Der Benutzer und alle seine Daten werden dauerhaft gelöscht."
+    },
+    "settings": {
+      "title": "Einstellungen",
+      "api_keys": {
+        "title": "API-Schlüssel",
+        "subtitle": "Verwalte API-Schlüssel für Drittanbieter-Integrationen.",
+        "new_key": "Neuer API-Schlüssel",
+        "no_keys": "Noch keine API-Schlüssel.",
+        "create_modal_title": "API-Schlüssel erstellen",
+        "key_name_label": "Name des Schlüssels",
+        "key_name_placeholder": "z.B. Mobile App",
+        "create_button": "Erstellen",
+        "created_title": "API-Schlüssel erstellt",
+        "created_warning": "Dieser Schlüssel wird nur einmal angezeigt. Kopiere ihn jetzt.",
+        "copy_button": "Kopieren",
+        "done_button": "Fertig",
+        "revoke_button": "Widerrufen",
+        "revoke_confirm_title": "API-Schlüssel widerrufen",
+        "revoke_confirm_message": "Bist du sicher? Diese Aktion kann nicht rückgängig gemacht werden.",
+        "cancel_button": "Abbrechen",
+        "scope_group": "Gruppe",
+        "scope_user": "Persönlich",
+        "prefix_label": "Schlüsselpräfix",
+        "created_at_label": "Erstellt",
+        "last_used_label": "Zuletzt verwendet",
+        "never": "Nie"
+      },
+      "general": {
+        "title": "Allgemein",
+        "subtitle": "Allgemeine Plattformeinstellungen.",
+        "languages": "Verfügbare Sprachen",
+        "languagesHelp": "Wähle die verfügbaren Sprachen für Benutzer aus.",
+        "defaultLocale": "Standardsprache",
+        "defaultLocaleHelp": "Die Standardsprache für neue Benutzer.",
+        "save": "Speichern",
+        "saving": "Speichern…",
+        "saved": "Einstellungen gespeichert.",
+        "atLeastOne": "Mindestens eine Sprache muss aktiv sein.",
+        "localeNames": {
+          "en": "Englisch",
+          "es": "Spanisch",
+          "it": "Italienisch",
+          "ca": "Katalanisch",
+          "fr": "Französisch",
+          "de": "Deutsch"
+        }
+      }
+    },
+    "editUser": {
+      "title": "Benutzer bearbeiten",
+      "back": "← Benutzer",
+      "save": "Änderungen speichern",
+      "saving": "Speichern…",
+      "saved": "Gespeichert",
+      "displayName": "Anzeigename",
+      "email": "E-Mail",
+      "role": "Rolle",
+      "locale": "Sprache",
+      "localeNote": "Der Benutzer kann dies auch in seinem eigenen Profil ändern",
+      "roleNote": "(Rolle in der Benutzertabelle ändern)",
+      "joined": "Beigetreten",
+      "lastLogin": "Letzte Anmeldung",
+      "status": "Status",
+      "active": "Aktiv",
+      "blocked": "Gesperrt"
+    },
+    "goToApp": "← App",
+    "apps": {
+      "title": "Apps",
+      "subtitle": "App-Module installieren und verwalten",
+      "install": "Installieren",
+      "uninstall": "Deinstallieren",
+      "configure": "Konfigurieren",
+      "saveConfig": "Speichern",
+      "cancel": "Abbrechen",
+      "processing": "Wird verarbeitet...",
+      "empty": "Keine Apps verfügbar.",
+      "noConfig": "Diese App hat keine konfigurierbaren Optionen.",
+      "boolTrue": "Ja",
+      "boolFalse": "Nein",
+      "configSaved": "Gespeichert",
+      "uninstall_confirm_title": "Anwendung deinstallieren?",
+      "uninstall_confirm_description": "Diese Aktion ist unwiderruflich. Alle Anwendungsdaten werden dauerhaft gelöscht und können nicht wiederhergestellt werden.",
+      "uninstall_confirm_button": "Ja, deinstallieren",
+      "visibility": {
+        "label": "Sichtbarkeit",
+        "public": "Öffentlich",
+        "private": "Privat"
+      },
+      "status": {
+        "active": "Aktiv",
+        "installing": "Installation",
+        "uninstalling": "Deinstallation",
+        "error": "Fehler"
+      },
+      "permissions": {
+        "title": "Zugang",
+        "visibility_public": "Öffentlich",
+        "visibility_private": "Privat",
+        "visibility_description_public": "Alle Gruppenmitglieder haben Zugang",
+        "visibility_description_private": "Nur Mitglieder mit explizitem Zugang",
+        "grant_access": "Zugang gewähren",
+        "revoke_access": "Widerrufen",
+        "has_access": "Hat Zugang",
+        "no_members": "Keine Mitglieder in der Gruppe",
+        "visibility_updated": "Sichtbarkeit aktualisiert",
+        "access_granted": "Zugang gewährt",
+        "access_revoked": "Zugang widerrufen"
+      }
+    }
+  },
+  "user": {
+    "editProfile": "Profil bearbeiten",
+    "signOut": "Abmelden"
+  },
+  "apps": {
+    "title": "Apps",
+    "install": "Installieren",
+    "uninstall": "Deinstallieren",
+    "configure": "Konfigurieren",
+    "status": {
+      "active": "Aktiv",
+      "installing": "Installation...",
+      "uninstalling": "Deinstallation...",
+      "error": "Fehler",
+      "invalid": "Ungültig",
+      "not_installed": "Nicht installiert"
+    },
+    "errors": {
+      "missing_manifest": "manifest.json nicht gefunden",
+      "missing_view": "view.tsx im Manifest deklariert, aber nicht gefunden",
+      "missing_admin": "admin.tsx im Manifest deklariert, aber nicht gefunden",
+      "missing_widget": "widget.tsx im Manifest deklariert, aber nicht gefunden",
+      "dependency_not_installed": "App \"{dep}\" muss zuerst installiert werden",
+      "extension_point_not_found": "App \"{base}\" stellt Erweiterungspunkt \"{point}\" nicht bereit",
+      "install_failed": "Installation fehlgeschlagen",
+      "uninstall_blocked": "Deinstallation nicht möglich: andere Apps hängen davon ab",
+      "prefix_conflict": "Das Tabellenpräfix '{prefix}' wird bereits von App '{slug}' verwendet",
+      "table_prefix_mismatch": "Tabelle '{table}' in migrations.sql verwendet nicht das im Manifest deklarierte Präfix '{prefix}'",
+      "uninstall_prefix_mismatch": "uninstall.sql operiert auf Tabelle '{table}', die nicht zu dieser App gehört (Präfix: '{prefix}')",
+      "migration_pending": "Eine Datenbankmigrierung steht aus. Führe die ausstehende Migration im Supabase SQL-Editor aus, bevor du diese App installierst."
+    },
+    "todo": {
+      "title": "Aufgaben",
+      "pending_label": "{count} ausstehend",
+      "done_label": "{count} erledigt",
+      "add_placeholder": "Neue Aufgabe...",
+      "add_button": "Hinzufügen",
+      "limit_reached": "Limit erreicht ({max} Aufgaben)",
+      "empty": "Noch keine Aufgaben",
+      "all_done": "Alles erledigt!",
+      "more_tasks": "{count} weitere Aufgabe(n)",
+      "open": "Öffnen",
+      "admin_title": "Aufgabenverwaltung",
+      "admin_subtitle": "{total} Aufgaben: {pending} ausstehend, {done} erledigt",
+      "admin_empty": "Keine Aufgaben im System"
+    },
+    "permissions": {
+      "title": "Zugang",
+      "visibility_public": "Öffentlich",
+      "visibility_private": "Privat",
+      "visibility_description_public": "Alle Gruppenmitglieder können zugreifen",
+      "visibility_description_private": "Nur Mitglieder mit explizitem Zugang",
+      "grant_access": "Zugang gewähren",
+      "revoke_access": "Widerrufen",
+      "has_access": "Hat Zugang",
+      "no_members": "Keine Mitglieder in der Gruppe",
+      "visibility_updated": "Sichtbarkeit aktualisiert",
+      "access_granted": "Zugang gewährt",
+      "access_revoked": "Zugang widerrufen"
+    }
+  },
+  "app": {
+    "nav": {
+      "home": "Startseite",
+      "profile": "Profil",
+      "more": "Mehr"
+    },
+    "dashboard": {
+      "welcome_title": "Willkommen",
+      "welcome_subtitle": "Ihre Gruppe hat noch keine aktiven Apps.",
+      "widgets_loading": "Laden..."
+    },
+    "header": {
+      "open_menu": "Menü öffnen"
+    }
+  }
+}

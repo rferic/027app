@@ -1,0 +1,172 @@
+---
+title: Erreurs
+description: Codes d'erreur standard, codes de statut HTTP et format des réponses pour la REST API de 027Apps.
+---
+
+# Erreurs
+
+Toutes les réponses d'erreur utilisent la même enveloppe JSON :
+
+```json
+{
+  "error": "error_code",
+  "message": "Human-readable description"
+}
+```
+
+Les erreurs de validation incluent en plus un objet `fields` qui associe chaque nom de champ invalide à un message d'erreur :
+
+```json
+{
+  "error": "validation_failed",
+  "message": "Input is invalid",
+  "fields": {
+    "email": "must be a valid email address",
+    "role": "must be 'admin' or 'member'"
+  }
+}
+```
+
+## Codes d'erreur
+
+### 400 — `validation_failed`
+
+Le corps de la requête ou les paramètres de requête n'ont pas passé la validation. L'objet `fields` indique quels champs sont invalides et pourquoi.
+
+```json
+{
+  "error": "validation_failed",
+  "message": "Input is invalid",
+  "fields": {
+    "slug": "slug is required"
+  }
+}
+```
+
+**Que faire :** Corrigez les champs indiqués dans `fields` et réessayez.
+
+---
+
+### 401 — `unauthorized`
+
+La requête ne contenait pas d'identifiants valides, ou les identifiants fournis sont expirés, révoqués ou malformés.
+
+```json
+{
+  "error": "unauthorized",
+  "message": "Invalid or expired token"
+}
+```
+
+Causes courantes :
+
+- En-tête `Authorization` ou `X-API-Key` manquant sur un endpoint protégé.
+- Le JWT a expiré — rafraîchissez la session et réessayez.
+- La clé d'API a été révoquée.
+
+**Que faire :** Obtenez de nouveaux identifiants et réessayez. Consultez [Authentification](/docs/api/authentication).
+
+---
+
+### 403 — `forbidden`
+
+Les identifiants sont valides, mais l'identité authentifiée n'a pas la permission d'accéder à la ressource.
+
+```json
+{
+  "error": "forbidden",
+  "message": "User is not a member of any group"
+}
+```
+
+**Que faire :** Vérifiez que l'utilisateur dispose du rôle ou de la permission d'application requis. Contactez l'administrateur du groupe si l'accès doit être accordé.
+
+---
+
+### 404 — `not_found`
+
+La ressource demandée n'existe pas.
+
+```json
+{
+  "error": "not_found",
+  "message": "App not found"
+}
+```
+
+**Que faire :** Vérifiez l'identifiant de la ressource. La ressource a peut-être été supprimée ou l'ID est incorrect.
+
+---
+
+### 409 — `conflict`
+
+La requête entre en conflit avec l'état actuel de la ressource.
+
+```json
+{
+  "error": "conflict",
+  "message": "A key with this name already exists"
+}
+```
+
+**Que faire :** Résolvez le conflit (ex. utilisez un nom différent, ou supprimez la ressource existante) et réessayez.
+
+---
+
+### 422 — `unprocessable`
+
+La requête est syntaxiquement valide, mais le serveur ne peut pas la traiter en raison de contraintes de logique métier.
+
+```json
+{
+  "error": "unprocessable",
+  "message": "Cannot revoke the last active admin key"
+}
+```
+
+**Que faire :** Lisez le champ `message` — il décrit la contrainte spécifique qui a été violée.
+
+---
+
+### 429 — `rate_limited`
+
+Le client a envoyé trop de requêtes en peu de temps.
+
+```json
+{
+  "error": "rate_limited",
+  "message": "Too many requests"
+}
+```
+
+**Que faire :** Attendez et réessayez après un délai. La réponse peut inclure un en-tête `Retry-After` indiquant combien de secondes attendre.
+
+---
+
+### 500 — `internal_error`
+
+Une erreur inattendue s'est produite côté serveur.
+
+```json
+{
+  "error": "internal_error",
+  "message": "An unexpected error occurred"
+}
+```
+
+**Que faire :** Réessayez la requête. Si l'erreur persiste, signalez-la à l'administrateur de la plateforme.
+
+---
+
+## Tableau récapitulatif
+
+| HTTP | `error` | Cause |
+|---|---|---|
+| 400 | `validation_failed` | Entrée invalide ; vérifiez `fields` |
+| 401 | `unauthorized` | Identifiants absents, expirés ou révoqués |
+| 403 | `forbidden` | Authentifié mais sans permission |
+| 404 | `not_found` | La ressource n'existe pas |
+| 409 | `conflict` | Conflit d'état |
+| 422 | `unprocessable` | Contrainte de logique métier |
+| 429 | `rate_limited` | Trop de requêtes |
+| 500 | `internal_error` | Erreur inattendue du serveur |

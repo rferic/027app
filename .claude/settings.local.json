@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__hub-filesystem__list_directory",
+      "Bash(pnpm tsc *)",
+      "Bash(pnpm add *)",
+      "Bash(pnpm build *)",
+      "Bash(node *)",
+      "Bash(timeout 15 pnpm dev)",
+      "Bash(pnpm dev *)",
+      "Bash(kill %1)",
+      "Bash(docker exec *)",
+      "Bash(supabase gen *)",
+      "Bash(pnpm test *)",
+      "mcp__hub-filesystem__read_file",
+      "Bash(grep -E \"--fd-\" /Users/ericrf/Sites/027apps/node_modules/fumadocs-ui/dist/style.css)",
+      "Bash(npx tsc *)",
+      "Bash(PORT=3003 npx playwright *)",
+      "Bash(npx playwright *)",
+      "Bash(pnpm lint *)",
+      "Bash(npm show *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/en/admin/apps)",
+      "Bash(curl *)",
+      "Bash(mkdir -p /Users/ericrf/Sites/027apps/src/app/\\\\\\(app\\\\\\)/\\\\[locale\\\\]/apps/\\\\[slug\\\\]/\\\\[\\\\[...path\\\\]\\\\])",
+      "Bash(mkdir -p /Users/ericrf/Sites/027apps/src/app/api/v1/apps/\\\\[slug\\\\]/\\\\[\\\\[...path\\\\]\\\\])",
+      "Bash(git *)"
+    ]
+  }
+}

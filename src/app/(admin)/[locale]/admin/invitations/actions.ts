@@ -1,0 +1,42 @@
+'use server'
+
+import { revalidatePath } from 'next/cache'
+import { cookies } from 'next/headers'
+import { requireAdmin } from '@/lib/auth/helpers'
+import { createInvitation as _create, revokeInvitation as _revoke, deleteInvitation as _delete } from '@/lib/use-cases/invitations'
+
+const VALID_LOCALES = ['en', 'es', 'it']
+
+async function getLocale(): Promise<string> {
+  const store = await cookies()
+  const raw = store.get('preferred-locale')?.value
+  return raw && VALID_LOCALES.includes(raw) ? raw : 'en'
+}
+
+export async function createInvitationAction(formData: FormData): Promise<{ error: string } | { token: string }> {
+  const { userId } = await requireAdmin()
+  const title = (formData.get('title') as string).trim()
+  const role = formData.get('role') as 'admin' | 'member'
+  const email = (formData.get('email') as string | null)?.trim() || null
+  const expiresAt = (formData.get('expires_at') as string | null) || null
+  if (!title) return { error: 'Title is required' }
+  const result = await _create({ title, role, email, expiresAt, invitedBy: userId })
+  if ('error' in result) return result
+  const locale = await getLocale()
+  revalidatePath(`/${locale}/admin/invitations`)
+  return { token: result.token }
+}
+
+export async function revokeInvitationAction(id: string): Promise<void> {
+  await requireAdmin()
+  await _revoke(id)
+  const locale = await getLocale()
+  revalidatePath(`/${locale}/admin/invitations`)
+}
+
+export async function deleteInvitationAction(id: string): Promise<void> {
+  await requireAdmin()
+  await _delete(id)
+  const locale = await getLocale()
+  revalidatePath(`/${locale}/admin/invitations`)
+}

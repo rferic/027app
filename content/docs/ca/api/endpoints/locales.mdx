@@ -1,0 +1,79 @@
+---
+title: GET /api/v1/locales
+description: Retorna els idiomes actius configurats per al grup. No requereix autenticació.
+---
+
+# GET /api/v1/locales
+
+Retorna els idiomes que estan actius per al grup, juntament amb l'idioma predeterminat del grup.
+
+Aquest endpoint és públic — no es requereix autenticació. Està pensat per a clients que necessiten conèixer els idiomes disponibles abans que l'usuari hagi iniciat sessió (p. ex. una pàgina d'inici de sessió o una vista pública).
+
+## Autenticació
+
+**Cap** — aquest endpoint és d'accés públic.
+
+## Sol·licitud
+
+```
+GET /api/v1/locales
+```
+
+No es requereixen capçaleres, paràmetres de consulta ni cos de sol·licitud.
+
+## Resposta
+
+**200 OK**
+
+```typescript
+type LocalesResponse = {
+  default: string    // The group's default locale (e.g. "en")
+  active: string[]   // All active locale codes, including the default
+}
+```
+
+Els codis d'idioma segueixen el format [IETF language tag](https://en.wikipedia.org/wiki/IETF_language_tag). La plataforma admet: `en`, `es`, `it`, `ca`, `fr`, `de`.
+
+Exemple:
+
+```json
+{
+  "default": "en",
+  "active": ["en", "es", "ca"]
+}
+```
+
+## Errors
+
+| HTTP | `error` | Causa |
+|---|---|---|
+| 404 | `not_found` | El grup no està configurat (no hauria de produir-se en una instal·lació correcta) |
+| 500 | `internal_error` | Error inesperat del servidor |
+
+## Exemples
+
+### curl
+
+```bash
+curl https://example.com/api/v1/locales
+```
+
+### fetch (TypeScript)
+
+```typescript
+type LocalesResponse = {
+  default: string
+  active: string[]
+}
+
+const res = await fetch('/api/v1/locales')
+
+if (!res.ok) {
+  const err = await res.json()
+  throw new Error(err.message)
+}
+
+const locales: LocalesResponse = await res.json()
+console.log(locales.default)  // "en"
+console.log(locales.active)   // ["en", "es", "ca"]
+```

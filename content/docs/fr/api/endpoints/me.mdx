@@ -1,0 +1,102 @@
+---
+title: GET /api/v1/me
+description: Retourne le profil de l'utilisateur authentifié, l'appartenance au groupe et le rôle.
+---
+
+# GET /api/v1/me
+
+Retourne le profil et l'appartenance au groupe de l'utilisateur actuellement authentifié.
+
+## Authentification
+
+**Requise :** JWT (`Authorization: Bearer <token>`)
+
+Les clés d'API ne sont pas acceptées sur cet endpoint. La réponse est toujours associée à l'utilisateur identifié par le token.
+
+## Requête
+
+```
+GET /api/v1/me
+Authorization: Bearer <access_token>
+```
+
+Aucun paramètre de requête ni corps de requête.
+
+## Réponse
+
+**200 OK**
+
+```typescript
+type MeResponse = {
+  id: string           // Supabase Auth user ID (UUID)
+  email: string        // User's email address
+  display_name: string | null
+  avatar_url: string   | null
+  locale: string       // User's preferred locale (e.g. "en", "es")
+  role: 'admin' | 'member'
+  joined_at: string    // ISO 8601 timestamp
+  created_at: string   // ISO 8601 timestamp
+  updated_at: string   // ISO 8601 timestamp
+}
+```
+
+Exemple :
+
+```json
+{
+  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "email": "alice@example.com",
+  "display_name": "Alice",
+  "avatar_url": null,
+  "locale": "en",
+  "role": "member",
+  "joined_at": "2025-03-15T10:22:00.000Z",
+  "created_at": "2025-03-15T10:22:00.000Z",
+  "updated_at": "2025-04-01T08:00:00.000Z"
+}
+```
+
+## Erreurs
+
+| HTTP | `error` | Cause |
+|---|---|---|
+| 401 | `unauthorized` | JWT absent, expiré ou malformé |
+| 403 | `forbidden` | Le token est valide mais l'utilisateur n'est membre d'aucun groupe |
+
+## Exemples
+
+### curl
+
+```bash
+curl https://example.com/api/v1/me \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+```
+
+### fetch (TypeScript)
+
+```typescript
+type MeResponse = {
+  id: string
+  email: string
+  display_name: string | null
+  avatar_url: string | null
+  locale: string
+  role: 'admin' | 'member'
+  joined_at: string
+  created_at: string
+  updated_at: string
+}
+
+const res = await fetch('/api/v1/me', {
+  headers: {
+    Authorization: `Bearer ${session.access_token}`,
+  },
+})
+
+if (!res.ok) {
+  const err = await res.json()
+  throw new Error(err.message)
+}
+
+const user: MeResponse = await res.json()
+```

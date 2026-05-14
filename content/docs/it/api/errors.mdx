@@ -1,0 +1,172 @@
+---
+title: Errori
+description: Codici di errore standard, codici di stato HTTP e formato delle risposte per la REST API di 027Apps.
+---
+
+# Errori
+
+Tutte le risposte di errore utilizzano lo stesso envelope JSON:
+
+```json
+{
+  "error": "error_code",
+  "message": "Human-readable description"
+}
+```
+
+Gli errori di validazione includono inoltre un oggetto `fields` che mappa ogni nome di campo non valido a un messaggio di errore:
+
+```json
+{
+  "error": "validation_failed",
+  "message": "Input is invalid",
+  "fields": {
+    "email": "must be a valid email address",
+    "role": "must be 'admin' or 'member'"
+  }
+}
+```
+
+## Codici di errore
+
+### 400 — `validation_failed`
+
+Il corpo della richiesta o i parametri di query non hanno superato la validazione. L'oggetto `fields` indica quali campi non sono validi e perché.
+
+```json
+{
+  "error": "validation_failed",
+  "message": "Input is invalid",
+  "fields": {
+    "slug": "slug is required"
+  }
+}
+```
+
+**Cosa fare:** Correggi i campi indicati in `fields` e riprova.
+
+---
+
+### 401 — `unauthorized`
+
+La richiesta non includeva credenziali valide, oppure le credenziali fornite sono scadute, revocate o malformate.
+
+```json
+{
+  "error": "unauthorized",
+  "message": "Invalid or expired token"
+}
+```
+
+Cause comuni:
+
+- Header `Authorization` o `X-API-Key` mancante su un endpoint protetto.
+- Il JWT è scaduto — aggiorna la sessione e riprova.
+- La chiave API è stata revocata.
+
+**Cosa fare:** Ottieni credenziali aggiornate e riprova. Consulta [Autenticazione](/docs/api/authentication).
+
+---
+
+### 403 — `forbidden`
+
+Le credenziali sono valide, ma l'identità autenticata non ha il permesso di accedere alla risorsa.
+
+```json
+{
+  "error": "forbidden",
+  "message": "User is not a member of any group"
+}
+```
+
+**Cosa fare:** Verifica che l'utente abbia il ruolo o il permesso applicazione richiesto. Contatta l'amministratore del gruppo se l'accesso dovrebbe essere concesso.
+
+---
+
+### 404 — `not_found`
+
+La risorsa richiesta non esiste.
+
+```json
+{
+  "error": "not_found",
+  "message": "App not found"
+}
+```
+
+**Cosa fare:** Controlla l'identificatore della risorsa. La risorsa potrebbe essere stata eliminata o l'ID potrebbe essere errato.
+
+---
+
+### 409 — `conflict`
+
+La richiesta è in conflitto con lo stato attuale della risorsa.
+
+```json
+{
+  "error": "conflict",
+  "message": "A key with this name already exists"
+}
+```
+
+**Cosa fare:** Risolvi il conflitto (es. usa un nome diverso, o elimina la risorsa esistente) e riprova.
+
+---
+
+### 422 — `unprocessable`
+
+La richiesta è sintatticamente valida, ma il server non può elaborarla a causa di vincoli di logica di business.
+
+```json
+{
+  "error": "unprocessable",
+  "message": "Cannot revoke the last active admin key"
+}
+```
+
+**Cosa fare:** Leggi il campo `message` — descrive il vincolo specifico che è stato violato.
+
+---
+
+### 429 — `rate_limited`
+
+Il client ha inviato troppe richieste in un breve periodo.
+
+```json
+{
+  "error": "rate_limited",
+  "message": "Too many requests"
+}
+```
+
+**Cosa fare:** Attendi e riprova dopo un ritardo. La risposta potrebbe includere un header `Retry-After` che indica quanti secondi attendere.
+
+---
+
+### 500 — `internal_error`
+
+Si è verificato un errore imprevisto lato server.
+
+```json
+{
+  "error": "internal_error",
+  "message": "An unexpected error occurred"
+}
+```
+
+**Cosa fare:** Riprova la richiesta. Se l'errore persiste, segnalalo all'amministratore della piattaforma.
+
+---
+
+## Tabella riepilogativa
+
+| HTTP | `error` | Causa |
+|---|---|---|
+| 400 | `validation_failed` | Input non valido; controlla `fields` |
+| 401 | `unauthorized` | Credenziali mancanti, scadute o revocate |
+| 403 | `forbidden` | Autenticato ma senza permesso |
+| 404 | `not_found` | La risorsa non esiste |
+| 409 | `conflict` | Conflitto di stato |
+| 422 | `unprocessable` | Vincolo di logica di business |
+| 429 | `rate_limited` | Troppe richieste |
+| 500 | `internal_error` | Errore imprevisto del server |

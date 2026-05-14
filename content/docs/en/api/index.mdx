@@ -1,0 +1,100 @@
+---
+title: REST API Overview
+description: 027Apps REST API v1 — base concepts, versioning, and response format.
+---
+
+# REST API v1
+
+The 027Apps REST API allows external applications and the mobile client to interact with the platform programmatically.
+
+**Base URL**
+
+```
+/api/v1
+```
+
+All endpoints are relative to this base path. The API is versioned via the URL prefix; breaking changes will introduce a new version (`/api/v2`).
+
+## Health check
+
+```bash
+GET /api/v1
+```
+
+Returns the current API version and status. No authentication required.
+
+```json
+{
+  "version": "v1",
+  "status": "ok"
+}
+```
+
+## Authentication
+
+The API supports three authentication levels:
+
+| Level | Header | When to use |
+|---|---|---|
+| Public | — | Endpoints that expose non-sensitive, group-wide data |
+| API Key | `X-API-Key: sk_027_...` | Server-to-server integrations |
+| JWT | `Authorization: Bearer <token>` | Mobile app and browser clients |
+
+See [Authentication](/docs/api/authentication) for details on how to obtain credentials and how each method behaves.
+
+## Response format
+
+Success responses return the resource directly — no outer envelope:
+
+```json
+{ "id": "abc123", "name": "Alice" }
+```
+
+List endpoints return a JSON array:
+
+```json
+[
+  { "slug": "calendar", "enabled": true },
+  { "slug": "tasks", "enabled": true }
+]
+```
+
+Paginated list responses include a `Link` header (RFC 5988) when there are additional pages:
+
+```
+Link: </api/v1/items?page=2>; rel="next"
+```
+
+Error responses always use the same envelope:
+
+```json
+{
+  "error": "not_found",
+  "message": "User not found"
+}
+```
+
+Validation errors include a `fields` object:
+
+```json
+{
+  "error": "validation_failed",
+  "message": "Input is invalid",
+  "fields": {
+    "email": "must be a valid email address"
+  }
+}
+```
+
+See [Errors](/docs/api/errors) for the full error reference.
+
+## Endpoints
+
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| `GET` | `/api/v1` | Public | Health check |
+| `GET` | `/api/v1/me` | JWT | Authenticated user info |
+| `GET` | `/api/v1/apps` | JWT or API Key | Group apps |
+| `GET` | `/api/v1/locales` | Public | Active locales for the group |
+
+See [Endpoints](/docs/api/endpoints) for the full reference.

@@ -1,0 +1,105 @@
+---
+title: Internationalization
+description: How 027Apps handles multiple languages — locales, user preferences, and message files.
+---
+
+# Internationalization
+
+027Apps supports 6 locales across the public web, admin panel, and API responses.
+
+## Supported locales
+
+| Code | Language   | Default |
+|------|------------|---------|
+| `en` | English    | Yes     |
+| `es` | Spanish    |         |
+| `it` | Italian    |         |
+| `ca` | Catalan    |         |
+| `fr` | French     |         |
+| `de` | German     |         |
+
+## Locale resolution
+
+When rendering a page or returning a localized response, the platform resolves the active locale in the following order:
+
+1. **User preference** — `profiles.locale` for the authenticated user
+2. **Group default** — `group_settings.default_locale` for the current group
+3. **Fallback** — `en`
+
+## Group settings
+
+Each group stores its locale configuration in the `group_settings` table:
+
+| Column | Type | Description |
+|---|---|---|
+| `active_locales` | `text[]` | Array of locale codes enabled for this group |
+| `default_locale` | `text` | Locale used when no user preference is set |
+
+Group admins can configure these values in the admin panel under **Settings → General**.
+
+## URL structure
+
+The public web uses locale-prefixed URLs:
+
+```
+/{locale}/...
+```
+
+Examples:
+- `/en/` — English home
+- `/es/apps/calendar` — Spanish calendar app
+- `/it/profile` — Italian profile page
+
+Locale is embedded in the URL path, not in request headers.
+
+## GET /api/v1/locales
+
+Returns the locales available for the authenticated user's group.
+
+**Auth:** `public` (no authentication required)
+
+**Response `200 OK`:**
+
+```json
+[
+  { "code": "en", "name": "English", "is_default": true },
+  { "code": "es", "name": "Spanish", "is_default": false },
+  { "code": "ca", "name": "Catalan", "is_default": false }
+]
+```
+
+Only locales listed in `group_settings.active_locales` are returned. The `is_default` field reflects `group_settings.default_locale`.
+
+## Profile locale
+
+The authenticated user's preferred locale is stored in `profiles.locale`. When set, it takes precedence over the group default.
+
+<Callout type="info">
+  Profile locale update via API is planned for a future sprint. Currently it can be changed from the profile page in the web UI.
+</Callout>
+
+## Message files
+
+UI strings are stored in JSON files, one per locale:
+
+```
+src/i18n/messages/
+  en.json
+  es.json
+  it.json
+  ca.json
+  fr.json
+  de.json
+```
+
+All 6 files must have **identical keys**. Missing keys fall back to `en`. Key namespaces follow this structure:
+
+| Namespace | Scope |
+|---|---|
+| `auth` | Login, logout, session messages |
+| `home` | Public home page |
+| `nav` | Navigation labels |
+| `common` | Shared UI labels (save, cancel, etc.) |
+| `admin.*` | Admin panel sections |
+| `user` | User profile strings |
+| `profile` | Profile page strings |

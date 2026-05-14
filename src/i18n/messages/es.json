@@ -1,0 +1,345 @@
+{
+  "auth": {
+    "login": "Iniciar sesión",
+    "logout": "Cerrar sesión",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "loginError": "Credenciales incorrectas",
+    "blockedError": "Tu cuenta ha sido bloqueada. Contacta con el administrador.",
+    "blockedTitle": "Cuenta suspendida",
+    "blockedDesc": "Tu cuenta ha sido suspendida. Contacta con el administrador para recuperar el acceso.",
+    "adminOnly": "Solo administradores pueden acceder aquí",
+    "subtitle": "Tu grupo, tus apps."
+  },
+  "home": {
+    "noApps": "Aún no tienes apps disponibles.",
+    "noAppsDesc": "Tus apps aparecerán aquí cuando el administrador las configure."
+  },
+  "nav": {
+    "dashboard": "Inicio",
+    "backoffice": "Backoffice",
+    "docs": "Documentación"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Ha ocurrido un error"
+  },
+  "admin": {
+    "title": "Panel de control",
+    "nav": {
+      "dashboard": "Inicio",
+      "users": "Usuarios",
+      "members": "Miembros",
+      "admins": "Administradores",
+      "invitations": "Invitaciones",
+      "profile": "Mi perfil",
+      "settings": "Configuración",
+      "general": "General",
+      "api_keys": "Claves API",
+      "menu": "Menú",
+      "apps": "Aplicaciones"
+    },
+    "dashboard": {
+      "title": "Inicio",
+      "subtitle": "Vista general del grupo",
+      "recentUsers": "Usuarios recientes",
+      "recentInvitations": "Invitaciones recientes",
+      "viewAll": "Ver todos →",
+      "newInvitation": "+ Nueva invitación",
+      "noUsers": "Aún no hay usuarios.",
+      "noInvitations": "Aún no hay invitaciones.",
+      "statsUsers": "Usuarios",
+      "statsAdmins": "Admins",
+      "statsMembers": "Miembros",
+      "statsPending": "Invitaciones pendientes"
+    },
+    "users": {
+      "title": "Miembros",
+      "subtitle": "{count} usuario registrado",
+      "subtitlePlural": "{count} usuarios registrados"
+    },
+    "admins": {
+      "title": "Administradores",
+      "subtitle": "{count} administrador",
+      "subtitlePlural": "{count} administradores"
+    },
+    "invitations": {
+      "title": "Invitaciones",
+      "subtitle": "{count} invitación",
+      "subtitlePlural": "{count} invitaciones",
+      "new": "Nueva invitación",
+      "newTitle": "Nueva invitación",
+      "newSubtitle": "Crea un enlace para invitar a alguien a la plataforma.",
+      "table": {
+        "title": "Título",
+        "role": "Rol",
+        "email": "Correo",
+        "status": "Estado",
+        "expires": "Expira",
+        "copyLink": "Copiar enlace",
+        "revoke": "Revocar",
+        "delete": "Eliminar",
+        "noInvitations": "Aún no hay invitaciones.",
+        "any": "cualquiera",
+        "cancel": "Cancelar",
+        "confirmRevokeTitle": "¿Revocar invitación?",
+        "confirmRevokeDesc": "Este enlace de invitación dejará de funcionar.",
+        "confirmDeleteTitle": "¿Eliminar invitación?",
+        "confirmDeleteDesc": "Esta acción no se puede deshacer."
+      },
+      "status": {
+        "pending": "Pendiente",
+        "accepted": "Aceptada",
+        "expired": "Expirada",
+        "revoked": "Revocada"
+      },
+      "form": {
+        "titleLabel": "Título",
+        "titlePlaceholder": "ej. Juan García — Frontend Dev",
+        "titleHelp": "Etiqueta interna para identificar esta invitación.",
+        "roleLabel": "Rol",
+        "roleMember": "Miembro",
+        "roleAdmin": "Admin",
+        "emailLabel": "Correo",
+        "emailOptional": "(opcional)",
+        "emailPlaceholder": "Déjalo en blanco para permitir cualquier correo",
+        "emailHelp": "Si se indica, solo ese correo podrá usar el enlace.",
+        "expiresLabel": "Fecha de expiración",
+        "submit": "Crear invitación",
+        "submitting": "Creando…",
+        "cancel": "Cancelar",
+        "createdTitle": "Invitación creada",
+        "createdDesc": "Comparte este enlace con la persona invitada:",
+        "copy": "Copiar",
+        "copyFailed": "Error al copiar",
+        "backToInvitations": "← Volver a invitaciones"
+      }
+    },
+    "profile": {
+      "title": "Mi perfil",
+      "subtitle": "Edita tu nombre y preferencia de idioma.",
+      "personalInfo": "Información personal",
+      "displayName": "Nombre visible",
+      "language": "Preferencia de idioma",
+      "languageNote": "Esto define el idioma del área de la app.",
+      "save": "Guardar cambios",
+      "saving": "Guardando…",
+      "saved": "Perfil actualizado correctamente.",
+      "changePassword": "Cambiar contraseña",
+      "newPassword": "Nueva contraseña",
+      "confirmPassword": "Confirmar nueva contraseña",
+      "changePasswordBtn": "Cambiar contraseña",
+      "changingPassword": "Cambiando…",
+      "passwordChanged": "Contraseña cambiada correctamente.",
+      "minPasswordChars": "Mín. 8 caracteres"
+    },
+    "table": {
+      "user": "Usuario",
+      "email": "Correo",
+      "role": "Rol",
+      "locale": "Idioma",
+      "lastLogin": "Último acceso",
+      "actions": "Acciones",
+      "edit": "Editar",
+      "block": "Bloquear",
+      "unblock": "Desbloquear",
+      "makeAdmin": "Hacer admin",
+      "makeMember": "Hacer miembro",
+      "noUsers": "Aún no hay usuarios.",
+      "blockedBadge": "bloqueado",
+      "cancel": "Cancelar",
+      "confirmBlockTitle": "¿Bloquear usuario?",
+      "confirmBlockDesc": "Este usuario no podrá iniciar sesión hasta que se desbloquee.",
+      "confirmMakeMemberTitle": "¿Eliminar acceso de admin?",
+      "confirmMakeMemberDesc": "Este usuario perderá el acceso al panel de administración.",
+      "delete": "Eliminar",
+      "confirmDeleteTitle": "¿Eliminar usuario?",
+      "confirmDeleteDesc": "Esta acción no se puede deshacer. El usuario y todos sus datos se eliminarán permanentemente."
+    },
+    "settings": {
+      "title": "Configuración",
+      "api_keys": {
+        "title": "Claves API",
+        "subtitle": "Gestiona las claves API para integraciones de terceros.",
+        "new_key": "Nueva clave API",
+        "no_keys": "Sin claves API todavía.",
+        "create_modal_title": "Crear clave API",
+        "key_name_label": "Nombre de la clave",
+        "key_name_placeholder": "ej. App móvil",
+        "create_button": "Crear",
+        "created_title": "Clave API creada",
+        "created_warning": "Esta clave solo se mostrará una vez. Cópiala ahora.",
+        "copy_button": "Copiar",
+        "done_button": "Listo",
+        "revoke_button": "Revocar",
+        "revoke_confirm_title": "Revocar clave API",
+        "revoke_confirm_message": "¿Estás seguro? Esta acción no se puede deshacer.",
+        "cancel_button": "Cancelar",
+        "scope_group": "Grupo",
+        "scope_user": "Personal",
+        "prefix_label": "Prefijo de la clave",
+        "created_at_label": "Creada",
+        "last_used_label": "Último uso",
+        "never": "Nunca"
+      },
+      "general": {
+        "title": "General",
+        "subtitle": "Configuración general de la plataforma.",
+        "languages": "Idiomas disponibles",
+        "languagesHelp": "Selecciona los idiomas disponibles para los usuarios.",
+        "defaultLocale": "Idioma por defecto",
+        "defaultLocaleHelp": "El idioma por defecto para nuevos usuarios.",
+        "save": "Guardar",
+        "saving": "Guardando…",
+        "saved": "Configuración guardada.",
+        "atLeastOne": "Al menos un idioma debe estar activo.",
+        "localeNames": {
+          "en": "Inglés",
+          "es": "Español",
+          "it": "Italiano",
+          "ca": "Catalán",
+          "fr": "Francés",
+          "de": "Alemán"
+        }
+      }
+    },
+    "editUser": {
+      "title": "Editar usuario",
+      "back": "← Usuarios",
+      "save": "Guardar cambios",
+      "saving": "Guardando…",
+      "saved": "Cambios guardados",
+      "displayName": "Nombre visible",
+      "email": "Correo",
+      "role": "Rol",
+      "locale": "Idioma",
+      "localeNote": "El usuario también puede cambiarlo desde su propio perfil",
+      "roleNote": "(cambia el rol desde la tabla de usuarios)",
+      "joined": "Registrado",
+      "lastLogin": "Último acceso",
+      "status": "Estado",
+      "active": "Activo",
+      "blocked": "Bloqueado"
+    },
+    "goToApp": "← App",
+    "apps": {
+      "title": "Aplicaciones",
+      "subtitle": "Instala y gestiona módulos de aplicación",
+      "install": "Instalar",
+      "uninstall": "Desinstalar",
+      "configure": "Configurar",
+      "saveConfig": "Guardar",
+      "cancel": "Cancelar",
+      "processing": "Procesando...",
+      "empty": "No hay aplicaciones disponibles.",
+      "noConfig": "Esta aplicación no tiene opciones configurables.",
+      "boolTrue": "Sí",
+      "boolFalse": "No",
+      "configSaved": "Guardado",
+      "uninstall_confirm_title": "¿Desinstalar aplicación?",
+      "uninstall_confirm_description": "Esta acción es irreversible. Se eliminarán todos los datos de la aplicación y no podrán recuperarse.",
+      "uninstall_confirm_button": "Sí, desinstalar",
+      "visibility": {
+        "label": "Visibilidad",
+        "public": "Pública",
+        "private": "Privada"
+      },
+      "status": {
+        "active": "Activa",
+        "installing": "Instalando",
+        "uninstalling": "Desinstalando",
+        "error": "Error"
+      },
+      "permissions": {
+        "title": "Acceso",
+        "visibility_public": "Pública",
+        "visibility_private": "Privada",
+        "visibility_description_public": "Todos los miembros del grupo pueden acceder",
+        "visibility_description_private": "Solo los miembros con acceso explícito",
+        "grant_access": "Dar acceso",
+        "revoke_access": "Revocar",
+        "has_access": "Con acceso",
+        "no_members": "No hay miembros en el grupo",
+        "visibility_updated": "Visibilidad actualizada",
+        "access_granted": "Acceso concedido",
+        "access_revoked": "Acceso revocado"
+      }
+    }
+  },
+  "user": {
+    "editProfile": "Editar perfil",
+    "signOut": "Cerrar sesión"
+  },
+  "apps": {
+    "title": "Aplicaciones",
+    "install": "Instalar",
+    "uninstall": "Desinstalar",
+    "configure": "Configurar",
+    "status": {
+      "active": "Activa",
+      "installing": "Instalando...",
+      "uninstalling": "Desinstalando...",
+      "error": "Error",
+      "invalid": "Inválida",
+      "not_installed": "No instalada"
+    },
+    "errors": {
+      "missing_manifest": "No se encontró manifest.json",
+      "missing_view": "Falta el archivo view.tsx declarado en el manifiesto",
+      "missing_admin": "Falta el archivo admin.tsx declarado en el manifiesto",
+      "missing_widget": "Falta el archivo widget.tsx declarado en el manifiesto",
+      "dependency_not_installed": "La app \"{dep}\" debe estar instalada primero",
+      "extension_point_not_found": "La app \"{base}\" no expone el punto de extensión \"{point}\"",
+      "install_failed": "Error durante la instalación",
+      "uninstall_blocked": "No se puede desinstalar: otras apps dependen de esta",
+      "prefix_conflict": "El prefijo de tabla '{prefix}' ya está en uso por la app '{slug}'",
+      "table_prefix_mismatch": "La tabla '{table}' en migrations.sql no usa el prefijo '{prefix}' declarado en el manifiesto",
+      "uninstall_prefix_mismatch": "El archivo uninstall.sql opera sobre '{table}', que no pertenece a esta app (prefijo: '{prefix}')",
+      "migration_pending": "Hay una migración de base de datos pendiente. Ejecuta la migración pendiente en el editor SQL de Supabase antes de instalar esta app."
+    },
+    "todo": {
+      "title": "Tareas",
+      "pending_label": "{count} pendiente(s)",
+      "done_label": "{count} completada(s)",
+      "add_placeholder": "Nueva tarea...",
+      "add_button": "Añadir",
+      "limit_reached": "Límite alcanzado ({max} tareas)",
+      "empty": "No tienes tareas todavía",
+      "all_done": "¡Todo completado!",
+      "more_tasks": "{count} tarea(s) más",
+      "open": "Abrir",
+      "admin_title": "Gestión de tareas",
+      "admin_subtitle": "{total} tareas: {pending} pendientes, {done} completadas",
+      "admin_empty": "No hay tareas en el sistema"
+    },
+    "permissions": {
+      "title": "Acceso",
+      "visibility_public": "Pública",
+      "visibility_private": "Privada",
+      "visibility_description_public": "Todos los miembros del grupo pueden acceder",
+      "visibility_description_private": "Solo los miembros con acceso explícito",
+      "grant_access": "Dar acceso",
+      "revoke_access": "Revocar",
+      "has_access": "Con acceso",
+      "no_members": "No hay miembros en el grupo",
+      "visibility_updated": "Visibilidad actualizada",
+      "access_granted": "Acceso concedido",
+      "access_revoked": "Acceso revocado"
+    }
+  },
+  "app": {
+    "nav": {
+      "home": "Inicio",
+      "profile": "Perfil",
+      "more": "Más"
+    },
+    "dashboard": {
+      "welcome_title": "Bienvenido",
+      "welcome_subtitle": "Tu grupo no tiene apps activas aún.",
+      "widgets_loading": "Cargando..."
+    },
+    "header": {
+      "open_menu": "Abrir menú"
+    }
+  }
+}

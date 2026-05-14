@@ -1,0 +1,172 @@
+---
+title: Errores
+description: Códigos de error estándar, códigos de estado HTTP y formato de respuesta para la REST API de 027Apps.
+---
+
+# Errores
+
+Todas las respuestas de error utilizan el mismo envoltorio JSON:
+
+```json
+{
+  "error": "error_code",
+  "message": "Human-readable description"
+}
+```
+
+Los errores de validación incluyen adicionalmente un objeto `fields` que mapea cada nombre de campo inválido a un mensaje de error:
+
+```json
+{
+  "error": "validation_failed",
+  "message": "Input is invalid",
+  "fields": {
+    "email": "must be a valid email address",
+    "role": "must be 'admin' or 'member'"
+  }
+}
+```
+
+## Códigos de error
+
+### 400 — `validation_failed`
+
+El cuerpo de la solicitud o los parámetros de consulta no superaron la validación. El objeto `fields` indica qué campos son inválidos y por qué.
+
+```json
+{
+  "error": "validation_failed",
+  "message": "Input is invalid",
+  "fields": {
+    "slug": "slug is required"
+  }
+}
+```
+
+**Qué hacer:** Corrige los campos indicados en `fields` y vuelve a intentarlo.
+
+---
+
+### 401 — `unauthorized`
+
+La solicitud no incluyó credenciales válidas, o las credenciales proporcionadas están expiradas, revocadas o mal formadas.
+
+```json
+{
+  "error": "unauthorized",
+  "message": "Invalid or expired token"
+}
+```
+
+Causas comunes:
+
+- Falta la cabecera `Authorization` o `X-API-Key` en un endpoint protegido.
+- El JWT ha expirado — refresca la sesión y vuelve a intentarlo.
+- La clave de API ha sido revocada.
+
+**Qué hacer:** Obtén credenciales nuevas y vuelve a intentarlo. Consulta [Autenticación](/docs/api/authentication).
+
+---
+
+### 403 — `forbidden`
+
+Las credenciales son válidas, pero la identidad autenticada no tiene permiso para acceder al recurso.
+
+```json
+{
+  "error": "forbidden",
+  "message": "User is not a member of any group"
+}
+```
+
+**Qué hacer:** Verifica que el usuario tenga el rol o permiso de aplicación requerido. Contacta al administrador del grupo si se debe conceder acceso.
+
+---
+
+### 404 — `not_found`
+
+El recurso solicitado no existe.
+
+```json
+{
+  "error": "not_found",
+  "message": "App not found"
+}
+```
+
+**Qué hacer:** Comprueba el identificador del recurso. Puede que haya sido eliminado o que el ID sea incorrecto.
+
+---
+
+### 409 — `conflict`
+
+La solicitud entra en conflicto con el estado actual del recurso.
+
+```json
+{
+  "error": "conflict",
+  "message": "A key with this name already exists"
+}
+```
+
+**Qué hacer:** Resuelve el conflicto (p. ej. usa un nombre diferente, o elimina el recurso existente) y vuelve a intentarlo.
+
+---
+
+### 422 — `unprocessable`
+
+La solicitud es sintácticamente válida, pero el servidor no puede procesarla debido a restricciones de lógica de negocio.
+
+```json
+{
+  "error": "unprocessable",
+  "message": "Cannot revoke the last active admin key"
+}
+```
+
+**Qué hacer:** Lee el campo `message` — describe la restricción específica que fue violada.
+
+---
+
+### 429 — `rate_limited`
+
+El cliente ha enviado demasiadas solicitudes en un período corto.
+
+```json
+{
+  "error": "rate_limited",
+  "message": "Too many requests"
+}
+```
+
+**Qué hacer:** Espera y vuelve a intentarlo tras un retraso. La respuesta puede incluir una cabecera `Retry-After` que indica cuántos segundos esperar.
+
+---
+
+### 500 — `internal_error`
+
+Ocurrió un error inesperado en el lado del servidor.
+
+```json
+{
+  "error": "internal_error",
+  "message": "An unexpected error occurred"
+}
+```
+
+**Qué hacer:** Vuelve a intentar la solicitud. Si el error persiste, repórtalo al administrador de la plataforma.
+
+---
+
+## Tabla resumen
+
+| HTTP | `error` | Causa |
+|---|---|---|
+| 400 | `validation_failed` | Entrada inválida; revisa `fields` |
+| 401 | `unauthorized` | Credenciales ausentes, expiradas o revocadas |
+| 403 | `forbidden` | Autenticado pero sin permiso |
+| 404 | `not_found` | El recurso no existe |
+| 409 | `conflict` | Conflicto de estado |
+| 422 | `unprocessable` | Restricción de lógica de negocio |
+| 429 | `rate_limited` | Demasiadas solicitudes |
+| 500 | `internal_error` | Error inesperado en el servidor |

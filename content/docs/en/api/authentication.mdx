@@ -1,0 +1,106 @@
+---
+title: Authentication
+description: How to authenticate requests to the 027Apps REST API using JWT or API keys.
+---
+
+# Authentication
+
+The 027Apps API supports two credential types: **JWT tokens** issued by Supabase Auth and **API keys** generated from the admin panel.
+
+## JWT (Bearer token)
+
+Use a JWT when building a browser or mobile client where a user is signed in. The token identifies both the user and the group they belong to.
+
+### Obtaining a token
+
+Sign in via the app's login page or directly with the Supabase Auth API. After a successful sign-in, Supabase returns an `access_token`:
+
+```typescript
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+const { data, error } = await supabase.auth.signInWithPassword({
+  email: 'alice@example.com',
+  password: 'secret',
+})
+
+const token = data.session?.access_token
+```
+
+Tokens expire after one hour. Use `supabase.auth.refreshSession()` or the Supabase client's built-in auto-refresh to obtain a new one.
+
+### Using the token
+
+Pass the token in the `Authorization` header:
+
+```bash
+curl https://example.com/api/v1/me \
+  -H "Authorization: Bearer <access_token>"
+```
+
+```typescript
+const res = await fetch('/api/v1/me', {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+})
+const user = await res.json()
+```
+
+## API Key
+
+Use an API key for server-to-server integrations where there is no interactive user. API keys are long-lived and scoped to the group.
+
+### Obtaining an API key
+
+1. Sign in as an administrator.
+2. Go to **Admin → Settings → API Keys**.
+3. Click **New API key**, enter a name, and choose a scope:
+   - **Group** — machine-to-machine access; no user context.
+   - **User** — acts on behalf of a specific user.
+4. Copy the key immediately. It is shown **only once** and is never stored in plain text.
+
+Keys follow the format `sk_027_<32 random characters>` (e.g. `sk_027_AbCdEfGhIjKlMnOpQrStUvWxYz012345`).
+
+### Using an API key
+
+Pass the key in the `X-API-Key` header:
+
+```bash
+curl https://example.com/api/v1/apps \
+  -H "X-API-Key: sk_027_AbCdEfGhIjKlMnOpQrStUvWxYz012345"
+```
+
+```typescript
+const res = await fetch('/api/v1/apps', {
+  headers: {
+    'X-API-Key': 'sk_027_AbCdEfGhIjKlMnOpQrStUvWxYz012345',
+  },
+})
+const apps = await res.json()
+```
+
+### Revoking an API key
+
+Go to **Admin → Settings → API Keys** and click **Revoke** next to the key. Revoked keys are rejected immediately.
+
+## Choosing between JWT and API key
+
+| Situation | Use |
+|---|---|
+| Mobile or browser app, user is signed in | JWT |
+| Backend service or cron job | API Key (group scope) |
+| Acting on behalf of a specific user without interactive auth | API Key (user scope) |
+| Reading public group data (locales) | No auth needed |
+
+## Error responses
+
+| Scenario | HTTP | `error` code |
+|---|---|---|
+| No credentials provided | 401 | `unauthorized` |
+| Token is expired or malformed | 401 | `unauthorized` |
+| User is not a member of any group | 403 | `forbidden` |
+| API key is revoked or unknown | 401 | `unauthorized` |
+
+See [Errors](/docs/api/errors) for the full error reference.

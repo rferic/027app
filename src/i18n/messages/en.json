@@ -1,0 +1,345 @@
+{
+  "auth": {
+    "login": "Sign in",
+    "logout": "Sign out",
+    "email": "Email address",
+    "password": "Password",
+    "loginError": "Invalid credentials",
+    "blockedError": "Your account has been blocked. Please contact the administrator.",
+    "blockedTitle": "Account suspended",
+    "blockedDesc": "Your account has been suspended. Contact the administrator to restore access.",
+    "adminOnly": "Only administrators can access this area",
+    "subtitle": "Your group, your apps."
+  },
+  "home": {
+    "noApps": "No apps available yet.",
+    "noAppsDesc": "Your apps will appear here once the admin configures them."
+  },
+  "nav": {
+    "dashboard": "Home",
+    "backoffice": "Backoffice",
+    "docs": "Documentation"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred"
+  },
+  "admin": {
+    "title": "Control panel",
+    "nav": {
+      "dashboard": "Dashboard",
+      "users": "Users",
+      "members": "Members",
+      "admins": "Administrators",
+      "invitations": "Invitations",
+      "profile": "My profile",
+      "settings": "Settings",
+      "general": "General",
+      "api_keys": "API Keys",
+      "menu": "Menu",
+      "apps": "Apps"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "subtitle": "Overview of your group",
+      "recentUsers": "Recent users",
+      "recentInvitations": "Recent invitations",
+      "viewAll": "View all →",
+      "newInvitation": "+ New invitation",
+      "noUsers": "No users yet.",
+      "noInvitations": "No invitations yet.",
+      "statsUsers": "Users",
+      "statsAdmins": "Admins",
+      "statsMembers": "Members",
+      "statsPending": "Pending invites"
+    },
+    "users": {
+      "title": "Members",
+      "subtitle": "{count} user registered",
+      "subtitlePlural": "{count} users registered"
+    },
+    "admins": {
+      "title": "Administrators",
+      "subtitle": "{count} administrator",
+      "subtitlePlural": "{count} administrators"
+    },
+    "invitations": {
+      "title": "Invitations",
+      "subtitle": "{count} invitation",
+      "subtitlePlural": "{count} invitations",
+      "new": "New invitation",
+      "newTitle": "New invitation",
+      "newSubtitle": "Create a link to invite someone to the platform.",
+      "table": {
+        "title": "Title",
+        "role": "Role",
+        "email": "Email",
+        "status": "Status",
+        "expires": "Expires",
+        "copyLink": "Copy link",
+        "revoke": "Revoke",
+        "delete": "Delete",
+        "noInvitations": "No invitations yet.",
+        "any": "any",
+        "cancel": "Cancel",
+        "confirmRevokeTitle": "Revoke invitation?",
+        "confirmRevokeDesc": "This invitation link will no longer work.",
+        "confirmDeleteTitle": "Delete invitation?",
+        "confirmDeleteDesc": "This action cannot be undone."
+      },
+      "status": {
+        "pending": "Pending",
+        "accepted": "Accepted",
+        "expired": "Expired",
+        "revoked": "Revoked"
+      },
+      "form": {
+        "titleLabel": "Title",
+        "titlePlaceholder": "e.g. John Smith — Frontend Dev",
+        "titleHelp": "Internal label to identify this invitation.",
+        "roleLabel": "Role",
+        "roleMember": "Member",
+        "roleAdmin": "Admin",
+        "emailLabel": "Email",
+        "emailOptional": "(optional)",
+        "emailPlaceholder": "Leave blank to allow any email",
+        "emailHelp": "If set, only this email can use the invitation link.",
+        "expiresLabel": "Expires at",
+        "submit": "Create invitation",
+        "submitting": "Creating…",
+        "cancel": "Cancel",
+        "createdTitle": "Invitation created",
+        "createdDesc": "Share this link with the invitee:",
+        "copy": "Copy",
+        "copyFailed": "Copy failed",
+        "backToInvitations": "← Back to invitations"
+      }
+    },
+    "profile": {
+      "title": "My profile",
+      "subtitle": "Edit your name and language preference.",
+      "personalInfo": "Personal information",
+      "displayName": "Display name",
+      "language": "Language preference",
+      "languageNote": "This sets the language for the app area.",
+      "save": "Save changes",
+      "saving": "Saving…",
+      "saved": "Profile updated successfully.",
+      "changePassword": "Change password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm new password",
+      "changePasswordBtn": "Change password",
+      "changingPassword": "Changing…",
+      "passwordChanged": "Password changed successfully.",
+      "minPasswordChars": "Min. 8 characters"
+    },
+    "table": {
+      "user": "User",
+      "email": "Email",
+      "role": "Role",
+      "locale": "Language",
+      "lastLogin": "Last login",
+      "actions": "Actions",
+      "edit": "Edit",
+      "block": "Block",
+      "unblock": "Unblock",
+      "makeAdmin": "Make admin",
+      "makeMember": "Make member",
+      "noUsers": "No users yet.",
+      "blockedBadge": "blocked",
+      "cancel": "Cancel",
+      "confirmBlockTitle": "Block user?",
+      "confirmBlockDesc": "This user won't be able to sign in until unblocked.",
+      "confirmMakeMemberTitle": "Remove admin access?",
+      "confirmMakeMemberDesc": "This user will lose access to the admin panel.",
+      "delete": "Delete",
+      "confirmDeleteTitle": "Delete user?",
+      "confirmDeleteDesc": "This action cannot be undone. The user and all their data will be permanently deleted."
+    },
+    "settings": {
+      "title": "Settings",
+      "api_keys": {
+        "title": "API Keys",
+        "subtitle": "Manage API keys for third-party integrations.",
+        "new_key": "New API Key",
+        "no_keys": "No API keys yet.",
+        "create_modal_title": "Create API Key",
+        "key_name_label": "Key name",
+        "key_name_placeholder": "e.g. Mobile app",
+        "create_button": "Create",
+        "created_title": "API Key Created",
+        "created_warning": "This key will only be shown once. Copy it now.",
+        "copy_button": "Copy",
+        "done_button": "Done",
+        "revoke_button": "Revoke",
+        "revoke_confirm_title": "Revoke API Key",
+        "revoke_confirm_message": "Are you sure? This cannot be undone.",
+        "cancel_button": "Cancel",
+        "scope_group": "Group",
+        "scope_user": "Personal",
+        "prefix_label": "Key prefix",
+        "created_at_label": "Created",
+        "last_used_label": "Last used",
+        "never": "Never"
+      },
+      "general": {
+        "title": "General",
+        "subtitle": "General platform settings.",
+        "languages": "Available languages",
+        "languagesHelp": "Select which languages users can choose from.",
+        "defaultLocale": "Default language",
+        "defaultLocaleHelp": "The default language for new users.",
+        "save": "Save",
+        "saving": "Saving…",
+        "saved": "Settings saved.",
+        "atLeastOne": "At least one language must be active.",
+        "localeNames": {
+          "en": "English",
+          "es": "Spanish",
+          "it": "Italian",
+          "ca": "Catalan",
+          "fr": "French",
+          "de": "German"
+        }
+      }
+    },
+    "editUser": {
+      "title": "Edit user",
+      "back": "← Users",
+      "save": "Save changes",
+      "saving": "Saving…",
+      "saved": "Changes saved",
+      "displayName": "Display name",
+      "email": "Email",
+      "role": "Role",
+      "locale": "Locale",
+      "localeNote": "The user can also change this from their own profile",
+      "roleNote": "(change role from the users table)",
+      "joined": "Joined",
+      "lastLogin": "Last login",
+      "status": "Status",
+      "active": "Active",
+      "blocked": "Blocked"
+    },
+    "goToApp": "← App",
+    "apps": {
+      "title": "Apps",
+      "subtitle": "Install and manage app modules",
+      "install": "Install",
+      "uninstall": "Uninstall",
+      "configure": "Configure",
+      "saveConfig": "Save",
+      "cancel": "Cancel",
+      "processing": "Processing...",
+      "empty": "No apps available.",
+      "noConfig": "This app has no configurable options.",
+      "boolTrue": "Yes",
+      "boolFalse": "No",
+      "configSaved": "Saved",
+      "uninstall_confirm_title": "Uninstall application?",
+      "uninstall_confirm_description": "This action is irreversible. All application data will be permanently deleted and cannot be recovered.",
+      "uninstall_confirm_button": "Yes, uninstall",
+      "visibility": {
+        "label": "Visibility",
+        "public": "Public",
+        "private": "Private"
+      },
+      "status": {
+        "active": "Active",
+        "installing": "Installing",
+        "uninstalling": "Uninstalling",
+        "error": "Error"
+      },
+      "permissions": {
+        "title": "Access",
+        "visibility_public": "Public",
+        "visibility_private": "Private",
+        "visibility_description_public": "All group members can access",
+        "visibility_description_private": "Only members with explicit access",
+        "grant_access": "Grant access",
+        "revoke_access": "Revoke",
+        "has_access": "Has access",
+        "no_members": "No members in the group",
+        "visibility_updated": "Visibility updated",
+        "access_granted": "Access granted",
+        "access_revoked": "Access revoked"
+      }
+    }
+  },
+  "user": {
+    "editProfile": "Edit profile",
+    "signOut": "Sign out"
+  },
+  "apps": {
+    "title": "Apps",
+    "install": "Install",
+    "uninstall": "Uninstall",
+    "configure": "Configure",
+    "status": {
+      "active": "Active",
+      "installing": "Installing...",
+      "uninstalling": "Uninstalling...",
+      "error": "Error",
+      "invalid": "Invalid",
+      "not_installed": "Not installed"
+    },
+    "errors": {
+      "missing_manifest": "manifest.json not found",
+      "missing_view": "view.tsx declared in manifest but not found",
+      "missing_admin": "admin.tsx declared in manifest but not found",
+      "missing_widget": "widget.tsx declared in manifest but not found",
+      "dependency_not_installed": "App \"{dep}\" must be installed first",
+      "extension_point_not_found": "App \"{base}\" does not expose extension point \"{point}\"",
+      "install_failed": "Installation failed",
+      "uninstall_blocked": "Cannot uninstall: other apps depend on this one",
+      "prefix_conflict": "Table prefix '{prefix}' is already in use by app '{slug}'",
+      "table_prefix_mismatch": "Table '{table}' in migrations.sql does not use the declared prefix '{prefix}'",
+      "uninstall_prefix_mismatch": "uninstall.sql operates on table '{table}' which does not belong to this app (prefix: '{prefix}')",
+      "migration_pending": "A required database migration is pending. Run the pending migration in Supabase SQL editor before installing this app."
+    },
+    "todo": {
+      "title": "Tasks",
+      "pending_label": "{count} pending",
+      "done_label": "{count} done",
+      "add_placeholder": "New task...",
+      "add_button": "Add",
+      "limit_reached": "Limit reached ({max} tasks)",
+      "empty": "No tasks yet",
+      "all_done": "All done!",
+      "more_tasks": "{count} more task(s)",
+      "open": "Open",
+      "admin_title": "Task management",
+      "admin_subtitle": "{total} tasks: {pending} pending, {done} done",
+      "admin_empty": "No tasks in the system"
+    },
+    "permissions": {
+      "title": "Access",
+      "visibility_public": "Public",
+      "visibility_private": "Private",
+      "visibility_description_public": "All group members can access this app",
+      "visibility_description_private": "Only members with explicit access",
+      "grant_access": "Grant access",
+      "revoke_access": "Revoke",
+      "has_access": "Has access",
+      "no_members": "No members in the group",
+      "visibility_updated": "Visibility updated",
+      "access_granted": "Access granted",
+      "access_revoked": "Access revoked"
+    }
+  },
+  "app": {
+    "nav": {
+      "home": "Home",
+      "profile": "Profile",
+      "more": "More"
+    },
+    "dashboard": {
+      "welcome_title": "Welcome",
+      "welcome_subtitle": "Your group has no active apps yet.",
+      "widgets_loading": "Loading..."
+    },
+    "header": {
+      "open_menu": "Open menu"
+    }
+  }
+}

@@ -1,0 +1,100 @@
+---
+title: Visió General de la REST API
+description: REST API v1 de 027Apps — conceptes base, versionament i format de les respostes.
+---
+
+# REST API v1
+
+La REST API de 027Apps permet que les aplicacions externes i el client mòbil interactuïn amb la plataforma de manera programàtica.
+
+**URL Base**
+
+```
+/api/v1
+```
+
+Tots els endpoints són relatius a aquesta ruta base. L'API està versionada mitjançant el prefix d'URL; els canvis incompatibles introduiran una nova versió (`/api/v2`).
+
+## Verificació d'estat
+
+```bash
+GET /api/v1
+```
+
+Retorna la versió actual de l'API i l'estat. No requereix autenticació.
+
+```json
+{
+  "version": "v1",
+  "status": "ok"
+}
+```
+
+## Autenticació
+
+L'API admet tres nivells d'autenticació:
+
+| Nivell | Capçalera | Quan usar-la |
+|---|---|---|
+| Públic | — | Endpoints que exposen dades no sensibles del grup |
+| API Key | `X-API-Key: sk_027_...` | Integracions servidor a servidor |
+| JWT | `Authorization: Bearer <token>` | Aplicació mòbil i clients de navegador |
+
+Consulta [Autenticació](/docs/api/authentication) per obtenir més detalls sobre com obtenir credencials i el comportament de cada mètode.
+
+## Format de les respostes
+
+Les respostes correctes retornen el recurs directament — sense embolcall extern:
+
+```json
+{ "id": "abc123", "name": "Alice" }
+```
+
+Els endpoints de llista retornen un array JSON:
+
+```json
+[
+  { "slug": "calendar", "enabled": true },
+  { "slug": "tasks", "enabled": true }
+]
+```
+
+Les respostes de llista paginades inclouen una capçalera `Link` (RFC 5988) quan hi ha pàgines addicionals:
+
+```
+Link: </api/v1/items?page=2>; rel="next"
+```
+
+Les respostes d'error sempre utilitzen el mateix embolcall:
+
+```json
+{
+  "error": "not_found",
+  "message": "User not found"
+}
+```
+
+Els errors de validació inclouen un objecte `fields`:
+
+```json
+{
+  "error": "validation_failed",
+  "message": "Input is invalid",
+  "fields": {
+    "email": "must be a valid email address"
+  }
+}
+```
+
+Consulta [Errors](/docs/api/errors) per a la referència completa d'errors.
+
+## Endpoints
+
+| Mètode | Ruta | Auth | Descripció |
+|---|---|---|---|
+| `GET` | `/api/v1` | Públic | Verificació d'estat |
+| `GET` | `/api/v1/me` | JWT | Informació de l'usuari autenticat |
+| `GET` | `/api/v1/apps` | JWT o API Key | Aplicacions del grup |
+| `GET` | `/api/v1/locales` | Públic | Idiomes actius del grup |
+
+Consulta [Endpoints](/docs/api/endpoints) per a la referència completa.

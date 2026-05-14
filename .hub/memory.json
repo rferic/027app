@@ -1,0 +1,166 @@
+{
+  "_meta": {
+    "description": "Memoria del proyecto apps027. Contiene stack, módulos y decisiones técnicas.",
+    "updated_at": "2026-05-12",
+    "last_fixes": "2026-05-12 — Sprint 1 fixes finales: botones dentro de cards con pt-3 border-t, rose→slate en acciones, toast unificado via Sonner, AdminOverflowReset agresivo, LOCALES completos"
+  },
+  "project": {
+    "name": "027Apps",
+    "type": "monolito modular",
+    "description": "Plataforma open-source de aplicaciones en grupo. Un grupo puede ser una familia, equipo, amigos u otro colectivo. Cada grupo gestiona sus propios usuarios y permisos de acceso a las apps.",
+    "open_source": true,
+    "path": "/Users/ericrf/Sites/027apps"
+  },
+  "stack": {
+    "defined": true,
+    "framework": "Next.js 16.2.4 (App Router, Turbopack) + TypeScript strict",
+    "database": "Supabase (PostgreSQL)",
+    "auth": "Supabase Auth",
+    "ui": "shadcn/ui + Tailwind CSS v4",
+    "animations": "Framer Motion (puntual)",
+    "i18n": "next-intl v4",
+    "package_manager": "pnpm",
+    "locales": ["en", "es", "it", "ca", "fr", "de"],
+    "default_locale": "en",
+    "mobile": "Expo (React Native) + EAS Update",
+    "testing_unit": "Vitest + Testing Library",
+    "testing_e2e": "Playwright",
+    "hosting": "Local (Vercel pendiente)",
+    "docs": "Fumadocs (fumadocs-ui + fumadocs-core + fumadocs-mdx)"
+  },
+  "architecture": {
+    "route_groups": {
+      "(admin)": "Backoffice en /admin — desktop-first — solo role admin",
+      "(app)": "Web pública — mobile-first — usuarios con permisos"
+    },
+    "data_model": {
+      "groups": "Entidad raíz. Un grupo = una familia, equipo, etc.",
+      "group_members": "Relación usuario-grupo con rol (admin|member)",
+      "installed_apps": "Apps instaladas en el grupo. Estado (installing|active|error|uninstalling), config, visibility (public|private).",
+      "app_permissions": "Permisos individuales usuario+app cuando visibility='private'",
+      "profiles": "Extensión del usuario Supabase Auth (nombre, locale, avatar...)"
+    },
+    "roles": {
+      "admin": "Acceso al backoffice /admin. Gestiona usuarios, invitaciones y permisos.",
+      "member": "Acceso a la web pública. Accede solo a las apps que tenga permitidas."
+    },
+    "auth_flows": {
+      "invitation": "Admin invita por email → Supabase Auth invitation → usuario se registra",
+      "session": "JWT persistente con refresh token (Supabase nativo)"
+    }
+  },
+  "modules": [],
+  "decisions": [
+    {
+      "date": "2026-05-12",
+      "decision": "Layout isolation (app) — bg-white previene dark mode bleed",
+      "reason": "Fumadocs/next-themes persiste class='dark' en <html>. El outer div en (app)/[locale]/layout.tsx incluye bg-white para aislar la web pública del dark mode. Admin y app pública tienen estilos intencionalmente diferentes."
+    },
+    {
+      "date": "2026-05-12",
+      "decision": "Admin sidebar default expandido",
+      "reason": "Cookie check cambiada de !== 'false' (default: colapsado) a === 'true' (default: expandido). UX mejor en desktop-first."
+    },
+    {
+      "date": "2026-05-12",
+      "decision": "Post-login locale routing desde profiles.locale",
+      "reason": "signIn en src/lib/use-cases/auth/index.ts lee profiles.locale tras autenticar y redirige a /{profile_locale}/dashboard. Fallback al locale del URL si el perfil no tiene locale. Asegura que el usuario ve la web en su idioma preferido post-login."
+    },
+    {
+      "date": "2026-05-12",
+      "decision": "Login page visual simplificado",
+      "reason": "Outer div en src/app/(app)/[locale]/login/page.tsx cambió a flex flex-1 items-center justify-center bg-slate-50 p-6. Centra el formulario en la pantalla, mejor para mobile."
+    },
+    {
+      "date": "2026-05-06",
+      "decision": "Stack definitivo elegido",
+      "reason": "Next.js + Supabase por versatilidad full-stack. shadcn/ui sobre Aceternity por rendimiento mobile. next-intl para soporte 6 idiomas."
+    },
+    {
+      "date": "2026-05-06",
+      "decision": "Modelo multi-group en lugar de single-family",
+      "reason": "Proyecto open-source. Cualquier colectivo puede usarlo. 'Familia' es un caso de uso, no el modelo."
+    },
+    {
+      "date": "2026-05-06",
+      "decision": "Backoffice en /admin (route group), no subdominio",
+      "reason": "Simplicidad de despliegue. Un solo dominio, misma app Next.js."
+    },
+    {
+      "date": "2026-05-10",
+      "decision": "DDL de apps via migrations.sql + uninstall.sql",
+      "reason": "Evita exec_sql SECURITY DEFINER. Apps declaran schema en SQL files; el sistema los aplica. install.ts solo hace init de datos."
+    },
+    {
+      "date": "2026-05-10",
+      "decision": "App visibility: public | private",
+      "reason": "installed_apps.visibility controla acceso. Public = todos los miembros. Private = acceso individual via app_permissions."
+    },
+    {
+      "date": "2026-05-10",
+      "decision": "Mobile: Expo + EAS Update, bundle estático",
+      "reason": "RN requiere bundle estático. Instalar/desinstalar app = solo DB. Nueva app = EAS Update via CI en /mobile. Proyecto Expo en Sprint 3."
+    },
+    {
+      "date": "2026-05-11",
+      "decision": "Docs: sitio /doc con Fumadocs",
+      "reason": "Fumadocs (fumadocs-ui + fumadocs-core + fumadocs-mdx) sobre Next.js App Router. MDX en apps/[slug]/docs/. Menú dinámico automático por app, búsqueda integrada Orama, sin servidor externo. Elimina path traversal al no leer filesystem directamente desde URL."
+    },
+    {
+      "date": "2026-05-11",
+      "decision": "Sprint 0: API REST v1 + Fumadocs (antes de Sprint 1)",
+      "reason": "Capa de use-cases (única implementación por acción), API /api/v1/ con 3 niveles auth (public/apikey/jwt), gestión de API keys, endpoints core, sitio /doc con Fumadocs + Orama search. Apps exponen endpoints via apps/[slug]/routes/ handlers."
+    },
+    {
+      "date": "2026-05-11",
+      "decision": "Use-cases como única implementación de lógica de negocio",
+      "reason": "src/lib/use-cases/[domain]/[action].ts. Server Actions y API handlers son wrappers delgados que construyen UseCaseContext y delegan. Garantiza que web, admin, API REST y mobile ejecutan exactamente el mismo código."
+    },
+    {
+      "date": "2026-05-12",
+      "decision": "Dark mode logo con dos SVGs + Tailwind dark:hidden/dark:block",
+      "reason": "logo.svg (light, fill white para 027) y logo-dark.svg (dark, fill blanco para 027) aplicados con Tailwind conditional visibility. Fumadocs usa class='dark' via next-themes, así que funciona correctamente en el sitio de docs."
+    },
+    {
+      "date": "2026-05-12",
+      "decision": "AppFooter global en (app)/[locale]/layout.tsx",
+      "reason": "Footer único para toda la web pública. Link a /{locale}/doc con i18n key 'nav.docs'. Layout envuelve children en flex flex-col flex-1 para que las páginas usen flex-1 y el footer quede al fondo. Login page reutiliza el footer del layout padre sin duplicación."
+    },
+    {
+      "date": "2026-05-10",
+      "decision": "GitHub + Vercel + versionado semántico (Sprint 3, TASK-29→35)",
+      "reason": "Prerequisito para EAS Update (Sprint 4) y usuarios reales. Conventional Commits + release-please para semver automático. CI: lint + tsc + test + build + pnpm audit. CD: deploy automático en push a main."
+    },
+    {
+      "date": "2026-05-10",
+      "decision": "Seguridad weaved en sprints actuales (sin sprint dedicado para MVP)",
+      "reason": "Path traversal en /doc (Sprint 1 TASK-15). CORS restringido + auth rate limits de Supabase + HTTP security headers en next.config.ts + pnpm audit en CI (Sprint 3). SQL injection mitigado por Supabase client parametrizado. RLS obligatorio en todas las tablas."
+    },
+    {
+      "date": "2026-05-12",
+      "decision": "App detail page en /admin/apps/[slug] centraliza admin view + config",
+      "reason": "UX: configuración y vista admin de la app en un solo lugar. El botón 'Configurar' en la lista navega a esta página en lugar de abrir un dialog inline."
+    },
+    {
+      "date": "2026-05-12",
+      "decision": "AdminOverflowReset — limpia CSS overflow al montar el admin layout",
+      "reason": "Fumadocs/next-themes puede persistir overflow:hidden en <html>/<body> durante navegación cliente. El componente limpia esto al montar el admin layout. Análogo al bg-white en (app) layout."
+    },
+    {
+      "date": "2026-05-12",
+      "decision": "Hydration: useFormatter de next-intl para fechas en componentes 'use client'",
+      "reason": "toLocaleDateString(undefined) causa mismatch SSR/cliente (undefined = locale de Node en servidor, locale de browser en cliente). useFormatter resuelve el locale consistentemente."
+    },
+    {
+      "date": "2026-05-12",
+      "decision": "Botones submit admin dentro de su card con pt-3 border-t separator. Rose eliminado de botones de acción.",
+      "reason": "CLAUDE.md especifica: rose solo para navegación activa del sidebar. Botones de acción siempre bg-slate-900. Botones dentro del card como último elemento con pt-3 border-t border-slate-100 para consistencia visual horizontal con el contenido del formulario."
+    },
+    {
+      "date": "2026-05-12",
+      "decision": "Toast unificado en admin via Sonner. Patrón useEffect+prevStateRef para useActionState, directo para useTransition.",
+      "reason": "UX: feedback visual consistente en todas las acciones de formulario. Toast bottom-right con theme=light para no depender de next-themes que solo existe en /doc. Sonner ya instalado en el proyecto."
+    }
+  ],
+  "notes": []
+}

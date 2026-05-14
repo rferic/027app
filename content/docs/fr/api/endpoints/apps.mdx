@@ -1,0 +1,124 @@
+---
+title: GET /api/v1/apps
+description: Retourne les applications disponibles pour le groupe, filtrées par permissions utilisateur lorsqu'un JWT est utilisé.
+---
+
+# GET /api/v1/apps
+
+Retourne les applications associées au groupe. L'ensemble des résultats dépend de la méthode d'authentification utilisée.
+
+## Authentification
+
+**Requise :** JWT (`Authorization: Bearer <token>`) **ou** API Key (`X-API-Key: sk_027_...`)
+
+Le type d'identifiant change ce qui est retourné :
+
+- **JWT** — retourne uniquement les applications pour lesquelles l'utilisateur authentifié dispose d'un enregistrement `app_permissions` activé.
+- **API Key** — retourne toutes les applications activées pour le groupe, indépendamment des permissions par utilisateur.
+
+## Requête
+
+```
+GET /api/v1/apps
+Authorization: Bearer <access_token>
+```
+
+ou
+
+```
+GET /api/v1/apps
+X-API-Key: sk_027_...
+```
+
+Aucun paramètre de requête ni corps de requête.
+
+## Réponse
+
+**200 OK**
+
+Retourne un tableau. Un tableau vide (`[]`) signifie que l'utilisateur n'a aucune permission d'application, ou qu'aucune application n'est installée.
+
+```typescript
+type App = {
+  slug: string     // Unique app identifier (e.g. "calendar", "tasks")
+  enabled: boolean // Whether the app permission is active
+}
+
+type AppsResponse = App[]
+```
+
+Exemple (JWT — portée utilisateur) :
+
+```json
+[
+  { "slug": "calendar", "enabled": true },
+  { "slug": "tasks", "enabled": true }
+]
+```
+
+Exemple (API Key — portée groupe, toutes les applications activées) :
+
+```json
+[
+  { "slug": "calendar", "enabled": true },
+  { "slug": "tasks", "enabled": true },
+  { "slug": "documents", "enabled": true }
+]
+```
+
+## Pagination
+
+Cet endpoint retourne tous les résultats en une seule réponse. La pagination n'est pas actuellement appliquée.
+
+## Erreurs
+
+| HTTP | `error` | Cause |
+|---|---|---|
+| 401 | `unauthorized` | Identifiants absents ou invalides |
+| 403 | `forbidden` | Le token JWT est valide mais l'utilisateur n'est pas membre du groupe |
+
+## Exemples
+
+### curl (JWT)
+
+```bash
+curl https://example.com/api/v1/apps \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+```
+
+### curl (API Key)
+
+```bash
+curl https://example.com/api/v1/apps \
+  -H "X-API-Key: sk_027_AbCdEfGhIjKlMnOpQrStUvWxYz012345"
+```
+
+### fetch (TypeScript)
+
+```typescript
+type App = {
+  slug: string
+  enabled: boolean
+}
+
+// Avec JWT
+const res = await fetch('/api/v1/apps', {
+  headers: {
+    Authorization: `Bearer ${session.access_token}`,
+  },
+})
+
+// Avec API Key
+const res = await fetch('/api/v1/apps', {
+  headers: {
+    'X-API-Key': apiKey,
+  },
+})
+
+if (!res.ok) {
+  const err = await res.json()
+  throw new Error(err.message)
+}
+
+const apps: App[] = await res.json()
+```

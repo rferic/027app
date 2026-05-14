@@ -1,0 +1,16 @@
+{
+  "title": "Tareas",
+  "add_placeholder": "Nueva tarea…",
+  "add_button": "Añadir",
+  "pending_label": "{count, plural, one {# pendiente} other {# pendientes}}",
+  "done_label": "{count, plural, one {# completada} other {# completadas}}",
+  "empty": "No hay tareas todavía.",
+  "all_done": "¡Todo listo!",
+  "open": "Abrir →",
+  "loading": "Cargando…",
+  "more_tasks": "+{count} más",
+  "admin_title": "Tareas — Admin",
+  "admin_subtitle": "{total} en total · {pending} pendientes · {done} completadas",
+  "admin_empty": "No se encontraron tareas.",
+  "limit_reached": "Has alcanzado el máximo de {max} tareas."
+}

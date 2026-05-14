@@ -1,0 +1,105 @@
+---
+title: Internationalisation
+description: Comment 027Apps gère plusieurs langues — langues, préférences utilisateur et fichiers de messages.
+---
+
+# Internationalisation
+
+027Apps prend en charge 6 langues sur le web public, le panneau d'administration et les réponses de l'API.
+
+## Langues supportées
+
+| Code | Langue     | Par défaut |
+|------|------------|------------|
+| `en` | Anglais    | Oui     |
+| `es` | Espagnol   |         |
+| `it` | Italien    |         |
+| `ca` | Catalan    |         |
+| `fr` | Français   |         |
+| `de` | Allemand   |         |
+
+## Résolution de la langue
+
+Lors du rendu d'une page ou du retour d'une réponse localisée, la plateforme résout la langue active dans l'ordre suivant :
+
+1. **Préférence utilisateur** — `profiles.locale` pour l'utilisateur authentifié
+2. **Langue par défaut du groupe** — `group_settings.default_locale` pour le groupe actuel
+3. **Langue de repli** — `en`
+
+## Paramètres du groupe
+
+Chaque groupe stocke sa configuration linguistique dans la table `group_settings` :
+
+| Colonne | Type | Description |
+|---|---|---|
+| `active_locales` | `text[]` | Tableau de codes de langue activés pour ce groupe |
+| `default_locale` | `text` | Langue utilisée lorsqu'aucune préférence utilisateur n'est définie |
+
+Les administrateurs du groupe peuvent configurer ces valeurs dans le panneau d'administration sous **Paramètres → Général**.
+
+## Structure des URL
+
+Le web public utilise des URL préfixées par la langue :
+
+```
+/{locale}/...
+```
+
+Exemples :
+- `/en/` — accueil en anglais
+- `/es/apps/calendar` — application calendrier en espagnol
+- `/it/profile` — page de profil en italien
+
+La langue est intégrée dans le chemin de l'URL, pas dans les en-têtes de la requête.
+
+## GET /api/v1/locales
+
+Retourne les langues disponibles pour le groupe de l'utilisateur authentifié.
+
+**Auth :** `public` (aucune authentification requise)
+
+**Réponse `200 OK` :**
+
+```json
+[
+  { "code": "en", "name": "Anglais", "is_default": true },
+  { "code": "es", "name": "Espagnol", "is_default": false },
+  { "code": "ca", "name": "Catalan", "is_default": false }
+]
+```
+
+Seules les langues listées dans `group_settings.active_locales` sont retournées. Le champ `is_default` reflète `group_settings.default_locale`.
+
+## Langue du profil
+
+La langue préférée de l'utilisateur authentifié est stockée dans `profiles.locale`. Lorsqu'elle est définie, elle a la priorité sur la langue par défaut du groupe.
+
+<Callout type="info">
+  La mise à jour de la langue du profil via l'API est prévue pour un sprint futur. Actuellement, elle peut être modifiée depuis la page de profil dans l'interface web.
+</Callout>
+
+## Fichiers de messages
+
+Les chaînes de l'interface sont stockées dans des fichiers JSON, un par langue :
+
+```
+src/i18n/messages/
+  en.json
+  es.json
+  it.json
+  ca.json
+  fr.json
+  de.json
+```
+
+Les 6 fichiers doivent avoir des **clés identiques**. Les clés manquantes utilisent `en` comme repli. Les espaces de noms de clés suivent cette structure :
+
+| Espace de noms | Portée |
+|---|---|
+| `auth` | Messages de connexion, déconnexion et session |
+| `home` | Page d'accueil publique |
+| `nav` | Libellés de navigation |
+| `common` | Libellés d'interface partagés (enregistrer, annuler, etc.) |
+| `admin.*` | Sections du panneau d'administration |
+| `user` | Chaînes du profil utilisateur |
+| `profile` | Chaînes de la page de profil |

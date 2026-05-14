@@ -1,0 +1,119 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { install } from './actions'
+import { installT, type InstallLocale } from './translations'
+
+const LOCALES: { value: InstallLocale; label: string }[] = [
+  { value: 'en', label: 'EN' },
+  { value: 'es', label: 'ES' },
+  { value: 'it', label: 'IT' },
+]
+
+export function InstallForm() {
+  const [locale, setLocale] = useState<InstallLocale>('en')
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const t = installT[locale]
+
+  useEffect(() => {
+    const match = document.cookie.match(/preferred-locale=([^;]+)/)
+    const saved = match?.[1] as InstallLocale | undefined
+    if (saved && saved in installT) setLocale(saved)
+  }, [])
+
+  function handleLocaleChange(newLocale: InstallLocale) {
+    setLocale(newLocale)
+    document.cookie = `preferred-locale=${newLocale};path=/;max-age=${365 * 24 * 60 * 60};samesite=lax`
+  }
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const form = new FormData(e.currentTarget)
+
+    if (form.get('password') !== form.get('confirm_password')) {
+      setError(t.passwordMismatch)
+      return
+    }
+
+    setLoading(true)
+    setError(null)
+
+    const result = await install(form)
+    if (result?.error) {
+      setError(result.error)
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 p-6">
+      <div className="w-full max-w-sm">
+        <div className="flex justify-end mb-4">
+          <div className="flex gap-1">
+            {LOCALES.map(({ value, label }) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => handleLocaleChange(value)}
+                className={`px-2 py-1 text-xs font-medium rounded transition-colors ${
+                  locale === value
+                    ? 'bg-slate-900 text-white'
+                    : 'text-slate-400 hover:text-slate-600'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center mb-8">
+          <img src="/logo-icon.svg" alt="027Apps" width={56} height={56} className="mb-4" />
+          <h1 className="text-2xl font-bold text-slate-900">{t.title}</h1>
+          <p className="text-sm text-slate-400 mt-1 text-center">{t.subtitle}</p>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="display_name">{t.yourName}</Label>
+              <Input id="display_name" name="display_name" type="text" required autoComplete="name" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="group_name">{t.groupName}</Label>
+              <Input id="group_name" name="group_name" type="text" required placeholder={t.groupNamePlaceholder} />
+            </div>
+            <div className="border-t border-slate-100 pt-4 space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">{t.email}</Label>
+                <Input id="email" name="email" type="email" required autoComplete="email" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">{t.password}</Label>
+                <Input id="password" name="password" type="password" required minLength={8} autoComplete="new-password" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirm_password">{t.confirmPassword}</Label>
+                <Input id="confirm_password" name="confirm_password" type="password" required minLength={8} autoComplete="new-password" />
+              </div>
+            </div>
+            {error && <p className="text-sm text-destructive">{error}</p>}
+            <Button
+              type="submit"
+              className="w-full bg-[#9B1C1C] hover:bg-[#7F1D1D] text-white"
+              disabled={loading}
+            >
+              {loading ? t.creating : t.submit}
+            </Button>
+          </form>
+        </div>
+
+        <p className="text-xs text-slate-400 text-center mt-6">{t.footer}</p>
+      </div>
+    </div>
+  )
+}
