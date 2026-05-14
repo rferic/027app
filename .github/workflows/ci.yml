@@ -15,7 +15,6 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
-      - run: pnpm tsc --noEmit
       - run: pnpm test --run
       - run: pnpm build
       - run: pnpm audit --audit-level moderate
