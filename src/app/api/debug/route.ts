@@ -23,10 +23,32 @@ export async function GET() {
 
   try {
     const supabase2 = createClient(url!, key!, { auth: { autoRefreshToken: false, persistSession: false } })
-    const { error: rpcError, data: rpcData } = await supabase2.rpc('version')
-    results.rpc = { data: rpcData, error: rpcError }
+    const { error: rpcError, data: rpcData, count: profilesCount } = await supabase2
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+    results.profiles = { data: rpcData, count: profilesCount, error: rpcError ? { message: rpcError.message, code: rpcError.code } : null }
   } catch (err) {
-    results.rpcError = err instanceof Error ? err.message : String(err)
+    results.profilesError = err instanceof Error ? err.message : String(err)
+  }
+
+  try {
+    const supabase3 = createClient(url!, key!, { auth: { autoRefreshToken: false, persistSession: false } })
+    const { error: rpcError, data: rpcData } = await supabase3
+      .from('groups')
+      .select('*', { count: 'exact', head: true })
+    results.groups = { data: rpcData, error: rpcError ? { message: rpcError.message, code: rpcError.code } : null }
+  } catch (err) {
+    results.groupsError = err instanceof Error ? err.message : String(err)
+  }
+
+  try {
+    const supabase4 = createClient(url!, key!, { auth: { autoRefreshToken: false, persistSession: false } })
+    const response = await supabase4.rest.post('/rpc/', { query: "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'" }, {
+      headers: { 'Content-Profile': 'public' },
+    })
+    results.rawQuery = { status: response.status, data: response.data }
+  } catch (err) {
+    results.rawQueryError = err instanceof Error ? err.message : String(err)
   }
 
   return Response.json(results)
