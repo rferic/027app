@@ -49,9 +49,14 @@ export function InstallForm() {
     setLoading(true)
     setError(null)
 
-    const result = await install(form)
-    if (result?.error) {
-      setError(result.error)
+    try {
+      const result = await install(form)
+      if (result?.error) {
+        setError(result.error)
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unexpected error')
+    } finally {
       setLoading(false)
     }
   }
