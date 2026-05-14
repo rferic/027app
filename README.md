@@ -1,6 +1,12 @@
-# apps027
+# 027Apps
 
-An open-source group apps platform. Whether you're managing a family, team, or any collective, apps027 provides a unified workspace where groups manage users, roles, and app permissions in one place.
+Open-source platform for group apps — for families, teams, or any collective.
+
+[![CI](https://github.com/rferic/027app/actions/workflows/ci.yml/badge.svg)](https://github.com/rferic/027app/actions/workflows/ci.yml)
+
+## What is this?
+
+027Apps is a unified platform where groups manage users, roles, and app permissions in one place. It provides a ready-to-use backoffice, invitation-based auth, multilingual UI, and an extensible app system so you can build custom modules for your group's needs.
 
 ## Features
 
@@ -34,73 +40,67 @@ An open-source group apps platform. Whether you're managing a family, team, or a
 
 | Technology | Purpose |
 |-----------|---------|
-| Next.js 15 | Frontend framework (App Router) |
+| Next.js 16 | Frontend framework (App Router) |
+| React 19 | UI library |
 | TypeScript | Strict typing |
-| Supabase | PostgreSQL + Auth |
+| Supabase | PostgreSQL + Auth + RLS |
+| Tailwind CSS v4 | Styling |
 | shadcn/ui | Component library |
-| Tailwind CSS | Styling |
 | next-intl | i18n management |
 | Vitest | Unit testing |
 | Playwright | E2E testing |
+| pnpm | Package manager |
 
-## Route Structure
+## Getting started
 
-- **`/{locale}/admin`** – Multilingual backoffice for group and user management (admin role only)
-- **`/{locale}`** – Public web app with locale-aware routing (member role)
+### Requirements
+- Node.js 22+
+- pnpm
+- Docker (for Supabase local development)
 
-## Visual Style
+### Installation
 
-- White sidebar with **rose/garnet** accent color (`rose-600` primary).
-- Gray page background (`bg-gray-100`), white content cards.
-- All action buttons are pill-shaped `<button>` elements — never plain text links.
-
-## Prerequisites
-
-- **Node.js** ≥ 18
-- **pnpm** (package manager)
-- **Supabase CLI** (for local development)
-
-## Getting Started
-
-### 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/apps027.git
-cd apps027
-```
-
-### 2. Install dependencies
-```bash
+git clone https://github.com/rferic/027app.git
+cd 027app
 pnpm install
 ```
 
-### 3. Set up environment variables
+### Environment variables
+
+Copy `.env.local.example` to `.env.local`:
+
 ```bash
 cp .env.local.example .env.local
 ```
 
-Edit `.env.local`:
+Fill in your Supabase credentials:
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
 
-### 4. Start local Supabase
+### Start local Supabase
+
 ```bash
 supabase start
 ```
 
-### 5. Apply database migrations
+### Apply database migrations
+
 ```bash
 # If supabase db push fails (remote already has earlier migrations), apply directly:
 docker exec -i supabase_db_027apps psql -U postgres -d postgres < supabase/migrations/<file>.sql
 ```
 
-### 6. Generate Supabase types
+### Generate Supabase types
+
 ```bash
 supabase gen types typescript --local > src/types/supabase.ts
 # Remove "Connecting to db" line at the top if present
 ```
 
-### 7. Start the development server
+### Start the development server
+
 ```bash
 pnpm dev
 ```
@@ -118,17 +118,30 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 | `pnpm test` | Run Vitest unit tests |
 | `pnpm test:e2e` | Run Playwright E2E tests |
 
-## How to Add a New App Module
+## Project structure
 
-1. **Create the page** under `src/app/(app)/[locale]/apps/[module-name]/page.tsx`
-2. **Define permissions** in `app_permissions` table
-3. **Add i18n keys** to all 6 locale files in `src/i18n/messages/`
-4. **Register in backoffice** so admins can grant access
+```
+src/
+  app/          Next.js App Router pages
+  components/   Shared React components
+  db/           Database migrations and helpers
+  i18n/         Internationalization messages
+  lib/          Utilities and shared logic
+  types/        TypeScript type definitions
+apps/           App modules (extensible modules)
+  README.md     App developer guide
+.github/
+  workflows/    CI and release automation
+```
+
+## Creating apps
+
+See [apps/README.md](apps/README.md) and the documentation site at `/doc`.
 
 ## Contributing
 
-Follow the conventions in `CLAUDE.md`. Write tests for new features. Open an issue first for large changes.
+See [CONTRIBUTING.md](.github/CONTRIBUTING.md)
 
 ## License
 
-See `LICENSE` for details.
+MIT

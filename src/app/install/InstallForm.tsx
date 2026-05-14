@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -13,21 +13,26 @@ const LOCALES: { value: InstallLocale; label: string }[] = [
   { value: 'it', label: 'IT' },
 ]
 
+function setPreferredLocaleCookie(locale: InstallLocale) {
+  document.cookie = `preferred-locale=${locale};path=/;max-age=${365 * 24 * 60 * 60};samesite=lax`
+}
+
+function getInitialLocale(): InstallLocale {
+  const match = document.cookie.match(/preferred-locale=([^;]+)/)
+  const saved = match?.[1] as InstallLocale | undefined
+  if (saved && saved in installT) return saved
+  return 'en'
+}
+
 export function InstallForm() {
-  const [locale, setLocale] = useState<InstallLocale>('en')
+  const [locale, setLocale] = useState<InstallLocale>(getInitialLocale)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const t = installT[locale]
 
-  useEffect(() => {
-    const match = document.cookie.match(/preferred-locale=([^;]+)/)
-    const saved = match?.[1] as InstallLocale | undefined
-    if (saved && saved in installT) setLocale(saved)
-  }, [])
-
   function handleLocaleChange(newLocale: InstallLocale) {
     setLocale(newLocale)
-    document.cookie = `preferred-locale=${newLocale};path=/;max-age=${365 * 24 * 60 * 60};samesite=lax`
+    setPreferredLocaleCookie(newLocale)
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {

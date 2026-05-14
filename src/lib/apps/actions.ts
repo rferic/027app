@@ -193,7 +193,7 @@ export async function getAppPermissionsAction(
     )
 
     const members: MemberWithAccess[] = (membersResult.data ?? []).map(m => {
-      const profile = m.profiles as { display_name: string | null; avatar_url: string | null }
+      const profile = m.profiles as unknown as { display_name: string | null; avatar_url: string | null }
       return {
         userId: m.user_id,
         displayName: profile.display_name ?? m.user_id,
