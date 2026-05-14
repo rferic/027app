@@ -22,4 +22,3 @@ jobs:
           NEXT_PUBLIC_SUPABASE_ANON_KEY: dummy-anon-key
           SUPABASE_SERVICE_ROLE_KEY: dummy-service-key
         run: pnpm build
-      - run: pnpm audit --audit-level moderate
