@@ -1,4 +1,10 @@
-create extension if not exists "uuid-ossp";
+create extension if not exists "uuid-ossp" with schema extensions;
+
+drop type if exists public.group_role cascade;
+drop table if exists public.app_permissions cascade;
+drop table if exists public.group_members cascade;
+drop table if exists public.groups cascade;
+drop table if exists public.profiles cascade;
 
 create table public.profiles (
   id             uuid primary key references auth.users(id) on delete cascade,
@@ -11,7 +17,7 @@ create table public.profiles (
 );
 
 create table public.groups (
-  id          uuid primary key default uuid_generate_v4(),
+  id          uuid primary key default gen_random_uuid(),
   name        text not null,
   slug        text not null unique,
   created_at  timestamptz not null default now(),
@@ -21,7 +27,7 @@ create table public.groups (
 create type public.group_role as enum ('admin', 'member');
 
 create table public.group_members (
-  id          uuid primary key default uuid_generate_v4(),
+  id          uuid primary key default gen_random_uuid(),
   group_id    uuid not null references public.groups(id) on delete cascade,
   user_id     uuid not null references auth.users(id) on delete cascade,
   role        public.group_role not null default 'member',
@@ -32,7 +38,7 @@ create table public.group_members (
 );
 
 create table public.app_permissions (
-  id          uuid primary key default uuid_generate_v4(),
+  id          uuid primary key default gen_random_uuid(),
   group_id    uuid not null references public.groups(id) on delete cascade,
   user_id     uuid not null references auth.users(id) on delete cascade,
   app_slug    text not null,

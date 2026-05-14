@@ -1,6 +1,6 @@
 create table public.invitations (
-  id          uuid primary key default uuid_generate_v4(),
-  token       uuid not null default uuid_generate_v4() unique,
+  id          uuid primary key default gen_random_uuid(),
+  token       uuid not null default gen_random_uuid() unique,
   title       text not null,
   role        public.group_role not null default 'member',
   email       text,
