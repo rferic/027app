@@ -11,6 +11,7 @@ import { AppValidationError } from '@/types/apps'
 // Minimal manifest: no views, no logo, no migrations — simplest valid shape
 const minimalRaw = {
   slug: 'test-app',
+  tablePrefix: 'test_app_',
   name: 'Test App',
   version: '1.0.0',
   description: 'A test app',

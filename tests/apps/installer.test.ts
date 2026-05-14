@@ -1,20 +1,18 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest'
-import { UseCaseError } from '@/lib/use-cases/types'
-
 // ---------------------------------------------------------------------------
 // Mocks
 // ---------------------------------------------------------------------------
 
-const mockReadFile = vi.fn()
-const mockAccess = vi.fn()
+const { mockReadFile, mockAccess } = vi.hoisted(() => ({
+  mockReadFile: vi.fn(),
+  mockAccess: vi.fn(),
+}))
 
-vi.mock('fs', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('fs')>()
-  return {
-    ...actual,
-    promises: { ...actual.promises, readFile: mockReadFile, access: mockAccess },
-  }
-})
+const mockFsPromises = { readFile: mockReadFile, access: mockAccess }
+vi.mock('fs', () => ({
+  default: { promises: mockFsPromises },
+  promises: mockFsPromises,
+}))
 
 vi.mock('@/lib/supabase/admin', () => ({
   createAdminClient: vi.fn(),
@@ -39,7 +37,10 @@ function makeChain(data: unknown, error: unknown = null) {
     catch: (fn: (v: unknown) => unknown) => Promise.resolve(resolved).catch(fn),
     finally: (fn: () => void) => Promise.resolve(resolved).finally(fn),
     single: vi.fn().mockResolvedValue(resolved),
-    maybeSingle: vi.fn().mockResolvedValue(resolved),
+    maybeSingle: vi.fn().mockImplementation(() => {
+      const isEmpty = Array.isArray(data) && data.length === 0
+      return Promise.resolve(isEmpty ? { data: null, error: null } : resolved)
+    }),
   }
   for (const m of ['select', 'insert', 'update', 'delete', 'eq', 'in', 'limit', 'order', 'rpc', 'filter']) {
     chain[m] = vi.fn().mockReturnValue(chain)
@@ -114,7 +115,7 @@ describe('installApp', () => {
   })
 
   it('sets status to error and rethrows when migrations.sql fails', async () => {
-    mockReadFile.mockResolvedValue('CREATE TABLE bad;')
+    mockReadFile.mockResolvedValue('CREATE TABLE test_app_bad (id int);')
     mockAccess.mockResolvedValue(undefined)
     mockRpc.mockReturnValue(makeChain(null, { message: 'syntax error' }))
 
@@ -145,7 +146,7 @@ describe('installApp', () => {
     mockFrom.mockImplementation(() => makeChain([]))
 
     const { installApp } = await import('@/lib/apps/installer')
-    await expect(installApp('test-app')).rejects.toMatchObject({ code: 'DEP_NOT_ACTIVE' })
+    await expect(installApp('test-app')).rejects.toMatchObject({ code: 'dependency_not_installed' })
   })
 })
 
@@ -180,7 +181,7 @@ describe('uninstallApp', () => {
     mockFrom.mockImplementation(() => makeChain([{ slug: 'dependent-app', status: 'active' }]))
 
     const { uninstallApp } = await import('@/lib/apps/installer')
-    await expect(uninstallApp('test-app')).rejects.toThrow(UseCaseError)
+    await expect(uninstallApp('test-app')).rejects.toThrow('depends on it and is active')
   })
 
   it('deletes the record on successful uninstall', async () => {
