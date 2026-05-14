@@ -2,6 +2,8 @@ import { notFound } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { InstallForm } from './InstallForm'
 
+export const dynamic = 'force-dynamic'
+
 export default async function InstallPage() {
   const supabase = createAdminClient()
 
