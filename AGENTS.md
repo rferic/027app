@@ -16,7 +16,29 @@ sprint-{N}-{descripcion}.md
 - **Implementado:** añadir sufijo `.done` → `sprint-1-apps-system.md.done`
 
 Antes de empezar cualquier tarea, revisa los archivos en `.plans/` para saber qué sprints están pendientes (`.md`) y cuáles ya están implementados (`.md.done`), y continúa la numeración desde la última TASK del último sprint.
+
+## Rama por sprint
+- Cada sprint se trabaja en su propia rama: `sprint/{N}-{descripcion}` (ej. `sprint/4-github-deploy`)
+- Features en ramas `feature/{descripcion}`, fixes en `fix/{descripcion}`
+- El merge a `main` se hace con **squash merge** — un solo commit limpio por feature/sprint
+- **NUNCA** se trabaja directamente en `main`
 <!-- END:sprint-conventions -->
+
+<!-- BEGIN:code-review -->
+# Code Review antes de merge
+
+1. El **Ingeniero** (agente de calidad) audita el código automáticamente
+2. El Ingeniero emite un veredicto (aprobado/rechazado con observaciones)
+3. Se pregunta al usuario: "¿Revisas tú o te fías del veredicto?"
+4. Según su respuesta: él revisa el diff o se procede con el merge
+<!-- END:code-review -->
+
+<!-- BEGIN:deploy-rule -->
+# 🚨 REGLA DE ORO: No hacer deploy sin permiso
+
+**NUNCA** se hace deploy a producción sin confirmación explícita del usuario.
+Toda skill, agente o flujo automático debe preguntar antes de deployar.
+<!-- END:deploy-rule -->
 
 <!-- BEGIN:shadcn-verification-rules -->
 # Verificación de componentes shadcn/ui
