@@ -109,7 +109,7 @@ apps/
 | `secondaryColor` | string | ✓ | Hex background accent |
 | `author.name` | string | ✓ | Author name |
 | `author.url` | string | — | Author website |
-| `minPlatformVersion` | string | ✓ | Minimum platform version required |
+| `minPlatformVersion` | string | ✓ | Minimum platform version required — references the `version` field in the root `package.json` (currently `0.1.0`). The platform checks this at install time to ensure compatibility. |
 | `views.public` | boolean | ✓ | Whether the app has a public web view |
 | `views.admin` | boolean | ✓ | Whether the app has an admin panel view |
 | `views.widget` | boolean | ✓ | Whether the app has a dashboard widget |
