@@ -1,12 +1,14 @@
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { routing } from '@/i18n/routing'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { AppHeader } from '@/components/app-header'
 import { AppFooter } from '@/components/app-footer'
 import { BlockedOverlay } from '@/components/blocked-overlay'
+import { Toaster } from '@/components/ui/sonner'
 import { AppShell, type NavItem } from '@/components/app-shell'
 import { readManifest } from '@/lib/apps/manifest'
 
@@ -22,6 +24,12 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
+
+  // Auth guard for all (app) routes except login
+  const pathname = (await headers()).get('x-invoke-path') || ''
+  if (!user && pathname && !pathname.endsWith('/login')) {
+    redirect(`/${locale}/login`)
+  }
 
   let displayName = ''
   let isAdmin = false
@@ -63,14 +71,19 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   return (
     <NextIntlClientProvider messages={messages}>
+      <Toaster theme="light" position="bottom-right" />
       <div className="flex flex-col min-h-screen bg-slate-50">
         {user && (
           <AppHeader locale={locale} displayName={displayName} isAdmin={isAdmin} />
         )}
         {user && isBlocked && <BlockedOverlay locale={locale} showSignOut />}
-        <AppShell navItems={navItems} locale={locale}>
-          {children}
-        </AppShell>
+        {user ? (
+          <AppShell navItems={navItems} locale={locale}>
+            {children}
+          </AppShell>
+        ) : (
+          children
+        )}
         <AppFooter locale={locale} />
       </div>
     </NextIntlClientProvider>

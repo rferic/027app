@@ -2,7 +2,7 @@ import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { getUserWithRole } from '@/lib/auth/helpers'
 import { getGroupSettings } from '@/lib/use-cases/settings'
-import { ProfileForm } from './ProfileForm'
+import { ProfileForm } from '@/components/profile-form'
 
 interface Props {
   params: Promise<{ locale: string }>
@@ -30,6 +30,7 @@ export default async function ProfilePage({ params }: Props) {
         displayName={profile?.display_name ?? ''}
         locale={profile?.locale ?? 'es'}
         availableLocales={settings.activeLocales}
+        showLocale
       />
     </main>
   )

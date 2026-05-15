@@ -4,19 +4,20 @@ import { useActionState, useEffect, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { LOCALE_LABELS } from '@/i18n/routing'
-import { updateProfileAction, changePasswordAction, type ProfileState, type PasswordState } from './actions'
+import { updateProfileAction, changePasswordAction, type ProfileState, type PasswordState } from '@/components/profile-actions'
 
 interface Props {
   displayName: string
-  locale: string
-  availableLocales: string[]
+  locale?: string
+  availableLocales?: string[]
+  showLocale?: boolean
 }
 
 const initialProfileState: ProfileState = { error: null }
 const initialPasswordState: PasswordState = { error: null }
 
-export function ProfileForm({ displayName, locale, availableLocales }: Props) {
-  const t = useTranslations('admin.profile')
+export function ProfileForm({ displayName, locale, availableLocales, showLocale = false }: Props) {
+  const t = useTranslations('profile')
   const [profileState, profileAction, profilePending] = useActionState(updateProfileAction, initialProfileState)
   const [passwordState, passwordAction, passwordPending] = useActionState(changePasswordAction, initialPasswordState)
   const prevProfileRef = useRef(initialProfileState)
@@ -26,14 +27,14 @@ export function ProfileForm({ displayName, locale, availableLocales }: Props) {
     if (profileState === prevProfileRef.current) return
     prevProfileRef.current = profileState
     if (profileState.success) toast.success(t('saved'))
-    else if (profileState.error) toast.error(profileState.error)
+    else if (profileState.error) toast.error(t.has(profileState.error) ? t(profileState.error) : profileState.error)
   }, [profileState, t])
 
   useEffect(() => {
     if (passwordState === prevPasswordRef.current) return
     prevPasswordRef.current = passwordState
     if (passwordState.success) toast.success(t('passwordChanged'))
-    else if (passwordState.error) toast.error(passwordState.error)
+    else if (passwordState.error) toast.error(t.has(passwordState.error) ? t(passwordState.error) : passwordState.error)
   }, [passwordState, t])
 
   return (
@@ -53,30 +54,33 @@ export function ProfileForm({ displayName, locale, availableLocales }: Props) {
               defaultValue={displayName}
               className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent"
             />
+            <p className="mt-1.5 text-xs text-slate-400">{t('displayNameHint')}</p>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              {t('language')}
-            </label>
-            <div className="flex gap-2 flex-wrap">
-              {availableLocales.map((loc) => (
-                <label key={loc} className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="locale"
-                    value={loc}
-                    defaultChecked={locale === loc}
-                    className="sr-only peer"
-                  />
-                  <span className="px-3 py-1.5 rounded-lg text-sm border border-slate-200 peer-checked:bg-slate-900 peer-checked:text-white peer-checked:border-slate-900 transition-colors cursor-pointer">
-                    {LOCALE_LABELS[loc] ?? loc.toUpperCase()}
-                  </span>
-                </label>
-              ))}
+          {showLocale && locale && availableLocales && (
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                {t('language')}
+              </label>
+              <div className="flex gap-2 flex-wrap">
+                {availableLocales.map((loc) => (
+                  <label key={loc} className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="locale"
+                      value={loc}
+                      defaultChecked={locale === loc}
+                      className="sr-only peer"
+                    />
+                    <span className="px-3 py-1.5 rounded-lg text-sm border border-slate-200 peer-checked:bg-slate-900 peer-checked:text-white peer-checked:border-slate-900 transition-colors cursor-pointer">
+                      {LOCALE_LABELS[loc] ?? loc.toUpperCase()}
+                    </span>
+                  </label>
+                ))}
+              </div>
+              <p className="mt-1.5 text-xs text-slate-400">{t('languageNote')}</p>
             </div>
-            <p className="mt-1.5 text-xs text-slate-400">{t('languageNote')}</p>
-          </div>
+          )}
 
           <div className="pt-3 border-t border-slate-100">
             <button
