@@ -112,7 +112,9 @@
         "createdDesc": "Comparteix aquest enllaç amb la persona convidada:",
         "copy": "Copiar",
         "copyFailed": "Error en copiar",
-        "backToInvitations": "← Tornar a invitacions"
+        "backToInvitations": "← Tornar a invitacions",
+        "newTitle": "Nova invitació",
+        "done": "Fet"
       }
     },
     "profile": {
@@ -263,6 +265,27 @@
         "visibility_updated": "Visibilitat actualitzada",
         "access_granted": "Accés concedit",
         "access_revoked": "Accés revocat"
+      },
+      "detail": {
+        "title": "Detalls de l'app",
+        "general": "General",
+        "author": "Autor",
+        "colors": "Colors",
+        "primary": "Principal",
+        "secondary": "Secundari",
+        "views": "Vistes",
+        "views_public": "Pública",
+        "views_admin": "Admin",
+        "views_widget": "Widget",
+        "views_native": "Nativa",
+        "enabled": "Habilitat",
+        "disabled": "Deshabilitat",
+        "configFields": "Camps de configuració",
+        "required": "Obligatori",
+        "optional": "Opcional",
+        "dependencies": "Dependències",
+        "none": "Cap",
+        "api": "API"
       }
     }
   },
@@ -327,6 +350,30 @@
       "access_revoked": "Accés revocat"
     }
   },
+  "profile": {
+    "title": "El meu perfil",
+    "personalInfo": "Informació personal",
+    "displayName": "Nom visible",
+    "displayNameHint": "Així és com el teu nom apareix per a altres membres del grup.",
+    "language": "Idioma",
+    "languageNote": "Canvia l'idioma a tota l'aplicació.",
+    "changePassword": "Canviar contrasenya",
+    "newPassword": "Nova contrasenya",
+    "confirmPassword": "Confirmar contrasenya",
+    "minPasswordChars": "Mínim 8 caràcters",
+    "save": "Desar canvis",
+    "saving": "Desant…",
+    "saved": "Perfil actualitzat",
+    "changePasswordBtn": "Canviar contrasenya",
+    "changingPassword": "Canviant…",
+    "passwordChanged": "Contrasenya canviada",
+    "error_name_required": "El nom és obligatori",
+    "error_password_too_short": "La contrasenya ha de tenir almenys 8 caràcters",
+    "error_passwords_mismatch": "Les contrasenyes no coincideixen",
+    "error_not_authenticated": "No has iniciat sessió",
+    "error_same_password": "La nova contrasenya ha de ser diferent de l'actual",
+    "error_generic": "Error en canviar la contrasenya"
+  },
   "app": {
     "nav": {
       "home": "Inici",
@@ -336,7 +383,10 @@
     "dashboard": {
       "welcome_title": "Benvingut",
       "welcome_subtitle": "El teu grup encara no té apps actives.",
-      "widgets_loading": "Carregant..."
+      "widgets_loading": "Carregant...",
+      "apps_widget_title": "Les teves Apps",
+      "apps_widget_empty": "No hi ha apps disponibles",
+      "apps_widget_empty_hint": "Demana a l'administrador que instal·li algunes apps per al teu grup"
     },
     "header": {
       "open_menu": "Obre el menú"

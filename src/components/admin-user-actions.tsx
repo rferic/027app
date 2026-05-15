@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { useRouter } from 'next/navigation'
 import { Menu } from '@base-ui/react/menu'
 import { useTranslations } from 'next-intl'
 import type { AdminUser } from '@/lib/use-cases/admin/users'
@@ -12,11 +11,11 @@ interface Props {
   user: AdminUser
   locale: string
   currentUserId: string
+  onEdit: () => void
 }
 
-export function AdminUserActions({ user, locale, currentUserId }: Props) {
+export function AdminUserActions({ user, locale, currentUserId, onEdit }: Props) {
   const t = useTranslations('admin.table')
-  const router = useRouter()
   const [, startTransition] = useTransition()
   const [confirmBlock, setConfirmBlock] = useState(false)
   const [confirmMakeMember, setConfirmMakeMember] = useState(false)
@@ -54,7 +53,7 @@ export function AdminUserActions({ user, locale, currentUserId }: Props) {
             <Menu.Popup className="bg-white border border-slate-200 rounded-xl shadow-lg py-1 min-w-[160px] z-50 outline-none">
               <Menu.Item
                 closeOnClick
-                onClick={() => router.push(`/${locale}/admin/users/${user.id}`)}
+                onClick={onEdit}
                 className="block w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 cursor-pointer outline-none"
               >
                 {t('edit')}

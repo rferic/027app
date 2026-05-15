@@ -112,7 +112,9 @@
         "createdDesc": "Condividi questo link con l'invitato:",
         "copy": "Copia",
         "copyFailed": "Copia non riuscita",
-        "backToInvitations": "← Torna agli inviti"
+        "backToInvitations": "← Torna agli inviti",
+        "newTitle": "Nuovo invito",
+        "done": "Fatto"
       }
     },
     "profile": {
@@ -263,6 +265,27 @@
         "visibility_updated": "Visibilità aggiornata",
         "access_granted": "Accesso concesso",
         "access_revoked": "Accesso revocato"
+      },
+      "detail": {
+        "title": "Dettagli app",
+        "general": "Generale",
+        "author": "Autore",
+        "colors": "Colori",
+        "primary": "Primario",
+        "secondary": "Secondario",
+        "views": "Viste",
+        "views_public": "Pubblica",
+        "views_admin": "Admin",
+        "views_widget": "Widget",
+        "views_native": "Nativa",
+        "enabled": "Abilitato",
+        "disabled": "Disabilitato",
+        "configFields": "Campi di configurazione",
+        "required": "Obbligatorio",
+        "optional": "Opzionale",
+        "dependencies": "Dipendenze",
+        "none": "Nessuna",
+        "api": "API"
       }
     }
   },
@@ -327,6 +350,30 @@
       "access_revoked": "Accesso revocato"
     }
   },
+  "profile": {
+    "title": "Il mio profilo",
+    "personalInfo": "Informazioni personali",
+    "displayName": "Nome visualizzato",
+    "displayNameHint": "Ecco come il tuo nome appare agli altri membri del gruppo.",
+    "language": "Lingua",
+    "languageNote": "Cambia la lingua in tutta l'app.",
+    "changePassword": "Cambia password",
+    "newPassword": "Nuova password",
+    "confirmPassword": "Conferma password",
+    "minPasswordChars": "Minimo 8 caratteri",
+    "save": "Salva modifiche",
+    "saving": "Salvataggio…",
+    "saved": "Profilo aggiornato",
+    "changePasswordBtn": "Cambia password",
+    "changingPassword": "Cambiando…",
+    "passwordChanged": "Password cambiata",
+    "error_name_required": "Il nome è obbligatorio",
+    "error_password_too_short": "La password deve contenere almeno 8 caratteri",
+    "error_passwords_mismatch": "Le password non coincidono",
+    "error_not_authenticated": "Non hai effettuato l'accesso",
+    "error_same_password": "La nuova password deve essere diversa da quella attuale",
+    "error_generic": "Errore nel cambio password"
+  },
   "app": {
     "nav": {
       "home": "Home",
@@ -336,7 +383,10 @@
     "dashboard": {
       "welcome_title": "Benvenuto",
       "welcome_subtitle": "Il tuo gruppo non ha ancora app attive.",
-      "widgets_loading": "Caricamento..."
+      "widgets_loading": "Caricamento...",
+      "apps_widget_title": "Le tue App",
+      "apps_widget_empty": "Nessuna app disponibile",
+      "apps_widget_empty_hint": "Chiedi all'amministratore di installare alcune app per il tuo gruppo"
     },
     "header": {
       "open_menu": "Apri menu"

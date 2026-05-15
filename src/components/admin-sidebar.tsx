@@ -103,6 +103,12 @@ export function AdminSidebar({ locale, initialCollapsed }: Props) {
   const isUsersSection = userSubItems.some((item) => isActive(item.href))
   const isSettingsSection = settingsSubItems.some((item) => isActive(item.href))
 
+  // Auto-open sections on mount/remount when the active route belongs to them
+  useEffect(() => {
+    if (isUsersSection) setUsersOpen(true)
+    if (isSettingsSection) setSettingsOpen(true)
+  }, [isUsersSection, isSettingsSection])
+
   const navContent = (forceExpanded = false) => {
     const isCollapsed = forceExpanded ? false : collapsed
     return (

@@ -112,7 +112,9 @@
         "createdDesc": "Comparte este enlace con la persona invitada:",
         "copy": "Copiar",
         "copyFailed": "Error al copiar",
-        "backToInvitations": "← Volver a invitaciones"
+        "backToInvitations": "← Volver a invitaciones",
+        "newTitle": "Nueva invitación",
+        "done": "Listo"
       }
     },
     "profile": {
@@ -263,6 +265,27 @@
         "visibility_updated": "Visibilidad actualizada",
         "access_granted": "Acceso concedido",
         "access_revoked": "Acceso revocado"
+      },
+      "detail": {
+        "title": "Detalles de la app",
+        "general": "General",
+        "author": "Autor",
+        "colors": "Colores",
+        "primary": "Principal",
+        "secondary": "Secundario",
+        "views": "Vistas",
+        "views_public": "Pública",
+        "views_admin": "Admin",
+        "views_widget": "Widget",
+        "views_native": "Nativa",
+        "enabled": "Habilitado",
+        "disabled": "Deshabilitado",
+        "configFields": "Campos de configuración",
+        "required": "Obligatorio",
+        "optional": "Opcional",
+        "dependencies": "Dependencias",
+        "none": "Ninguna",
+        "api": "API"
       }
     }
   },
@@ -327,6 +350,30 @@
       "access_revoked": "Acceso revocado"
     }
   },
+  "profile": {
+    "title": "Mi perfil",
+    "personalInfo": "Información personal",
+    "displayName": "Nombre visible",
+    "displayNameHint": "Así es como tu nombre aparece para otros miembros del grupo.",
+    "language": "Idioma",
+    "languageNote": "Cambia el idioma en toda la aplicación.",
+    "changePassword": "Cambiar contraseña",
+    "newPassword": "Nueva contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "minPasswordChars": "Mínimo 8 caracteres",
+    "save": "Guardar cambios",
+    "saving": "Guardando…",
+    "saved": "Perfil actualizado",
+    "changePasswordBtn": "Cambiar contraseña",
+    "changingPassword": "Cambiando…",
+    "passwordChanged": "Contraseña cambiada",
+    "error_name_required": "El nombre es obligatorio",
+    "error_password_too_short": "La contraseña debe tener al menos 8 caracteres",
+    "error_passwords_mismatch": "Las contraseñas no coinciden",
+    "error_not_authenticated": "No has iniciado sesión",
+    "error_same_password": "La nueva contraseña debe ser diferente a la actual",
+    "error_generic": "Error al cambiar la contraseña"
+  },
   "app": {
     "nav": {
       "home": "Inicio",
@@ -336,7 +383,10 @@
     "dashboard": {
       "welcome_title": "Bienvenido",
       "welcome_subtitle": "Tu grupo no tiene apps activas aún.",
-      "widgets_loading": "Cargando..."
+      "widgets_loading": "Cargando...",
+      "apps_widget_title": "Tus Apps",
+      "apps_widget_empty": "No hay apps disponibles",
+      "apps_widget_empty_hint": "Pídele al administrador que instale algunas apps para tu grupo"
     },
     "header": {
       "open_menu": "Abrir menú"

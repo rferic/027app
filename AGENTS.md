@@ -22,7 +22,42 @@ Antes de empezar cualquier tarea, revisa los archivos en `.plans/` para saber qu
 - Features en ramas `feature/{descripcion}`, fixes en `fix/{descripcion}`
 - El merge a `main` se hace con **squash merge** — un solo commit limpio por feature/sprint
 - **NUNCA** se trabaja directamente en `main`
+
+## Flujo preview-first (OBLIGATORIO)
+Siempre seguir este orden:
+
+```
+Push rama → Vercel preview (staging) → pruebas en preview → OK → merge a main → deploy producción
+```
+
+**Reglas:**
+1. Nunca mergear a `main` sin antes haber pusheado la rama y verificado el preview en staging
+2. El preview de Vercel se genera automáticamente al pushear la rama
+3. Probar en la URL de preview antes de autorizar el merge
+4. Documentar en el sprint la URL de preview usada
+
+**Excepciones:** Solo si el usuario dice explícitamente "merge directo" o "sin preview".
 <!-- END:sprint-conventions -->
+
+<!-- BEGIN:admin-form-pattern -->
+# Patrón de formularios admin
+
+Todos los formularios de creación/edición en el área admin (`/(admin)`) DEBEN usar el patrón MODAL:
+
+- Backdrop: `fixed inset-0 z-50` con `bg-black/40`
+- Panel: `bg-white rounded-xl border border-slate-100 shadow-xl p-6 w-full max-w-lg mx-4`
+- Abrir/cerrar con estado local (`useState(true/false)`) en el componente padre de la lista
+- Cierre: backdrop click + botón X + escape key
+- NO usar páginas separadas (`/[id]/` o `/new`) para formularios de creación/edición
+- NO usar formularios inline visibles siempre
+
+Excepciones permitidas:
+- Páginas de configuración completas (ej. Settings General, App Config)
+- Páginas de perfil propio (ej. Admin Profile)
+- Formularios que son el propósito principal de la página
+
+Ejemplo canónico: `ApiKeysManager.tsx` (modal inline), `CreateInvitationModal.tsx` (modal separado).
+<!-- END:admin-form-pattern -->
 
 <!-- BEGIN:code-review -->
 # Code Review antes de merge
@@ -60,3 +95,98 @@ Los componentes actualmente instalados se pueden verificar con: `ls src/componen
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
+
+<!-- BEGIN:environments -->
+# Entornos
+
+## Proyectos
+
+| Entorno | Supabase Project Ref | Supabase URL | Vercel |
+|---|---|---|---|
+| **Local** | — | `http://localhost:54321` | — |
+| **Staging** | `tsphkmbtnahjgsivdhaj` | `https://tsphkmbtnahjgsivdhaj.supabase.co` | Preview Deployments |
+| **Producción** | `zbwvvzeljiymwqcbemyy` | `https://zbwvvzeljiymwqcbemyy.supabase.co` | Production |
+
+## Claves de API
+
+| Entorno | `SUPABASE_SERVICE_ROLE_KEY` | `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
+|---|---|---|
+| **Local** | Generada con JWT secret local | Generada con JWT secret local |
+| **Staging** | En Vercel (env Preview) | En Vercel (env Preview) |
+| **Producción** | En Vercel (env Production) | En Vercel (env Production) |
+
+## Flujo de trabajo
+
+```
+Push rama (sprint/*, feature/*, fix/*)
+  → CI: lint + tsc + test
+  → Vercel: Preview Deployment (contra Supabase staging)
+  → migrate-staging.yml: supabase db push (contra staging)
+       [solo si hay cambios en supabase/migrations/]
+
+Merge a main (squash merge)
+  → Vercel: Production Deployment (contra Supabase producción)
+  → migrate-prod.yml: supabase db push (contra producción)
+       [solo si hay cambios en supabase/migrations/]
+```
+
+## Workflows de GitHub Actions
+
+| Archivo | Disparador | Destino |
+|---|---|---|
+| `ci.yml` | PR a `main` | lint + tsc + test |
+| `release.yml` | Push a `main` | release-please (semver) |
+| `migrate-prod.yml` | Push a `main` (migrations/) | `supabase db push` → **producción** |
+| `migrate-staging.yml` | Push a `sprint/*`, `feature/*`, `fix/*` (migrations/) | `supabase db push` → **staging** |
+
+## Cómo probar en staging
+
+1. Push a una rama `sprint/*`, `feature/*` o `fix/*`
+2. Esperar a que Vercel despliegue el Preview Deployment
+3. Abrir la URL que Vercel muestra en el PR/commit (ej. `sprint-5-estabilizacion.027apps.vercel.app`)
+4. Esa URL apunta a Supabase staging — datos aislados de producción
+
+## Migraciones manuales
+
+Si necesitas aplicar migraciones a staging manualmente:
+
+```bash
+supabase link --project-ref tsphkmbtnahjgsivdhaj
+supabase db push --include-all
+```
+
+Si necesitas aplicar migraciones a producción manualmente:
+
+```bash
+supabase link --project-ref zbwvvzeljiymwqcbemyy
+supabase db push --include-all
+```
+<!-- END:environments -->
+
+<!-- BEGIN:local-dev -->
+# Desarrollo local
+
+1. Asegúrate de que Supabase local está corriendo:
+   ```bash
+   supabase start
+   ```
+
+2. El `.env.local` debe tener las claves locales:
+   - `NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` y `SUPABASE_SERVICE_ROLE_KEY` = claves locales firmadas con el JWT secret local
+
+3. Para regenerar las claves locales (si cambia el JWT secret):
+   ```bash
+   node -e "
+   const c = require('crypto');
+   const s = 'super-secret-jwt-token-with-at-least-32-characters-long';
+   const n = Math.floor(Date.now()/1000);
+   const h = Buffer.from(JSON.stringify({alg:'HS256',typ:'JWT'})).toString('base64url');
+   [['service_role'],['anon']].forEach(([r])=>{
+     const p = Buffer.from(JSON.stringify({iss:'supabase',ref:'027apps',role:r,iat:n,exp:n+86400*365})).toString('base64url');
+     const sig = c.createHmac('sha256', s).update(h+'.'+p).digest('base64url');
+     console.log(r.toUpperCase()+'_KEY= '+h+'.'+p+'.'+sig);
+   });
+   "
+   ```
+<!-- END:local-dev -->

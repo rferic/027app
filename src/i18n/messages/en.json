@@ -112,7 +112,9 @@
         "createdDesc": "Share this link with the invitee:",
         "copy": "Copy",
         "copyFailed": "Copy failed",
-        "backToInvitations": "← Back to invitations"
+        "backToInvitations": "← Back to invitations",
+        "newTitle": "New invitation",
+        "done": "Done"
       }
     },
     "profile": {
@@ -263,6 +265,27 @@
         "visibility_updated": "Visibility updated",
         "access_granted": "Access granted",
         "access_revoked": "Access revoked"
+      },
+      "detail": {
+        "title": "App Details",
+        "general": "General",
+        "author": "Author",
+        "colors": "Colors",
+        "primary": "Primary",
+        "secondary": "Secondary",
+        "views": "Views",
+        "views_public": "Public",
+        "views_admin": "Admin",
+        "views_widget": "Widget",
+        "views_native": "Native",
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "configFields": "Configuration Fields",
+        "required": "Required",
+        "optional": "Optional",
+        "dependencies": "Dependencies",
+        "none": "None",
+        "api": "API"
       }
     }
   },
@@ -327,6 +350,30 @@
       "access_revoked": "Access revoked"
     }
   },
+  "profile": {
+    "title": "My profile",
+    "personalInfo": "Personal info",
+    "displayName": "Display name",
+    "displayNameHint": "This is how your name appears to other group members.",
+    "language": "Language",
+    "languageNote": "Changes the language across the entire app.",
+    "changePassword": "Change password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "minPasswordChars": "At least 8 characters",
+    "save": "Save changes",
+    "saving": "Saving…",
+    "saved": "Profile updated",
+    "changePasswordBtn": "Change password",
+    "changingPassword": "Changing…",
+    "passwordChanged": "Password changed",
+    "error_name_required": "Name is required",
+    "error_password_too_short": "Password must be at least 8 characters",
+    "error_passwords_mismatch": "Passwords do not match",
+    "error_not_authenticated": "You are not signed in",
+    "error_same_password": "New password must be different from the current one",
+    "error_generic": "Error changing password"
+  },
   "app": {
     "nav": {
       "home": "Home",
@@ -336,7 +383,10 @@
     "dashboard": {
       "welcome_title": "Welcome",
       "welcome_subtitle": "Your group has no active apps yet.",
-      "widgets_loading": "Loading..."
+      "widgets_loading": "Loading...",
+      "apps_widget_title": "Your Apps",
+      "apps_widget_empty": "No apps available",
+      "apps_widget_empty_hint": "Ask your administrator to install some apps for your group"
     },
     "header": {
       "open_menu": "Open menu"

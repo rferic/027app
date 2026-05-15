@@ -84,7 +84,7 @@ export default async function AdminDashboard({ params }: Props) {
               })}
             </ul>
           )}
-          <Link href={`${base}/invitations/new`} className="mt-4 w-full flex items-center justify-center px-3 py-2 text-xs font-medium bg-slate-900 text-white rounded-lg hover:bg-slate-700 transition-colors">{t('newInvitation')}</Link>
+          <Link href={`${base}/invitations`} className="mt-4 w-full flex items-center justify-center px-3 py-2 text-xs font-medium bg-slate-900 text-white rounded-lg hover:bg-slate-700 transition-colors">{t('newInvitation')}</Link>
         </div>
       </div>
     </main>

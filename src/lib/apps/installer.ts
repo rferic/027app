@@ -73,24 +73,26 @@ export async function installApp(slug: string): Promise<void> {
     }
   }
 
-  const { data: prefixConflict, error: prefixCheckError } = await (adminClient
+  const { data: activeApps, error: activeAppsError } = await adminClient
     .from('installed_apps')
     .select('slug')
-    .eq('table_prefix' as 'slug', manifest.tablePrefix as never)
-    .limit(1)
-    .maybeSingle() as unknown as Promise<{ data: { slug: string } | null; error: { message: string } | null }>)
-  if (prefixCheckError) throw new Error(`Failed to check prefix uniqueness: ${prefixCheckError.message}`)
-  if (prefixConflict) {
-    throw new InstallerError(
-      'prefix_conflict',
-      { prefix: manifest.tablePrefix, slug: prefixConflict.slug },
-      `Table prefix "${manifest.tablePrefix}" is already used by app "${prefixConflict.slug}"`
-    )
+    .eq('status', 'active')
+  if (activeAppsError) throw new Error(`Failed to check prefix uniqueness: ${activeAppsError.message}`)
+  for (const { slug: installedSlug } of (activeApps ?? [])) {
+    if (installedSlug === slug) continue
+    const installedManifest = await readManifest(installedSlug)
+    if (installedManifest.tablePrefix === manifest.tablePrefix) {
+      throw new InstallerError(
+        'prefix_conflict',
+        { prefix: manifest.tablePrefix, slug: installedSlug },
+        `Table prefix "${manifest.tablePrefix}" is already used by app "${installedSlug}"`
+      )
+    }
   }
 
-  const { error: insertError } = await adminClient
-    .from('installed_apps')
-    .insert({ slug, version: manifest.version, status: 'installing', config: {}, table_prefix: manifest.tablePrefix } as unknown as InstalledAppsInsert)
+  const { error: insertError } = await adminClient.rpc('exec_sql', {
+    sql: `insert into installed_apps (slug, version, status, config, table_prefix) values ('${slug}', '${manifest.version}', 'installing', '{}', '${manifest.tablePrefix}')`
+  })
   if (insertError) throw new Error(`Failed to insert installed_app: ${insertError.message}`)
 
   const migrationsPath = path.join(process.cwd(), 'apps', slug, 'migrations.sql')

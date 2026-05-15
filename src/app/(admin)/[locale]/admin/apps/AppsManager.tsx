@@ -3,9 +3,10 @@
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { useTranslations, useLocale } from 'next-intl'
-import { Package, CheckCircle, XCircle, Loader2, AlertTriangle } from 'lucide-react'
+import { Package, CheckCircle, XCircle, Loader2, AlertTriangle, Info } from 'lucide-react'
 import { installAppAction, uninstallAppAction, updateAppVisibilityAction } from '@/lib/apps/actions'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { AppDetailDrawer } from '@/components/app-detail-drawer'
 import type { CombinedApp } from '@/types/apps'
 
 interface Props {
@@ -35,6 +36,7 @@ function AppCard({ app }: { app: CombinedApp }) {
   const [isPendingVisibility, startVisibilityTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [showUninstallConfirm, setShowUninstallConfirm] = useState(false)
+  const [showDetail, setShowDetail] = useState(false)
 
   const isInstalled = app.installed !== null
   const isActive = app.installed?.status === 'active'
@@ -76,6 +78,16 @@ function AppCard({ app }: { app: CombinedApp }) {
             <div className="flex items-center gap-2 flex-wrap">
               <span className="font-semibold text-gray-900 text-sm">{app.manifest?.name ?? app.slug}</span>
               {app.manifest && <span className="text-xs text-gray-400">v{app.manifest.version}</span>}
+              {app.manifest && (
+                <button
+                  type="button"
+                  onClick={() => setShowDetail(true)}
+                  className="p-0.5 rounded text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer transition-colors"
+                  title="App details"
+                >
+                  <Info size={14} />
+                </button>
+              )}
               {app.installed && <StatusBadge status={app.installed.status} />}
             </div>
             <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{app.manifest?.description ?? ''}</p>
@@ -180,6 +192,14 @@ function AppCard({ app }: { app: CombinedApp }) {
             ))}
           </div>
         </div>
+      )}
+
+      {showDetail && app.manifest && (
+        <AppDetailDrawer
+          manifest={app.manifest}
+          open={showDetail}
+          onOpenChange={setShowDetail}
+        />
       )}
     </div>
   )

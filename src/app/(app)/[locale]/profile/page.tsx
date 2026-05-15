@@ -1,7 +1,8 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
-import { LocaleSwitcher } from '@/components/locale-switcher'
-import { ProfileForm } from './ProfileForm'
+import { ProfileForm } from '@/components/profile-form'
 
 interface Props {
   params: Promise<{ locale: string }>
@@ -10,11 +11,16 @@ interface Props {
 export default async function ProfilePage({ params }: Props) {
   const { locale } = await params
   const supabase = await createClient()
+  const t = await getTranslations('profile')
 
   const { data: { user } } = await supabase.auth.getUser()
-  const { data: profile } = user
-    ? await supabase.from('profiles').select('display_name').eq('id', user.id).single()
-    : { data: null }
+  if (!user) redirect(`/${locale}/login`)
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('display_name')
+    .eq('id', user.id)
+    .single()
 
   return (
     <main className="max-w-sm mx-auto px-4 py-10">
@@ -25,20 +31,10 @@ export default async function ProfilePage({ params }: Props) {
         >
           ← Back
         </Link>
-        <h1 className="text-xl font-semibold text-slate-900 mt-3">My profile</h1>
+        <h1 className="text-xl font-semibold text-slate-900 mt-3">{t('title')}</h1>
       </div>
 
-      <div className="space-y-6">
-        <ProfileForm displayName={profile?.display_name ?? ''} />
-
-        <div className="pt-2">
-          <p className="text-sm font-medium text-slate-700 mb-3">Language</p>
-          <LocaleSwitcher currentLocale={locale} saveToDb />
-          <p className="mt-2 text-xs text-slate-400">
-            Changes the language across the entire app.
-          </p>
-        </div>
-      </div>
+      <ProfileForm displayName={profile?.display_name ?? ''} />
     </main>
   )
 }
