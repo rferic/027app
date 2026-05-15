@@ -23,6 +23,30 @@ Antes de empezar cualquier tarea, revisa los archivos en `.plans/` para saber qu
 - El merge a `main` se hace con **squash merge** — un solo commit limpio por feature/sprint
 - **NUNCA** se trabaja directamente en `main`
 
+## Formato de PR y commits
+
+```
+PR title:         Sprint N: Título descriptivo
+Squash commit:    Sprint N: Título descriptivo
+Commits en rama:  Sprint N: type(scope): mensaje
+```
+
+**Ejemplos:**
+
+```
+PR:               Sprint 6: Multitenant groups
+Squash commit:    Sprint 6: Multitenant groups
+Commits:          Sprint 6: feat: widget dashboard
+                  Sprint 6: fix: sidebar collapse
+                  Sprint 6: docs: pre-push hook
+```
+
+**Reglas:**
+- El PR title y el squash commit SIEMPRE empiezan con `Sprint N: `
+- Los commits individuales en la rama también llevan `Sprint N: ` prefijo
+- `type` sigue conventional commits: feat, fix, docs, refactor, test, chore
+- El `scope` es opcional, va entre paréntesis tras el type
+
 ## Flujo preview-first (OBLIGATORIO)
 Siempre seguir este orden:
 
