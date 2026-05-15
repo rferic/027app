@@ -51,6 +51,8 @@
       "statsUsers": "Utilisateurs",
       "statsAdmins": "Admins",
       "statsMembers": "Membres",
+      "statsApps": "Apps",
+      "statsAppsSublabel": "disponibles",
       "statsPending": "Invitations en attente"
     },
     "users": {
@@ -112,7 +114,9 @@
         "createdDesc": "Partagez ce lien avec l'invité :",
         "copy": "Copier",
         "copyFailed": "Échec de la copie",
-        "backToInvitations": "← Retour aux invitations"
+        "backToInvitations": "← Retour aux invitations",
+        "newTitle": "Nouvelle invitation",
+        "done": "Terminer"
       }
     },
     "profile": {
@@ -263,6 +267,27 @@
         "visibility_updated": "Visibilité mise à jour",
         "access_granted": "Accès accordé",
         "access_revoked": "Accès révoqué"
+      },
+      "detail": {
+        "title": "Détails de l'app",
+        "general": "Général",
+        "author": "Auteur",
+        "colors": "Couleurs",
+        "primary": "Principale",
+        "secondary": "Secondaire",
+        "views": "Vues",
+        "views_public": "Publique",
+        "views_admin": "Admin",
+        "views_widget": "Widget",
+        "views_native": "Native",
+        "enabled": "Activé",
+        "disabled": "Désactivé",
+        "configFields": "Champs de configuration",
+        "required": "Obligatoire",
+        "optional": "Optionnel",
+        "dependencies": "Dépendances",
+        "none": "Aucune",
+        "api": "API"
       }
     }
   },
@@ -327,6 +352,30 @@
       "access_revoked": "Accès révoqué"
     }
   },
+  "profile": {
+    "title": "Mon profil",
+    "personalInfo": "Informations personnelles",
+    "displayName": "Nom affiché",
+    "displayNameHint": "C'est ainsi que votre nom apparaît aux autres membres du groupe.",
+    "language": "Langue",
+    "languageNote": "Change la langue dans toute l'application.",
+    "changePassword": "Changer le mot de passe",
+    "newPassword": "Nouveau mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "minPasswordChars": "Au moins 8 caractères",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "saved": "Profil mis à jour",
+    "changePasswordBtn": "Changer le mot de passe",
+    "changingPassword": "Modification…",
+    "passwordChanged": "Mot de passe modifié",
+    "error_name_required": "Le nom est requis",
+    "error_password_too_short": "Le mot de passe doit contenir au moins 8 caractères",
+    "error_passwords_mismatch": "Les mots de passe ne correspondent pas",
+    "error_not_authenticated": "Vous n'êtes pas connecté",
+    "error_same_password": "Le nouveau mot de passe doit être différent de l'actuel",
+    "error_generic": "Erreur lors du changement de mot de passe"
+  },
   "app": {
     "nav": {
       "home": "Accueil",
@@ -336,7 +385,10 @@
     "dashboard": {
       "welcome_title": "Bienvenue",
       "welcome_subtitle": "Votre groupe n'a pas encore d'applications actives.",
-      "widgets_loading": "Chargement..."
+      "widgets_loading": "Chargement...",
+      "apps_widget_title": "Vos Apps",
+      "apps_widget_empty": "Aucune app disponible",
+      "apps_widget_empty_hint": "Demande à ton administrateur d'installer des apps pour ton groupe"
     },
     "header": {
       "open_menu": "Ouvrir le menu"

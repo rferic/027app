@@ -5,12 +5,21 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { readManifest } from '@/lib/apps/manifest'
 import { Sparkles } from 'lucide-react'
+import { AppInstalledWidget } from '@/components/app-installed-widget'
 
 const SLUG_RE = /^[a-z0-9-]+$/
 
 interface WidgetEntry {
   slug: string
   Component: React.ComponentType
+}
+
+interface AppWidgetData {
+  slug: string
+  name: string
+  description: string
+  primaryColor: string
+  secondaryColor: string
 }
 
 async function loadWidgets(): Promise<WidgetEntry[]> {
@@ -30,6 +39,36 @@ async function loadWidgets(): Promise<WidgetEntry[]> {
       results.push({ slug: app.slug, Component: mod.default })
     } catch {
       // App has no valid widget — skip silently
+    }
+  }
+  return results
+}
+
+async function loadAppWidgets(): Promise<AppWidgetData[]> {
+  const adminClient = createAdminClient()
+  // Debug: check app visibility in Supabase Dashboard → installed_apps table.
+  // Apps with visibility='private' won't show in this widget. Make sure at least
+  // one app has status='active' AND visibility='public' in your local DB.
+  const { data: installedApps } = await adminClient
+    .from('installed_apps')
+    .select('slug')
+    .eq('status', 'active')
+    .eq('visibility', 'public')
+
+  const results: AppWidgetData[] = []
+  for (const app of installedApps ?? []) {
+    if (!SLUG_RE.test(app.slug)) continue
+    try {
+      const manifest = await readManifest(app.slug)
+      results.push({
+        slug: app.slug,
+        name: manifest.name,
+        description: manifest.description,
+        primaryColor: manifest.primaryColor,
+        secondaryColor: manifest.secondaryColor,
+      })
+    } catch {
+      // Skip invalid manifests
     }
   }
   return results
@@ -84,8 +123,11 @@ export default async function DashboardPage({ params }: Props) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect(`/${locale}/login`)
 
+  const apps = await loadAppWidgets()
+
   return (
     <main className="p-6 max-w-5xl mx-auto">
+      <AppInstalledWidget apps={apps} locale={locale} />
       <Suspense fallback={<DashboardSkeleton />}>
         <WidgetGrid locale={locale} />
       </Suspense>

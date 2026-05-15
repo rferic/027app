@@ -96,6 +96,8 @@ describe('installApp', () => {
     const insertChain = makeChain(null)
     const updateChain = makeChain(null)
 
+    mockRpc.mockReturnValue(makeChain(null))
+
     mockFrom.mockImplementation((table: string) => {
       if (table === 'installed_apps') {
         return {
@@ -117,7 +119,9 @@ describe('installApp', () => {
   it('sets status to error and rethrows when migrations.sql fails', async () => {
     mockReadFile.mockResolvedValue('CREATE TABLE test_app_bad (id int);')
     mockAccess.mockResolvedValue(undefined)
-    mockRpc.mockReturnValue(makeChain(null, { message: 'syntax error' }))
+    mockRpc
+      .mockReturnValueOnce(makeChain(null))
+      .mockReturnValueOnce(makeChain(null, { message: 'syntax error' }))
 
     const insertChain = makeChain(null)
     const updateChain = makeChain(null)

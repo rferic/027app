@@ -1,13 +1,16 @@
 'use client'
 
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import type { AdminUser } from '@/lib/use-cases/admin/users'
 import { AdminUserActions } from './admin-user-actions'
+import { EditUserModal } from '@/app/(admin)/[locale]/admin/users/EditUserModal'
 
 interface Props {
   users: AdminUser[]
   currentUserId: string
   locale: string
+  availableLocales: string[]
 }
 
 function formatDate(iso: string): string {
@@ -38,8 +41,9 @@ function initials(name: string): string {
     .slice(0, 2)
 }
 
-export function AdminUserTable({ users, currentUserId, locale }: Props) {
+export function AdminUserTable({ users, currentUserId, locale, availableLocales }: Props) {
   const t = useTranslations('admin.table')
+  const [editingUser, setEditingUser] = useState<AdminUser | null>(null)
 
   if (users.length === 0) {
     return (
@@ -113,13 +117,20 @@ export function AdminUserTable({ users, currentUserId, locale }: Props) {
               </td>
               <td className="px-4 py-3">
                 <div className="flex items-center justify-end">
-                  <AdminUserActions user={user} locale={locale} currentUserId={currentUserId} />
+                  <AdminUserActions user={user} locale={locale} currentUserId={currentUserId} onEdit={() => setEditingUser(user)} />
                 </div>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      {editingUser && (
+        <EditUserModal
+          user={editingUser}
+          availableLocales={availableLocales}
+          onClose={() => setEditingUser(null)}
+        />
+      )}
     </div>
   )
 }

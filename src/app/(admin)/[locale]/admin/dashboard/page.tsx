@@ -9,13 +9,13 @@ interface Props {
 
 function StatCard({ label, value, href, sublabel }: { label: string; value: number; href?: string; sublabel?: string }) {
   const content = (
-    <div className="bg-white rounded-xl border border-slate-100 p-5 hover:border-slate-200 transition-colors">
+    <div className="bg-white rounded-xl border border-slate-100 p-5 hover:border-slate-200 transition-colors h-full">
       <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">{label}</p>
       <p className="text-3xl font-bold text-slate-900 mt-1">{value}</p>
       {sublabel && <p className="text-xs text-slate-400 mt-1">{sublabel}</p>}
     </div>
   )
-  if (href) return <Link href={href}>{content}</Link>
+  if (href) return <Link href={href} className="block h-full">{content}</Link>
   return content
 }
 
@@ -38,10 +38,11 @@ export default async function AdminDashboard({ params }: Props) {
         <h1 className="text-xl font-semibold text-slate-900">{t('title')}</h1>
         <p className="text-sm text-slate-400 mt-1">{t('subtitle')}</p>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <StatCard label={t('statsAdmins')} value={stats.admins} href={`${base}/admins`} />
-        <StatCard label={t('statsMembers')} value={stats.members} href={`${base}/users`} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <StatCard label={t('statsPending')} value={stats.pendingInvitations} href={`${base}/invitations`} />
+        <StatCard label={t('statsMembers')} value={stats.members} href={`${base}/users`} />
+        <StatCard label={t('statsAdmins')} value={stats.admins} href={`${base}/admins`} />
+        <StatCard label={t('statsApps')} value={stats.installedApps} href={`${base}/apps`} sublabel={`${stats.totalApps} ${t('statsAppsSublabel')}`} />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-xl border border-slate-100 p-5">
@@ -84,7 +85,7 @@ export default async function AdminDashboard({ params }: Props) {
               })}
             </ul>
           )}
-          <Link href={`${base}/invitations/new`} className="mt-4 w-full flex items-center justify-center px-3 py-2 text-xs font-medium bg-slate-900 text-white rounded-lg hover:bg-slate-700 transition-colors">{t('newInvitation')}</Link>
+          <Link href={`${base}/invitations`} className="mt-4 w-full flex items-center justify-center px-3 py-2 text-xs font-medium bg-slate-900 text-white rounded-lg hover:bg-slate-700 transition-colors">{t('newInvitation')}</Link>
         </div>
       </div>
     </main>
