@@ -195,3 +195,4 @@ _(ninguno todavía — se añaden aquí a medida que se crean)_
 | 2026-05-12 | App detail page + AppConfigSection | Página /admin/apps/[slug] centraliza vista admin + configuración. Botón "Configurar" navega en lugar de abrir modal. AppConfigSection es un client component reutilizable. |
 | 2026-05-12 | AdminOverflowReset — limpia overflow CSS | Componente que limpia overflow:hidden de Fumadocs/next-themes al montar admin. Análogo al bg-white en (app) layout para aislamiento de estilos. |
 | 2026-05-12 | Hydration: useFormatter de next-intl | ApiKeysManager y otros 'use client' que muestran fechas usan useFormatter en lugar de toLocaleDateString para evitar SSR/cliente mismatch. |
+| 2026-05-16 | Pre-push hook (.githooks/pre-push) | Ejecuta frozen-lockfile → lint → tsc → test → build en cada push. Aborta si falla. Atrapa errores antes de GitHub Actions. `git config core.hooksPath .githooks`. |
