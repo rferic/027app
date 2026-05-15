@@ -2,7 +2,7 @@
   "_meta": {
     "description": "Memoria del proyecto apps027. Contiene stack, módulos y decisiones técnicas.",
     "updated_at": "2026-05-12",
-    "last_fixes": "2026-05-12 — Sprint 1 fixes finales: botones dentro de cards con pt-3 border-t, rose→slate en acciones, toast unificado via Sonner, AdminOverflowReset agresivo, LOCALES completos"
+    "last_fixes": "2026-05-16 — Sprint 5 completado. TASK-47: pre-push hook (.githooks/pre-push) con frozen-lockfile+lint+tsc+test+build. AGENTS.md actualizado con pre-check obligatorio. Staging+producción operativos. 8 tareas del sprint cerradas."
   },
   "project": {
     "name": "027Apps",
@@ -160,6 +160,11 @@
       "date": "2026-05-12",
       "decision": "Toast unificado en admin via Sonner. Patrón useEffect+prevStateRef para useActionState, directo para useTransition.",
       "reason": "UX: feedback visual consistente en todas las acciones de formulario. Toast bottom-right con theme=light para no depender de next-themes que solo existe en /doc. Sonner ya instalado en el proyecto."
+    },
+    {
+      "date": "2026-05-16",
+      "decision": "Pre-push hook nativo (.githooks/pre-push) con pre-check completo",
+      "reason": "CI fallaba recurrentemente por lint, lockfile desync, types o build. El hook ejecuta frozen-lockfile → lint → tsc → test → build en cada push y aborta si falla. Atrapa errores antes de GitHub Actions. git config core.hooksPath .githooks."
     }
   ],
   "notes": []

@@ -23,6 +23,30 @@ Antes de empezar cualquier tarea, revisa los archivos en `.plans/` para saber qu
 - El merge a `main` se hace con **squash merge** — un solo commit limpio por feature/sprint
 - **NUNCA** se trabaja directamente en `main`
 
+## Formato de PR y commits
+
+```
+PR title:         Sprint N: Título descriptivo
+Squash commit:    Sprint N: Título descriptivo
+Commits en rama:  Sprint N: type(scope): mensaje
+```
+
+**Ejemplos:**
+
+```
+PR:               Sprint 6: Multitenant groups
+Squash commit:    Sprint 6: Multitenant groups
+Commits:          Sprint 6: feat: widget dashboard
+                  Sprint 6: fix: sidebar collapse
+                  Sprint 6: docs: pre-push hook
+```
+
+**Reglas:**
+- El PR title y el squash commit SIEMPRE empiezan con `Sprint N: `
+- Los commits individuales en la rama también llevan `Sprint N: ` prefijo
+- `type` sigue conventional commits: feat, fix, docs, refactor, test, chore
+- El `scope` es opcional, va entre paréntesis tras el type
+
 ## Flujo preview-first (OBLIGATORIO)
 Siempre seguir este orden:
 
@@ -60,12 +84,30 @@ Ejemplo canónico: `ApiKeysManager.tsx` (modal inline), `CreateInvitationModal.t
 <!-- END:admin-form-pattern -->
 
 <!-- BEGIN:code-review -->
+# Pre-Check antes de merge (OBLIGATORIO)
+
+Antes de cualquier code review o merge, ejecutar localmente:
+
+```bash
+pnpm install --frozen-lockfile  # lockfile sincronizado
+pnpm lint                       # corrige errores automáticos con --fix si aplica
+pnpm tsc --noEmit               # errores de tipos
+pnpm test --run                 # tests unitarios
+pnpm build                      # build completo
+```
+
+Si cualquiera falla, **no se procede** hasta corregirlo.
+
+El pre-push hook (`.githooks/pre-push`) ejecuta esto automáticamente en cada `git push`.
+Para activarlo: `git config core.hooksPath .githooks` (ya configurado).
+
 # Code Review antes de merge
 
-1. El **Ingeniero** (agente de calidad) audita el código automáticamente
-2. El Ingeniero emite un veredicto (aprobado/rechazado con observaciones)
-3. Se pregunta al usuario: "¿Revisas tú o te fías del veredicto?"
-4. Según su respuesta: él revisa el diff o se procede con el merge
+1. Ejecutar pre-check (lint + tsc + test + build)
+2. El **Ingeniero** (agente de calidad) audita el código automáticamente
+3. El Ingeniero emite un veredicto (aprobado/rechazado con observaciones)
+4. Se pregunta al usuario: "¿Revisas tú o te fías del veredicto?"
+5. Según su respuesta: él revisa el diff o se procede con el merge
 <!-- END:code-review -->
 
 <!-- BEGIN:deploy-rule -->

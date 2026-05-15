@@ -23,13 +23,19 @@ git status
 
 Confirmar que no estamos en `main`. Si estamos en `main`, parar y abortar.
 
-### Paso 2 — Verificar CI
+### Paso 2 — Pre-check local (lockfile + lint + types + tests + build)
 
-- Ir al GitHub Actions de la rama y verificar que todos los checks pasan
-- Si CI no está configurado para esta rama, ejecutar localmente:
-  ```bash
-  pnpm lint && pnpm tsc --noEmit && pnpm test --run && pnpm build
-  ```
+Ejecutar **siempre** localmente antes de cualquier push:
+
+```bash
+pnpm install --frozen-lockfile  # lockfile sincronizado
+pnpm lint
+pnpm tsc --noEmit
+pnpm test --run
+pnpm build
+```
+
+Si cualquiera falla, corregir antes de continuar. **No pasar al siguiente paso hasta que todo esté verde.**
 
 ### Paso 3 — Ingeniero audita
 

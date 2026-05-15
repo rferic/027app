@@ -1,0 +1,46 @@
+#!/bin/sh
+
+echo "🔍 Pre-push check: running full validation..."
+
+# 1. Verificar lockfile sincronizado
+echo "→ pnpm install --frozen-lockfile"
+pnpm install --frozen-lockfile 2>/dev/null
+if [ $? -ne 0 ]; then
+  echo "❌ FAIL: pnpm-lock.yaml no está sincronizado con package.json"
+  echo "   Ejecuta 'pnpm install' y commitea el lockfile actualizado."
+  exit 1
+fi
+
+# 2. Lint
+echo "→ pnpm lint"
+pnpm lint
+if [ $? -ne 0 ]; then
+  echo "❌ FAIL: lint errors. Corre 'pnpm lint' y corrige."
+  exit 1
+fi
+
+# 3. TypeScript
+echo "→ pnpm tsc --noEmit"
+pnpm tsc --noEmit
+if [ $? -ne 0 ]; then
+  echo "❌ FAIL: type errors."
+  exit 1
+fi
+
+# 4. Tests
+echo "→ pnpm test --run"
+pnpm test --run
+if [ $? -ne 0 ]; then
+  echo "❌ FAIL: tests failing."
+  exit 1
+fi
+
+# 5. Build
+echo "→ pnpm build"
+pnpm build
+if [ $? -ne 0 ]; then
+  echo "❌ FAIL: build errors."
+  exit 1
+fi
+
+echo "✅ Pre-push check passed!"

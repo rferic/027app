@@ -189,6 +189,42 @@ Traducir a los 6 idiomas.
 
 ---
 
+### TASK-47 — Infra: pre-push hook y pre-check local para evitar CI failures
+
+**Problema:** CI falla recurrentemente por lint errors, lockfile desync, o build errors que se podrían haber detectado antes del push.
+
+**Archivos afectados:**
+- `.githooks/pre-push` (nuevo — hook nativo de git)
+- `AGENTS.md` (actualizado con pre-check obligatorio + hook info)
+- `.agents/skills/merge-to-main/SKILL.md` (actualizado con frozen-lockfile)
+
+**Solución:**
+1. Crear `.githooks/pre-push` con validación completa:
+   ```bash
+   pnpm install --frozen-lockfile  # lockfile sync
+   pnpm lint                       
+   pnpm tsc --noEmit               
+   pnpm test --run                 
+   pnpm build                      
+   ```
+   Si cualquier paso falla → `exit 1` (aborta push).
+
+2. Configurar `git config core.hooksPath .githooks` para activar el hook.
+
+3. Documentar en `AGENTS.md` como **pre-check obligatorio** antes de merge, con frozen-lockfile añadido al comando.
+
+4. Actualizar la skill `merge-to-main/SKILL.md` para incluir frozen-lockfile en el paso de pre-check.
+
+**Comportamiento esperado:**
+- En cada `git push`: se ejecuta el hook automáticamente
+- Si lockfile, lint, types, tests o build fallan: el push se cancela
+- El Ingeniero (QA) solo recibe código que ya pasa todas las validaciones
+- CI nunca falla por estos motivos
+
+***Configuración necesaria en otras máquinas:*** `git config core.hooksPath .githooks`
+
+---
+
 ## Orden de ejecución recomendado
 
 ```
@@ -203,6 +239,8 @@ TASK-43 (detalle app — requiere decisión de diseño al usuario)
 TASK-44 (unificar modales — requiere decisión del usuario)
     ↓
 TASK-45 (widget apps — independiente, puede ir en paralelo con 43/44)
+    ↓
+TASK-47 (pre-push hook — último, después de todo implementado y estable)
 ```
 
 ---
