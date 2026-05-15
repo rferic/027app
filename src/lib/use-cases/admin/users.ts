@@ -1,4 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/admin'
+import { scanApps } from '@/lib/apps/scanner'
 
 export type AdminUser = {
   id: string
@@ -16,6 +17,8 @@ export type AdminStats = {
   admins: number
   members: number
   pendingInvitations: number
+  installedApps: number
+  totalApps: number
 }
 
 export async function getAdminUserList(): Promise<AdminUser[]> {
@@ -50,7 +53,7 @@ export async function getAdminUserList(): Promise<AdminUser[]> {
 export async function getAdminStats(): Promise<AdminStats> {
   const supabase = createAdminClient()
 
-  const [membersResult, pendingInvResult] = await Promise.all([
+  const [membersResult, pendingInvResult, installedResult] = await Promise.all([
     supabase.from('group_members').select('role'),
     supabase
       .from('invitations')
@@ -58,14 +61,18 @@ export async function getAdminStats(): Promise<AdminStats> {
       .is('accepted_at', null)
       .is('revoked_at', null)
       .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`),
+    supabase.from('installed_apps').select('id', { count: 'exact', head: true }),
   ])
 
   const members = membersResult.data ?? []
+  const scanned = await scanApps()
   return {
     totalUsers: members.length,
     admins: members.filter((m) => m.role === 'admin').length,
     members: members.filter((m) => m.role !== 'admin').length,
     pendingInvitations: pendingInvResult.count ?? 0,
+    installedApps: installedResult.count ?? 0,
+    totalApps: scanned.length,
   }
 }
 

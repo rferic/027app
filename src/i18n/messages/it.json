@@ -51,6 +51,8 @@
       "statsUsers": "Utenti",
       "statsAdmins": "Admin",
       "statsMembers": "Membri",
+      "statsApps": "App",
+      "statsAppsSublabel": "disponibili",
       "statsPending": "Inviti in attesa"
     },
     "users": {
