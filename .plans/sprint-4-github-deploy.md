@@ -1,4 +1,6 @@
-# Sprint 3: GitHub + Versionado + Deploy
+# Sprint 4: GitHub + Versionado + Deploy
+
+> ⚠️ **Este sprint se trabaja en la rama `sprint/4-github-deploy`.** NO directamente en `main`.
 
 ## Contexto del proyecto
 

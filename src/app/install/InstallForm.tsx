@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Loader2, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -30,6 +31,7 @@ export function InstallForm() {
   )
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [redirecting, setRedirecting] = useState(false)
   const t = installT[locale]
 
   function handleLocaleChange(newLocale: InstallLocale) {
@@ -53,10 +55,20 @@ export function InstallForm() {
       const result = await install(form)
       if (result?.error) {
         setError(result.error)
+        setLoading(false)
+        return
       }
+      setRedirecting(true)
     } catch (err) {
+      const isRedirect =
+        err instanceof Error &&
+        (err.message.includes('NEXT_REDIRECT') ||
+          (err as Error & { digest?: string }).digest?.startsWith('NEXT_REDIRECT'))
+      if (isRedirect) {
+        setRedirecting(true)
+        return
+      }
       setError(err instanceof Error ? err.message : 'Unexpected error')
-    } finally {
       setLoading(false)
     }
   }
@@ -113,14 +125,28 @@ export function InstallForm() {
                 <Input id="confirm_password" name="confirm_password" type="password" required minLength={8} autoComplete="new-password" />
               </div>
             </div>
-            {error && <p className="text-sm text-destructive">{error}</p>}
-            <Button
-              type="submit"
-              className="w-full bg-[#9B1C1C] hover:bg-[#7F1D1D] text-white"
-              disabled={loading}
-            >
-              {loading ? t.creating : t.submit}
-            </Button>
+            {error && <p className="text-sm text-red-500 text-center">{error}</p>}
+            {redirecting ? (
+              <div className="flex flex-col items-center gap-3 py-4">
+                <CheckCircle2 className="size-8 text-emerald-500" />
+                <p className="text-sm text-slate-500">{t.redirecting}</p>
+              </div>
+            ) : (
+              <Button
+                type="submit"
+                className="w-full bg-[#9B1C1C] hover:bg-[#7F1D1D] text-white"
+                disabled={loading}
+              >
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="size-4 animate-spin" />
+                    {t.creating}
+                  </span>
+                ) : (
+                  t.submit
+                )}
+              </Button>
+            )}
           </form>
         </div>
 

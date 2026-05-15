@@ -12,6 +12,7 @@ export const installT = {
     submit: 'Create admin account',
     creating: 'Creating...',
     passwordMismatch: 'Passwords do not match',
+    redirecting: 'Account created! Redirecting to login…',
   },
   es: {
     title: 'Configurar 027Apps',
@@ -26,6 +27,7 @@ export const installT = {
     submit: 'Crear cuenta de administrador',
     creating: 'Creando...',
     passwordMismatch: 'Las contraseñas no coinciden',
+    redirecting: 'Cuenta creada! Redirigiendo al inicio de sesión…',
   },
   it: {
     title: 'Configura 027Apps',
@@ -40,6 +42,7 @@ export const installT = {
     submit: 'Crea account amministratore',
     creating: 'Creazione...',
     passwordMismatch: 'Le password non corrispondono',
+    redirecting: 'Account creato! Reindirizzamento al login…',
   },
 } as const
 
