@@ -2,12 +2,8 @@ import { promises as fs } from 'fs'
 import path from 'path'
 import { createAdminClient } from '@/lib/supabase/admin'
 import type { AppInstallContext } from '@/types/apps'
-import type { Database } from '@/types/supabase'
 import { readManifest } from '@/lib/apps/manifest'
 import { scanApps } from '@/lib/apps/scanner'
-
-// table_prefix not yet in generated types — added by migration
-type InstalledAppsInsert = Database['public']['Tables']['installed_apps']['Insert']
 
 type InstallModule = { install: (ctx: AppInstallContext) => Promise<void> }
 type UninstallModule = { uninstall: (ctx: AppInstallContext) => Promise<void> }
