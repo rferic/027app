@@ -30,7 +30,7 @@ export async function scanApps(): Promise<ScannedApp[]> {
   return results
 }
 
-const SLUGS_QUERY_TIMEOUT_MS = 500
+const SLUGS_QUERY_TIMEOUT_MS = 2000
 const SLUGS_CACHE_TTL_MS = 60_000 // 1 minute
 
 let slugsCache: { slugs: string[]; expiresAt: number } | null = null
