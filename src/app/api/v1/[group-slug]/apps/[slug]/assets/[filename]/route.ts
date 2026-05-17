@@ -15,15 +15,24 @@ const CONTENT_TYPES: Record<string, string> = {
 
 export async function GET(
   _req: Request,
-  { params }: { params: Promise<{ slug: string; filename: string }> }
+  { params }: { params: Promise<{ 'group-slug': string; slug: string; filename: string }> }
 ) {
-  const { slug, filename } = await params
+  const { 'group-slug': groupSlug, slug, filename } = await params
 
   if (!SLUG_RE.test(slug) || filename.includes('..') || filename.startsWith('/')) {
     return new Response('Not Found', { status: 404 })
   }
 
   const admin = createAdminClient()
+
+  const { data: group } = await admin
+    .from('groups')
+    .select('id')
+    .eq('slug', groupSlug)
+    .single()
+
+  if (!group) return new Response('Not Found', { status: 404 })
+
   const { data: app } = await admin
     .from('installed_apps')
     .select('slug')

@@ -3,14 +3,14 @@ import { getAppAssetUrl } from '@/lib/apps/assets'
 
 describe('getAppAssetUrl', () => {
   it('returns correct URL for valid asset', () => {
-    expect(getAppAssetUrl('todo', 'icon.svg')).toBe('/api/v1/apps/todo/assets/icon.svg')
+    expect(getAppAssetUrl('familia', 'todo', 'icon.svg')).toBe('/api/v1/familia/apps/todo/assets/icon.svg')
   })
 
   it('throws for path traversal with ..', () => {
-    expect(() => getAppAssetUrl('todo', '../secret.txt')).toThrow()
+    expect(() => getAppAssetUrl('familia', 'todo', '../secret.txt')).toThrow()
   })
 
   it('throws for absolute paths', () => {
-    expect(() => getAppAssetUrl('todo', '/etc/passwd')).toThrow()
+    expect(() => getAppAssetUrl('familia', 'todo', '/etc/passwd')).toThrow()
   })
 })

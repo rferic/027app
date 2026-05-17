@@ -1,15 +1,14 @@
-import { type NextRequest } from 'next/server'
 import { authenticate } from '@/lib/api/auth'
 import { apiOk, apiError } from '@/lib/api/response'
 import { createAdminClientUntyped } from '@/lib/supabase/admin'
+import type { HandlerContext } from '@/lib/apps/router-types'
 
-export default async function handler(req: NextRequest) {
+export default async function handler(req: Request, ctx: HandlerContext) {
   const auth = await authenticate(req, 'jwt')
   if (auth instanceof Response) return auth
 
   const url = new URL(req.url)
   const showAll = url.searchParams.get('all') === 'true' && auth.role === 'admin'
-  const groupId = url.searchParams.get('group_id')
 
   const adminClient = createAdminClientUntyped()
 
@@ -23,12 +22,11 @@ export default async function handler(req: NextRequest) {
   }
 
   if (!auth.userId) return apiError('UNAUTHORIZED', 'User ID required', 401)
-  if (!groupId) return apiError('MISSING_GROUP_ID', 'group_id query parameter is required', 400)
 
   const { data, error } = await adminClient
     .from('todo_items')
     .select('id, title, completed, created_at')
-    .eq('group_id', groupId)
+    .eq('group_id', ctx.groupId)
     .or(`user_id.eq.${auth.userId},visibility.eq.public`)
     .order('created_at', { ascending: false })
 

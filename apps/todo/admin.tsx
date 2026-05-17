@@ -21,7 +21,7 @@ export default function TodoAdmin() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/v1/apps/todo?all=true', { credentials: 'include' })
+    fetch('/api/v1/admin/apps/todo', { credentials: 'include' })
       .then(r => r.ok ? r.json() : [])
       .then((data: TodoItem[]) => { setTodos(data); setLoading(false) })
   }, [])

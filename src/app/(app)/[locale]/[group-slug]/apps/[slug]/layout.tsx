@@ -29,7 +29,7 @@ export default async function AppSlugLayout({ children, params }: Props) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect(`/${locale}/login`)
 
-  // Resolver grupo
+  // Resolve group
   const groupCtx = await resolveGroupContext(groupSlug, user.id)
   if (!groupCtx) notFound()
 
@@ -51,7 +51,7 @@ export default async function AppSlugLayout({ children, params }: Props) {
 
   if (!installedApp) notFound()
 
-  // Acceso a app privada: verificar group_app_access
+  // Check group_app_access for private apps
   if (installedApp.visibility === 'private') {
     const untyped = createAdminClientUntyped()
     const { data: access } = await untyped
@@ -67,7 +67,7 @@ export default async function AppSlugLayout({ children, params }: Props) {
 
   return (
     <AppTheme primaryColor={manifest.primaryColor} secondaryColor={manifest.secondaryColor}>
-      <AppProvider slug={slug} manifest={manifest} config={resolvedConfig} groupId={groupCtx.id}>
+      <AppProvider slug={slug} manifest={manifest} config={resolvedConfig} groupId={groupCtx.id} groupSlug={groupSlug}>
         {children}
       </AppProvider>
     </AppTheme>

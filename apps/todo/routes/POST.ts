@@ -1,9 +1,9 @@
-import { type NextRequest } from 'next/server'
 import { authenticate } from '@/lib/api/auth'
 import { apiOk, apiError } from '@/lib/api/response'
 import { createAdminClientUntyped } from '@/lib/supabase/admin'
+import type { HandlerContext } from '@/lib/apps/router-types'
 
-export default async function handler(req: NextRequest) {
+export default async function handler(req: Request, ctx: HandlerContext) {
   const auth = await authenticate(req, 'jwt')
   if (auth instanceof Response) return auth
   if (!auth.userId) return apiError('UNAUTHORIZED', 'User ID required', 401)
@@ -18,18 +18,15 @@ export default async function handler(req: NextRequest) {
   if (typeof body !== 'object' || body === null) {
     return apiError('BAD_REQUEST', 'Body must be an object', 400)
   }
-  const { title, group_id } = body as Record<string, unknown>
+  const { title } = body as Record<string, unknown>
   if (typeof title !== 'string' || !title.trim()) {
     return apiError('VALIDATION_ERROR', 'title is required', 422)
-  }
-  if (typeof group_id !== 'string' || !group_id.trim()) {
-    return apiError('VALIDATION_ERROR', 'group_id is required', 422)
   }
 
   const adminClient = createAdminClientUntyped()
   const { data, error } = await adminClient
     .from('todo_items')
-    .insert({ user_id: auth.userId, title: title.trim(), group_id: group_id.trim(), visibility: 'private' })
+    .insert({ user_id: auth.userId, title: title.trim(), group_id: ctx.groupId, visibility: 'private' })
     .select('id, title, completed, created_at')
     .single()
 

@@ -12,8 +12,8 @@ interface TodoItem {
   created_at: string
 }
 
-async function fetchTodos(groupId: string): Promise<TodoItem[]> {
-  const res = await fetch(`/api/v1/apps/todo?group_id=${encodeURIComponent(groupId)}`, {
+async function fetchTodos(groupSlug: string): Promise<TodoItem[]> {
+  const res = await fetch(`/api/v1/${groupSlug}/apps/todo`, {
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
   })
@@ -21,19 +21,19 @@ async function fetchTodos(groupId: string): Promise<TodoItem[]> {
   return res.json()
 }
 
-async function createTodo(title: string, groupId: string): Promise<TodoItem | null> {
-  const res = await fetch('/api/v1/apps/todo', {
+async function createTodo(title: string, groupSlug: string): Promise<TodoItem | null> {
+  const res = await fetch(`/api/v1/${groupSlug}/apps/todo`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
-    body: JSON.stringify({ title, group_id: groupId }),
+    body: JSON.stringify({ title }),
   })
   if (!res.ok) return null
   return res.json()
 }
 
-async function updateTodo(id: string, completed: boolean, groupId: string): Promise<void> {
-  await fetch(`/api/v1/apps/todo/${id}?group_id=${encodeURIComponent(groupId)}`, {
+async function updateTodo(id: string, completed: boolean, groupSlug: string): Promise<void> {
+  await fetch(`/api/v1/${groupSlug}/apps/todo/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
@@ -41,8 +41,8 @@ async function updateTodo(id: string, completed: boolean, groupId: string): Prom
   })
 }
 
-async function deleteTodo(id: string, groupId: string): Promise<void> {
-  await fetch(`/api/v1/apps/todo/${id}?group_id=${encodeURIComponent(groupId)}`, {
+async function deleteTodo(id: string, groupSlug: string): Promise<void> {
+  await fetch(`/api/v1/${groupSlug}/apps/todo/${id}`, {
     method: 'DELETE',
     credentials: 'include',
   })
@@ -50,7 +50,7 @@ async function deleteTodo(id: string, groupId: string): Promise<void> {
 
 export default function TodoView() {
   const t = useTranslations('apps.todo')
-  const { config, groupId } = useAppContext()
+  const { config, groupId, groupSlug } = useAppContext()
   const maxItems = Number(config.max_items ?? 50)
 
   const [todos, setTodos] = useState<TodoItem[]>([])
@@ -60,9 +60,9 @@ export default function TodoView() {
   const [limitError, setLimitError] = useState(false)
 
   useEffect(() => {
-    if (!groupId) return
-    fetchTodos(groupId).then(data => { setTodos(data); setLoading(false) })
-  }, [groupId])
+    if (!groupSlug) return
+    fetchTodos(groupSlug).then(data => { setTodos(data); setLoading(false) })
+  }, [groupSlug])
 
   function handleAdd(e: React.FormEvent) {
     e.preventDefault()
@@ -75,19 +75,19 @@ export default function TodoView() {
     setLimitError(false)
     setNewTitle('')
     startTransition(async () => {
-      const item = await createTodo(title, groupId!)
+      const item = await createTodo(title, groupSlug!)
       if (item) setTodos(prev => [item, ...prev])
     })
   }
 
   function handleToggle(id: string, completed: boolean) {
     setTodos(prev => prev.map(item => item.id === id ? { ...item, completed } : item))
-    startTransition(async () => { await updateTodo(id, completed, groupId!) })
+    startTransition(async () => { await updateTodo(id, completed, groupSlug!) })
   }
 
   function handleDelete(id: string) {
     setTodos(prev => prev.filter(item => item.id !== id))
-    startTransition(async () => { await deleteTodo(id, groupId!) })
+    startTransition(async () => { await deleteTodo(id, groupSlug!) })
   }
 
   const pending = todos.filter(item => !item.completed)

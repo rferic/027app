@@ -17,32 +17,34 @@ interface TodoItem {
   completed: boolean
 }
 
-async function apiFetch(path: string, options?: RequestInit) {
-  return fetch(`${API_BASE}/api/v1/apps/todo${path}`, {
+async function apiFetch(groupSlug: string, path: string, options?: RequestInit) {
+  return fetch(`${API_BASE}/api/v1/${groupSlug}/apps/todo${path}`, {
     ...options,
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     credentials: 'include',
   })
 }
 
-export default function TodoNativeScreen() {
+export default function TodoNativeScreen({ groupSlug }: { groupSlug?: string }) {
+  if (!groupSlug) throw new Error('TodoNativeScreen requires groupSlug prop')
+
   const [todos, setTodos] = useState<TodoItem[]>([])
   const [newTitle, setNewTitle] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    apiFetch('')
+    apiFetch(groupSlug, '')
       .then(r => r.ok ? r.json() : [])
       .then((data: TodoItem[]) => { setTodos(data); setLoading(false) })
-  }, [])
+  }, [groupSlug])
 
   async function handleAdd() {
     const title = newTitle.trim()
     if (!title || saving) return
     setSaving(true)
     setNewTitle('')
-    const res = await apiFetch('', {
+    const res = await apiFetch(groupSlug, '', {
       method: 'POST',
       body: JSON.stringify({ title }),
     })
@@ -55,12 +57,12 @@ export default function TodoNativeScreen() {
 
   async function handleToggle(id: string, completed: boolean) {
     setTodos(prev => prev.map(t => t.id === id ? { ...t, completed } : t))
-    await apiFetch(`/${id}`, { method: 'PUT', body: JSON.stringify({ completed }) })
+    await apiFetch(groupSlug, `/${id}`, { method: 'PUT', body: JSON.stringify({ completed }) })
   }
 
   async function handleDelete(id: string) {
     setTodos(prev => prev.filter(t => t.id !== id))
-    await apiFetch(`/${id}`, { method: 'DELETE' })
+    await apiFetch(groupSlug, `/${id}`, { method: 'DELETE' })
   }
 
   if (loading) {

@@ -14,16 +14,16 @@ interface TodoItem {
 
 export default function TodoWidget() {
   const t = useTranslations('apps.todo')
-  const { groupId } = useAppContext()
+  const { groupSlug } = useAppContext()
   const [todos, setTodos] = useState<TodoItem[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!groupId) return
-    fetch(`/api/v1/apps/todo?group_id=${encodeURIComponent(groupId)}`, { credentials: 'include' })
+    if (!groupSlug) return
+    fetch(`/api/v1/${groupSlug}/apps/todo`, { credentials: 'include' })
       .then(r => r.ok ? r.json() : [])
       .then((data: TodoItem[]) => { setTodos(data); setLoading(false) })
-  }, [groupId])
+  }, [groupSlug])
 
   const pending = todos.filter(item => !item.completed)
 

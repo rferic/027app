@@ -8,6 +8,7 @@ export interface AppContextValue {
   manifest: AppManifest
   config: ResolvedAppConfig
   groupId?: string
+  groupSlug?: string
 }
 
 export const AppContext = createContext<AppContextValue | null>(null)
