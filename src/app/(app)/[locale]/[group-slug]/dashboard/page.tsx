@@ -23,16 +23,23 @@ interface AppWidgetData {
   secondaryColor: string
 }
 
-async function loadWidgets(): Promise<WidgetEntry[]> {
+async function loadWidgets(groupId: string): Promise<WidgetEntry[]> {
   const adminClient = createAdminClient()
   const { data: installedApps } = await adminClient
     .from('installed_apps')
-    .select('slug')
+    .select('slug, visibility')
     .eq('status', 'active')
+
+  const { data: accessRows } = await adminClient
+    .from('group_app_access')
+    .select('app_slug')
+    .eq('group_id', groupId)
+  const accessSet = new Set((accessRows ?? []).map(r => r.app_slug))
 
   const results: WidgetEntry[] = []
   for (const app of installedApps ?? []) {
     if (!SLUG_RE.test(app.slug)) continue
+    if (app.visibility === 'private' && !accessSet.has(app.slug)) continue
     try {
       const manifest = await readManifest(app.slug)
       if (!manifest.views.widget) continue
@@ -90,9 +97,9 @@ function DashboardSkeleton() {
   )
 }
 
-async function WidgetGrid({ locale }: { locale: string }) {
+async function WidgetGrid({ locale, groupId }: { locale: string; groupId: string }) {
   const [widgets, t] = await Promise.all([
-    loadWidgets(),
+    loadWidgets(groupId),
     getTranslations('app'),
   ])
 
@@ -140,7 +147,7 @@ export default async function DashboardPage({ params }: Props) {
     <main className="p-6 max-w-5xl mx-auto">
       <AppInstalledWidget apps={apps} locale={locale} groupSlug={groupSlug} />
       <Suspense fallback={<DashboardSkeleton />}>
-        <WidgetGrid locale={locale} />
+        <WidgetGrid locale={locale} groupId={groupCtx.id} />
       </Suspense>
     </main>
   )

@@ -64,8 +64,8 @@ export async function createInvitation(data: {
       email: data.email || null,
       expires_at: data.expiresAt || null,
       invited_by: data.invitedBy,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any)
+      group_ids: data.groupIds,
+    })
     .select('token')
     .single()
 

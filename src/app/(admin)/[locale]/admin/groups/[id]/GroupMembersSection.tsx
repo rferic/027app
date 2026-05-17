@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo, useRef, startTransition } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Search } from 'lucide-react'
@@ -28,9 +28,14 @@ interface Props {
 export function GroupMembersSection({ groupId, members: initialMembers, onRefresh }: Props) {
   const t = useTranslations('admin')
   const [members, setMembers] = useState(initialMembers)
+  const prevRef = useRef(initialMembers)
 
-  // Sincronizar cuando el drawer recarga datos frescos
-  useEffect(() => { startTransition(() => setMembers(initialMembers)) }, [initialMembers])
+  useEffect(() => {
+    if (prevRef.current !== initialMembers) {
+      prevRef.current = initialMembers
+      setMembers(initialMembers)
+    }
+  }, [initialMembers])
 
   const [showAdd, setShowAdd] = useState(false)
   const [availableUsers, setAvailableUsers] = useState<AvailableUser[]>([])

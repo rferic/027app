@@ -79,7 +79,7 @@ export async function canGroupAccessApp(
     .select('id')
     .eq('app_slug', appSlug)
     .eq('group_id', groupId)
-    .single()
+    .maybeSingle()
 
   return !!access
 }
