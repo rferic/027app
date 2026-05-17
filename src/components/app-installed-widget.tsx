@@ -15,10 +15,14 @@ interface AppWidgetData {
 interface Props {
   apps: AppWidgetData[]
   locale: string
+  groupSlug?: string
 }
 
-export function AppInstalledWidget({ apps, locale }: Props) {
+export function AppInstalledWidget({ apps, locale, groupSlug }: Props) {
   const t = useTranslations('app')
+
+  const appHref = (slug: string) =>
+    groupSlug ? `/${locale}/${groupSlug}/apps/${slug}` : `/${locale}/apps/${slug}`
 
   return (
     <section className="mb-6">
@@ -43,7 +47,7 @@ export function AppInstalledWidget({ apps, locale }: Props) {
           {apps.map((app) => (
             <Link
               key={app.slug}
-              href={`/${locale}/apps/${app.slug}`}
+              href={appHref(app.slug)}
               className="group bg-white rounded-xl border border-slate-100 p-4 hover:border-slate-200 hover:shadow-sm transition-all"
             >
               <div className="flex items-center gap-3">

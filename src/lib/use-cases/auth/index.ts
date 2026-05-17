@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { routing } from '@/i18n/routing'
+import { getUserGroups } from '@/lib/groups/context'
 
 export async function signIn(email: string, password: string, locale: string) {
   const supabase = await createClient()
@@ -29,7 +30,12 @@ export async function signIn(email: string, password: string, locale: string) {
       ? profile.locale
       : locale
 
-  redirect(`/${targetLocale}/dashboard`)
+  const groups = await getUserGroups(user.id)
+  const dashboardPath = groups.length > 0
+    ? `/${targetLocale}/${groups[0].slug}/dashboard`
+    : `/${targetLocale}/`
+
+  redirect(dashboardPath)
 }
 
 export async function signOut(locale: string = 'en') {

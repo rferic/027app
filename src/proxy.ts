@@ -96,6 +96,7 @@ export async function proxy(request: NextRequest) {
       return loginResponse
     }
 
+    response.headers.set('x-invoke-path', pathname)
     return response
   }
 
@@ -118,6 +119,9 @@ export async function proxy(request: NextRequest) {
   )
   await supabase.auth.getUser()
 
+  // Pasar el pathname al Server Component via response header
+  // Next.js reenvía response headers del middleware a headers() en SC
+  intlResponse.headers.set('x-invoke-path', pathname)
   return intlResponse
 }
 

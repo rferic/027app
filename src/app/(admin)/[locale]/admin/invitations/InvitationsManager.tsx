@@ -9,9 +9,10 @@ import { CreateInvitationModal } from './CreateInvitationModal'
 interface Props {
   invitations: Invitation[]
   baseUrl: string
+  availableGroups: { id: string; name: string; slug: string }[]
 }
 
-export function InvitationsManager({ invitations, baseUrl }: Props) {
+export function InvitationsManager({ invitations, baseUrl, availableGroups }: Props) {
   const t = useTranslations('admin.invitations')
   const [showCreateModal, setShowCreateModal] = useState(false)
 
@@ -41,6 +42,7 @@ export function InvitationsManager({ invitations, baseUrl }: Props) {
           baseUrl={baseUrl}
           onClose={() => setShowCreateModal(false)}
           onCreated={() => setShowCreateModal(false)}
+          availableGroups={availableGroups}
         />
       )}
     </main>

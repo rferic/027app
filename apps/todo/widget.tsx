@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Circle, Loader2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { useAppContext } from '@/lib/apps/context'
 
 interface TodoItem {
   id: string
@@ -13,14 +14,16 @@ interface TodoItem {
 
 export default function TodoWidget() {
   const t = useTranslations('apps.todo')
+  const { groupSlug } = useAppContext()
   const [todos, setTodos] = useState<TodoItem[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/v1/apps/todo', { credentials: 'include' })
+    if (!groupSlug) return
+    fetch(`/api/v1/${groupSlug}/apps/todo`, { credentials: 'include' })
       .then(r => r.ok ? r.json() : [])
       .then((data: TodoItem[]) => { setTodos(data); setLoading(false) })
-  }, [])
+  }, [groupSlug])
 
   const pending = todos.filter(item => !item.completed)
 

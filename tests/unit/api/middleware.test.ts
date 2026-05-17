@@ -161,7 +161,7 @@ describe("authenticate — 'jwt'", () => {
       error: null,
     })
     const mockAdminFrom = vi.fn()
-    const memberRow = { group_id: 'group-abc', role: 'member' }
+    const memberRows = [{ group_id: 'group-abc', role: 'member' }]
 
     vi.mocked(createApiClient).mockReturnValue(
       { auth: { getUser: mockGetUser } } as unknown as ReturnType<typeof createApiClient>
@@ -170,7 +170,7 @@ describe("authenticate — 'jwt'", () => {
       { from: mockAdminFrom } as unknown as ReturnType<typeof createApiAdminClient>
     )
 
-    mockAdminFrom.mockReturnValue(makeChain(memberRow))
+    mockAdminFrom.mockReturnValue(makeChain(memberRows))
 
     const { authenticate } = await import('@/lib/api/auth')
 

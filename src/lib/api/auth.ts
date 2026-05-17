@@ -10,7 +10,7 @@ export async function authenticate(
   if (level === 'public') {
     // Sin auth — groupId desde la única instancia del grupo
     const supabase = createApiAdminClient()
-    const { data: group } = await supabase.from('groups').select('id').limit(1).single()
+    const { data: group } = await supabase.from('groups').select('id').limit(1).maybeSingle()
     if (!group) return apiError('not_found', 'Group not configured', 404)
     return { supabase, groupId: group.id }
   }
@@ -43,20 +43,25 @@ async function validateJwt(token: string): Promise<UseCaseContext | Response> {
   }
 
   const admin = createApiAdminClient()
-  const { data: member } = await admin
+  const { data: members } = await admin
     .from('group_members')
     .select('group_id, role')
     .eq('user_id', user.id)
-    .maybeSingle()
 
-  if (!member) return apiError('forbidden', 'User is not a member of any group', 403)
+  if (!members || members.length === 0) {
+    return apiError('forbidden', 'User is not a member of any group', 403)
+  }
+
+  // Usar el primer grupo por defecto (el cliente debe especificar group_id si necesita otro)
+  const first = members[0]
+  const isAdmin = members.some(m => m.role === 'admin')
 
   return {
     supabase,
     userId: user.id,
     email: user.email ?? undefined,
-    groupId: member.group_id,
-    role: member.role as 'admin' | 'member',
+    groupId: first.group_id,
+    role: isAdmin ? 'admin' : 'member',
   }
 }
 

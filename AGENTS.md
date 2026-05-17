@@ -13,9 +13,15 @@ sprint-{N}-{descripcion}.md
 
 ## Estado de un sprint
 - **Pendiente:** el archivo no tiene sufijo → `sprint-1-apps-system.md`
-- **Implementado:** añadir sufijo `.done` → `sprint-1-apps-system.md.done`
+- **Preview (staging):** añadir sufijo `.preview` → `sprint-1-apps-system.md.preview`
+- **Implementado (producción):** añadir sufijo `.done` → `sprint-1-apps-system.md.done`
 
-Antes de empezar cualquier tarea, revisa los archivos en `.plans/` para saber qué sprints están pendientes (`.md`) y cuáles ya están implementados (`.md.done`), y continúa la numeración desde la última TASK del último sprint.
+**Flujo:**
+1. Sprint pendiente → `.md` (sin sufijo)
+2. Push a staging/preview → renombrar a `.md.preview` ANTES del commit
+3. Merge a main + deploy producción → renombrar a `.md.done`
+
+Antes de empezar cualquier tarea, revisa los archivos en `.plans/` para saber qué sprints están pendientes (`.md`), en preview (`.md.preview`) o ya implementados (`.md.done`), y continúa la numeración desde la última TASK del último sprint.
 
 ## Rama por sprint
 - Cada sprint se trabaja en su propia rama: `sprint/{N}-{descripcion}` (ej. `sprint/4-github-deploy`)
@@ -232,3 +238,51 @@ supabase db push --include-all
    "
    ```
 <!-- END:local-dev -->
+
+<!-- BEGIN:i18n-rules -->
+# 🚨 REGLAS DE ORO PARA i18n (OBLIGATORIO, NO OPCIONAL)
+
+Errores recurrentes que DEBES evitar:
+
+## 1. ANTES de escribir `t('clave')`, LEE la definición en el JSON
+Busca la clave en `src/i18n/messages/en.json` y VERIFICA qué variables espera:
+```
+"clave": "Hola {name}, tienes {count} mensajes"
+```
+Requiere: `t('clave', { name: '...', count: ... })`. Si falta alguna variable → FORMATTING_ERROR.
+
+## 2. DESPUÉS de añadir nuevas claves a en.json, SINCRONIZA a los otros 5 idiomas
+Ejecuta este script para copiar las claves nuevas a es, it, ca, fr, de:
+```bash
+python3 << 'PYEOF'
+import json
+import os
+base = 'src/i18n/messages'
+with open(f'{base}/en.json') as f:
+    en = json.load(f)
+locales = ['es', 'it', 'ca', 'fr', 'de']
+for loc in locales:
+    with open(f'{base}/{loc}.json') as f:
+        data = json.load(f)
+    def merge_keys(src, dst):
+        for k, v in src.items():
+            if isinstance(v, dict) and k in dst and isinstance(dst[k], dict):
+                merge_keys(v, dst[k])
+            elif k not in dst:
+                dst[k] = v
+    merge_keys(en, data)
+    with open(f'{base}/{loc}.json', 'w') as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+    print(f'✓ {loc}.json synced')
+PYEOF
+```
+
+## 3. DESPUÉS de modificar archivos JSON, AVIERTE al usuario que REINICIE el dev server
+Los mensajes de next-intl se cachean al arrancar. Sin restart, las claves nuevas no existen.
+
+## 4. NUNCA asumas que una clave existe sin verificarlo
+Syntax segura: busca el key en en.json con grep/read antes de usarlo.
+
+## 5. `toLocaleDateString()` siempre con locale
+Usar `toLocaleDateString(locale)` (no sin argumentos) para evitar hydration mismatch.
+<!-- END:i18n-rules -->

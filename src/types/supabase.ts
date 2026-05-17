@@ -84,37 +84,28 @@ export type Database = {
           },
         ]
       }
-      app_permissions: {
+      group_app_access: {
         Row: {
           app_slug: string
           created_at: string
-          enabled: boolean
           group_id: string
           id: string
-          updated_at: string
-          user_id: string
         }
         Insert: {
           app_slug: string
           created_at?: string
-          enabled?: boolean
           group_id: string
           id?: string
-          updated_at?: string
-          user_id: string
         }
         Update: {
           app_slug?: string
           created_at?: string
-          enabled?: boolean
           group_id?: string
           id?: string
-          updated_at?: string
-          user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "app_permissions_group_id_fkey"
+            foreignKeyName: "group_app_access_group_id_fkey"
             columns: ["group_id"]
             isOneToOne: false
             referencedRelation: "groups"
@@ -224,6 +215,7 @@ export type Database = {
           installed_at: string
           slug: string
           status: string
+          table_prefix: string | null
           updated_at: string
           version: string
           visibility: string
@@ -235,6 +227,7 @@ export type Database = {
           installed_at?: string
           slug: string
           status: string
+          table_prefix?: string | null
           updated_at?: string
           version: string
           visibility?: string
@@ -246,6 +239,7 @@ export type Database = {
           installed_at?: string
           slug?: string
           status?: string
+          table_prefix?: string | null
           updated_at?: string
           version?: string
           visibility?: string
@@ -259,6 +253,7 @@ export type Database = {
           created_at: string
           email: string | null
           expires_at: string | null
+          group_ids: string[]
           id: string
           invited_by: string
           revoked_at: string | null
@@ -272,6 +267,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           expires_at?: string | null
+          group_ids?: string[]
           id?: string
           invited_by: string
           revoked_at?: string | null
@@ -285,6 +281,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           expires_at?: string | null
+          group_ids?: string[]
           id?: string
           invited_by?: string
           revoked_at?: string | null
@@ -323,6 +320,47 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      todo_items: {
+        Row: {
+          assigned_to: string | null
+          completed: boolean
+          created_at: string
+          group_id: string
+          id: string
+          title: string
+          user_id: string
+          visibility: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          completed?: boolean
+          created_at?: string
+          group_id: string
+          id?: string
+          title: string
+          user_id: string
+          visibility?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          completed?: boolean
+          created_at?: string
+          group_id?: string
+          id?: string
+          title?: string
+          user_id?: string
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "todo_items_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -467,3 +505,4 @@ export const Constants = {
     },
   },
 } as const
+

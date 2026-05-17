@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { createAdminClient, createAdminClientUntyped } from '@/lib/supabase/admin'
 import { requireAdmin } from '@/lib/auth/helpers'
 import { scanApps } from '@/lib/apps/scanner'
 import { installApp, uninstallApp, InstallerError } from '@/lib/apps/installer'
@@ -99,21 +99,9 @@ export async function updateAppVisibilityAction(
   }
 }
 
-async function getGroupId(): Promise<string> {
-  const { userId } = await requireAdmin()
-  const adminClient = createAdminClient()
-  const { data } = await adminClient
-    .from('group_members')
-    .select('group_id')
-    .eq('user_id', userId)
-    .single()
-  if (!data) throw new Error('Group not found')
-  return data.group_id
-}
-
 export async function grantAppAccessAction(
   slug: string,
-  userId: string
+  groupId: string
 ): Promise<{ success: true } | { error: string }> {
   try {
     await requireAdmin()
@@ -125,12 +113,12 @@ export async function grantAppAccessAction(
       .eq('status', 'active')
       .single()
     if (!app) return { error: 'App not found or not active' }
-    const groupId = await getGroupId()
-    const { error } = await adminClient
-      .from('app_permissions')
+    const untyped = createAdminClientUntyped()
+    const { error } = await untyped
+      .from('group_app_access')
       .upsert(
-        { app_slug: slug, user_id: userId, group_id: groupId, enabled: true },
-        { onConflict: 'group_id,user_id,app_slug' }
+        { app_slug: slug, group_id: groupId },
+        { onConflict: 'group_id,app_slug' }
       )
     if (error) return { error: error.message }
     revalidatePath('/', 'layout')
@@ -142,16 +130,15 @@ export async function grantAppAccessAction(
 
 export async function revokeAppAccessAction(
   slug: string,
-  userId: string
+  groupId: string
 ): Promise<{ success: true } | { error: string }> {
   try {
-    const adminClient = createAdminClient()
-    const groupId = await getGroupId()
-    const { error } = await adminClient
-      .from('app_permissions')
+    await requireAdmin()
+    const untyped = createAdminClientUntyped()
+    const { error } = await untyped
+      .from('group_app_access')
       .delete()
       .eq('app_slug', slug)
-      .eq('user_id', userId)
       .eq('group_id', groupId)
     if (error) return { error: error.message }
     revalidatePath('/', 'layout')
@@ -161,48 +148,41 @@ export async function revokeAppAccessAction(
   }
 }
 
-interface MemberWithAccess {
-  userId: string
-  displayName: string
-  avatarUrl: string | null
+interface GroupWithAccess {
+  groupId: string
+  groupName: string
+  groupSlug: string
   hasAccess: boolean
 }
 
 export async function getAppPermissionsAction(
   slug: string
-): Promise<{ members: MemberWithAccess[] } | { error: string }> {
+): Promise<{ groups: GroupWithAccess[] } | { error: string }> {
   try {
     await requireAdmin()
     const adminClient = createAdminClient()
-    const groupId = await getGroupId()
 
-    const [membersResult, permissionsResult] = await Promise.all([
-      adminClient
-        .from('group_members')
-        .select('user_id, profiles!inner(display_name, avatar_url)')
-        .eq('group_id', groupId),
-      adminClient
-        .from('app_permissions')
-        .select('user_id, enabled')
-        .eq('app_slug', slug)
-        .eq('group_id', groupId),
-    ])
+    const { data: allGroups } = await adminClient
+      .from('groups')
+      .select('id, name, slug')
+      .order('name')
 
-    const permissions = new Map(
-      (permissionsResult.data ?? []).map(p => [p.user_id, p.enabled])
-    )
+    const untyped = createAdminClientUntyped()
+    const { data: accessEntries } = await untyped
+      .from('group_app_access')
+      .select('group_id')
+      .eq('app_slug', slug)
 
-    const members: MemberWithAccess[] = (membersResult.data ?? []).map(m => {
-      const profile = m.profiles as unknown as { display_name: string | null; avatar_url: string | null }
-      return {
-        userId: m.user_id,
-        displayName: profile.display_name ?? m.user_id,
-        avatarUrl: profile.avatar_url,
-        hasAccess: permissions.get(m.user_id) === true,
-      }
-    })
+    const accessSet = new Set((accessEntries ?? []).map((a: { group_id: string }) => a.group_id))
 
-    return { members }
+    const groups: GroupWithAccess[] = (allGroups ?? []).map(g => ({
+      groupId: g.id,
+      groupName: g.name,
+      groupSlug: g.slug,
+      hasAccess: accessSet.has(g.id),
+    }))
+
+    return { groups }
   } catch (err) {
     return { error: err instanceof Error ? err.message : String(err) }
   }

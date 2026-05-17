@@ -12,5 +12,11 @@
   "admin_title": "Aufgaben — Admin",
   "admin_subtitle": "{total} gesamt · {pending} ausstehend · {done} erledigt",
   "admin_empty": "Keine Aufgaben gefunden.",
-  "limit_reached": "Sie haben das Maximum von {max} Aufgaben erreicht."
+  "limit_reached": "Sie haben das Maximum von {max} Aufgaben erreicht.",
+  "visibility": "Sichtbarkeit",
+  "visibility_private": "Privat",
+  "visibility_public": "Öffentlich",
+  "assigned_to": "Zugewiesen an",
+  "assigned_to_me": "Ich",
+  "assign_to_me": "Mir zuweisen"
 }

@@ -32,7 +32,7 @@ export default async function AdminAppViewPage({ params }: Props) {
   if (!installedApp || installedApp.status !== 'active') notFound()
 
   const permissionsResult = await getAppPermissionsAction(slug)
-  const permissionsMembers = 'members' in permissionsResult ? permissionsResult.members : []
+  const permissionsGroups = 'groups' in permissionsResult ? permissionsResult.groups : []
 
   let manifest
   try {
@@ -74,7 +74,7 @@ export default async function AdminAppViewPage({ params }: Props) {
         <AdminAppPermissions
           slug={slug}
           visibility={installedApp.visibility as 'public' | 'private'}
-          members={permissionsMembers}
+          groups={permissionsGroups}
         />
       </div>
 

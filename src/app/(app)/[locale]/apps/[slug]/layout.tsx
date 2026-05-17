@@ -1,7 +1,7 @@
 import { notFound, redirect } from 'next/navigation'
 import { setRequestLocale } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { createAdminClient, createAdminClientUntyped } from '@/lib/supabase/admin'
 import { readManifest } from '@/lib/apps/manifest'
 import { resolveAppConfig } from '@/lib/apps/config'
 import { AppValidationError } from '@/types/apps'
@@ -46,14 +46,24 @@ export default async function AppSlugLayout({ children, params }: Props) {
   if (!user) redirect(`/${locale}/login`)
 
   if (installedApp.visibility === 'private') {
-    const { data: permission } = await adminClient
-      .from('app_permissions')
-      .select('enabled')
-      .eq('app_slug', slug)
+    // Check if user belongs to any group with access
+    const { data: userGroups } = await adminClient
+      .from('group_members')
+      .select('group_id')
       .eq('user_id', user.id)
-      .eq('enabled', true)
-      .single()
-    if (!permission) notFound()
+
+    if (!userGroups || userGroups.length === 0) notFound()
+
+    const groupIds = userGroups.map(g => g.group_id)
+    const untypedClient = createAdminClientUntyped()
+    const { data: accessEntries } = await untypedClient
+      .from('group_app_access')
+      .select('id')
+      .eq('app_slug', slug)
+      .in('group_id', groupIds)
+      .limit(1)
+
+    if (!accessEntries || accessEntries.length === 0) notFound()
   }
 
   const resolvedConfig = resolveAppConfig(manifest, (installedApp.config as Record<string, unknown>) ?? {})

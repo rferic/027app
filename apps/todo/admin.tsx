@@ -10,6 +10,9 @@ interface TodoItem {
   title: string
   completed: boolean
   created_at: string
+  visibility?: string
+  assigned_to?: string | null
+  group_id?: string
 }
 
 export default function TodoAdmin() {
@@ -18,7 +21,7 @@ export default function TodoAdmin() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/v1/apps/todo?all=true', { credentials: 'include' })
+    fetch('/api/v1/admin/apps/todo', { credentials: 'include' })
       .then(r => r.ok ? r.json() : [])
       .then((data: TodoItem[]) => { setTodos(data); setLoading(false) })
   }, [])
@@ -51,6 +54,16 @@ export default function TodoAdmin() {
               <span className={`flex-1 text-sm ${todo.completed ? 'line-through text-slate-400' : 'text-slate-800'}`}>
                 {todo.title}
               </span>
+              {todo.visibility && (
+                <span className="text-[10px] capitalize text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded flex-shrink-0">
+                  {todo.visibility === 'private' ? t('visibility_private') : t('visibility_public')}
+                </span>
+              )}
+              {todo.assigned_to && (
+                <span className="text-[10px] text-slate-400 flex-shrink-0" title={t('assigned_to')}>
+                  {todo.assigned_to === todo.user_id ? t('assigned_to_me') : todo.assigned_to.slice(0, 8) + '…'}
+                </span>
+              )}
               <span className="text-xs text-slate-400 flex-shrink-0 font-mono">
                 {todo.user_id.slice(0, 8)}…
               </span>

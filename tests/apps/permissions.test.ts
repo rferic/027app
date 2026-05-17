@@ -1,6 +1,9 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 
-vi.mock('@/lib/supabase/admin', () => ({ createAdminClient: vi.fn() }))
+vi.mock('@/lib/supabase/admin', () => {
+  const shared = vi.fn()
+  return { createAdminClient: shared, createAdminClientUntyped: shared }
+})
 vi.mock('@/lib/auth/helpers', () => ({ requireAdmin: vi.fn() }))
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }))
 
@@ -94,45 +97,30 @@ describe('revokeAppAccessAction', () => {
     const { createAdminClient } = await import('@/lib/supabase/admin')
 
     const eqSpy = vi.fn()
-    // chain: .delete().eq(app_slug).eq(user_id).eq(group_id)
-    eqSpy
-      .mockReturnValueOnce({ eq: eqSpy })  // after first eq
-      .mockReturnValueOnce({ eq: eqSpy })  // after second eq
-      .mockResolvedValueOnce({ data: null, error: null })  // after third eq (group_id)
+    .mockReturnValueOnce({ eq: vi.fn().mockResolvedValue({ data: null, error: null }) })
 
     const deleteChain = { eq: eqSpy }
     const mockFrom = vi.fn()
 
-    // revokeAppAccessAction: first createAdminClient (main), second inside getGroupId
     mockFrom.mockImplementation((table: string) => {
-      if (table === 'app_permissions') return { delete: vi.fn().mockReturnValue(deleteChain) }
-      if (table === 'group_members') return {
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: { group_id: 'group-1' }, error: null }),
-          }),
-        }),
-      }
+      if (table === 'group_app_access') return { delete: vi.fn().mockReturnValue(deleteChain) }
       return makeChain(null)
     })
 
     vi.mocked(createAdminClient).mockReturnValue({ from: mockFrom } as unknown as ReturnType<typeof createAdminClient>)
 
     const { revokeAppAccessAction } = await import('@/lib/apps/actions')
-    const result = await revokeAppAccessAction('todo', 'user-123')
+    const result = await revokeAppAccessAction('todo', 'group-1')
     expect(result).toEqual({ success: true })
-    expect(mockFrom).toHaveBeenCalledWith('app_permissions')
-    // Verify group_id filter was applied (3rd eq call)
-    expect(eqSpy).toHaveBeenCalledWith('group_id', 'group-1')
+    expect(mockFrom).toHaveBeenCalledWith('group_app_access')
   })
 
   it('returns error if not admin', async () => {
     const { requireAdmin } = await import('@/lib/auth/helpers')
-    // getGroupId calls requireAdmin internally
     vi.mocked(requireAdmin).mockRejectedValueOnce(new Error('Unauthorized'))
 
     const { revokeAppAccessAction } = await import('@/lib/apps/actions')
-    const result = await revokeAppAccessAction('todo', 'user-123')
+    const result = await revokeAppAccessAction('todo', 'group-1')
     expect(result).toEqual({ error: expect.stringContaining('Unauthorized') })
   })
 })
@@ -193,72 +181,47 @@ describe('updateAppVisibilityAction', () => {
 describe('getAppPermissionsAction', () => {
   beforeEach(() => vi.resetAllMocks())
 
-  it('returns members with hasAccess correctly cross-referenced', async () => {
+  it('returns groups with hasAccess correctly cross-referenced', async () => {
     const { requireAdmin } = await import('@/lib/auth/helpers')
     vi.mocked(requireAdmin).mockResolvedValue({ userId: 'admin-1' } as Awaited<ReturnType<typeof requireAdmin>>)
 
     const { createAdminClient } = await import('@/lib/supabase/admin')
 
-    const membersData = [
-      { user_id: 'user-1', profiles: { display_name: 'Alice', avatar_url: null } },
-      { user_id: 'user-2', profiles: { display_name: 'Bob', avatar_url: 'http://example.com/bob.jpg' } },
+    const groupsData = [
+      { id: 'g1', name: 'Family', slug: 'family' },
+      { id: 'g2', name: 'Work', slug: 'work' },
     ]
-    const permissionsData = [
-      { user_id: 'user-1', enabled: true },
+    const accessData = [
+      { group_id: 'g1' },
     ]
 
-    // getAppPermissionsAction calls getGroupId() twice (once inside getGroupId, once explicitly)
-    // getGroupId creates its own adminClient — we need createAdminClient to handle multiple calls
-    // Call 1 (getGroupId inside getAppPermissionsAction): group_members.select.eq.single → group_id
-    // Call 2 (getAppPermissionsAction body): group_members.select.eq + app_permissions.select.eq.eq via Promise.all
-    // Since getGroupId is called once per action invocation, we have 2 createAdminClient calls total
-
-    const makeGroupIdClient = () => ({
-      from: vi.fn().mockReturnValue({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: { group_id: 'group-1' }, error: null }),
+    const mockFrom = vi.fn().mockImplementation((table: string) => {
+      if (table === 'groups') {
+        return {
+          select: vi.fn().mockReturnValue({
+            order: vi.fn().mockResolvedValue({ data: groupsData, error: null }),
           }),
-        }),
-      }),
+        }
+      }
+      if (table === 'group_app_access') {
+        return {
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockResolvedValue({ data: accessData, error: null }),
+          }),
+        }
+      }
+      return makeChain(null)
     })
 
-    const makeMainClient = () => ({
-      from: vi.fn().mockImplementation((table: string) => {
-        if (table === 'group_members') {
-          return {
-            select: vi.fn().mockReturnValue({
-              eq: vi.fn().mockResolvedValue({ data: membersData, error: null }),
-            }),
-          }
-        }
-        if (table === 'app_permissions') {
-          return {
-            select: vi.fn().mockReturnValue({
-              eq: vi.fn().mockReturnValue({
-                eq: vi.fn().mockResolvedValue({ data: permissionsData, error: null }),
-              }),
-            }),
-          }
-        }
-        return makeChain(null)
-      }),
-    })
-
-    // Call order in getAppPermissionsAction:
-    // 1st createAdminClient() → used in action body (for group_members + app_permissions)
-    // 2nd createAdminClient() → used inside getGroupId() for .single()
-    vi.mocked(createAdminClient)
-      .mockReturnValueOnce(makeMainClient() as unknown as ReturnType<typeof createAdminClient>)
-      .mockReturnValueOnce(makeGroupIdClient() as unknown as ReturnType<typeof createAdminClient>)
+    vi.mocked(createAdminClient).mockReturnValue({ from: mockFrom } as unknown as ReturnType<typeof createAdminClient>)
 
     const { getAppPermissionsAction } = await import('@/lib/apps/actions')
     const result = await getAppPermissionsAction('todo')
 
     expect(result).toEqual({
-      members: [
-        { userId: 'user-1', displayName: 'Alice', avatarUrl: null, hasAccess: true },
-        { userId: 'user-2', displayName: 'Bob', avatarUrl: 'http://example.com/bob.jpg', hasAccess: false },
+      groups: [
+        { groupId: 'g1', groupName: 'Family', groupSlug: 'family', hasAccess: true },
+        { groupId: 'g2', groupName: 'Work', groupSlug: 'work', hasAccess: false },
       ],
     })
   })

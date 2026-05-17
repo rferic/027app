@@ -12,8 +12,8 @@ interface TodoItem {
   created_at: string
 }
 
-async function fetchTodos(): Promise<TodoItem[]> {
-  const res = await fetch('/api/v1/apps/todo', {
+async function fetchTodos(groupSlug: string): Promise<TodoItem[]> {
+  const res = await fetch(`/api/v1/${groupSlug}/apps/todo`, {
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
   })
@@ -21,8 +21,8 @@ async function fetchTodos(): Promise<TodoItem[]> {
   return res.json()
 }
 
-async function createTodo(title: string): Promise<TodoItem | null> {
-  const res = await fetch('/api/v1/apps/todo', {
+async function createTodo(title: string, groupSlug: string): Promise<TodoItem | null> {
+  const res = await fetch(`/api/v1/${groupSlug}/apps/todo`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
@@ -32,8 +32,8 @@ async function createTodo(title: string): Promise<TodoItem | null> {
   return res.json()
 }
 
-async function updateTodo(id: string, completed: boolean): Promise<void> {
-  await fetch(`/api/v1/apps/todo/${id}`, {
+async function updateTodo(id: string, completed: boolean, groupSlug: string): Promise<void> {
+  await fetch(`/api/v1/${groupSlug}/apps/todo/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
@@ -41,8 +41,8 @@ async function updateTodo(id: string, completed: boolean): Promise<void> {
   })
 }
 
-async function deleteTodo(id: string): Promise<void> {
-  await fetch(`/api/v1/apps/todo/${id}`, {
+async function deleteTodo(id: string, groupSlug: string): Promise<void> {
+  await fetch(`/api/v1/${groupSlug}/apps/todo/${id}`, {
     method: 'DELETE',
     credentials: 'include',
   })
@@ -50,7 +50,7 @@ async function deleteTodo(id: string): Promise<void> {
 
 export default function TodoView() {
   const t = useTranslations('apps.todo')
-  const { config } = useAppContext()
+  const { config, groupId, groupSlug } = useAppContext()
   const maxItems = Number(config.max_items ?? 50)
 
   const [todos, setTodos] = useState<TodoItem[]>([])
@@ -60,8 +60,9 @@ export default function TodoView() {
   const [limitError, setLimitError] = useState(false)
 
   useEffect(() => {
-    fetchTodos().then(data => { setTodos(data); setLoading(false) })
-  }, [])
+    if (!groupSlug) return
+    fetchTodos(groupSlug).then(data => { setTodos(data); setLoading(false) })
+  }, [groupSlug])
 
   function handleAdd(e: React.FormEvent) {
     e.preventDefault()
@@ -74,19 +75,19 @@ export default function TodoView() {
     setLimitError(false)
     setNewTitle('')
     startTransition(async () => {
-      const item = await createTodo(title)
+      const item = await createTodo(title, groupSlug!)
       if (item) setTodos(prev => [item, ...prev])
     })
   }
 
   function handleToggle(id: string, completed: boolean) {
     setTodos(prev => prev.map(item => item.id === id ? { ...item, completed } : item))
-    startTransition(async () => { await updateTodo(id, completed) })
+    startTransition(async () => { await updateTodo(id, completed, groupSlug!) })
   }
 
   function handleDelete(id: string) {
     setTodos(prev => prev.filter(item => item.id !== id))
-    startTransition(async () => { await deleteTodo(id) })
+    startTransition(async () => { await deleteTodo(id, groupSlug!) })
   }
 
   const pending = todos.filter(item => !item.completed)

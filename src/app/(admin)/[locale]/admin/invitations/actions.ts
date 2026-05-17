@@ -16,11 +16,15 @@ async function getLocale(): Promise<string> {
 export async function createInvitationAction(formData: FormData): Promise<{ error: string } | { token: string }> {
   const { userId } = await requireAdmin()
   const title = (formData.get('title') as string).trim()
-  const role = formData.get('role') as 'admin' | 'member'
+  const role = (formData.get('role') as 'admin' | 'member') || 'member'
   const email = (formData.get('email') as string | null)?.trim() || null
   const expiresAt = (formData.get('expires_at') as string | null) || null
+  const groupIdsStr = (formData.get('group_ids') as string) || '[]'
+  let groupIds: string[] = []
+  try { groupIds = JSON.parse(groupIdsStr) } catch { /* ignore */ }
   if (!title) return { error: 'Title is required' }
-  const result = await _create({ title, role, email, expiresAt, invitedBy: userId })
+  if (groupIds.length === 0) return { error: 'At least one group is required' }
+  const result = await _create({ title, role, email, expiresAt, invitedBy: userId, groupIds })
   if ('error' in result) return result
   const locale = await getLocale()
   revalidatePath(`/${locale}/admin/invitations`)

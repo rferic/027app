@@ -9,11 +9,15 @@ interface Props {
   baseUrl: string
   onClose: () => void
   onCreated: () => void
+  availableGroups: { id: string; name: string; slug: string }[]
 }
 
-export function CreateInvitationModal({ baseUrl, onClose, onCreated }: Props) {
+export function CreateInvitationModal({ baseUrl, onClose, onCreated, availableGroups }: Props) {
   const [pending, startTransition] = useTransition()
   const [createdUrl, setCreatedUrl] = useState<string | null>(null)
+  const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>(() =>
+    availableGroups.length === 1 ? [availableGroups[0].id] : []
+  )
   const t = useTranslations('admin.invitations.form')
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -114,6 +118,38 @@ export function CreateInvitationModal({ baseUrl, onClose, onCreated }: Props) {
                 />
                 <p className="text-xs text-gray-400 mt-1">{t('emailHelp')}</p>
               </div>
+
+              {availableGroups.length > 1 && (
+                <div>
+                  <label className={labelCls}>
+                    {t('groups_label')} <span className="text-red-400">*</span>
+                  </label>
+                  <div className="space-y-1.5 max-h-32 overflow-y-auto border border-slate-200 rounded-lg p-2">
+                    {availableGroups.map(group => (
+                      <label key={group.id} className="flex items-center gap-2 cursor-pointer py-0.5">
+                        <input
+                          type="checkbox"
+                          checked={selectedGroupIds.includes(group.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedGroupIds(prev => [...prev, group.id])
+                            } else {
+                              setSelectedGroupIds(prev => prev.filter(id => id !== group.id))
+                            }
+                          }}
+                          className="rounded border-slate-300"
+                        />
+                        <span className="text-sm text-slate-700">{group.name}</span>
+                        <span className="text-xs text-slate-400">({group.slug})</span>
+                      </label>
+                    ))}
+                  </div>
+                  {selectedGroupIds.length === 0 && (
+                    <p className="text-xs text-red-400 mt-1">{t('groups_required')}</p>
+                  )}
+                </div>
+              )}
+              <input type="hidden" name="group_ids" value={JSON.stringify(selectedGroupIds)} />
 
               <div>
                 <label className={labelCls}>
