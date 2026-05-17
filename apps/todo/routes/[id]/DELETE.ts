@@ -8,15 +8,20 @@ export default async function handler(req: NextRequest) {
   if (auth instanceof Response) return auth
   if (!auth.userId) return apiError('UNAUTHORIZED', 'User ID required', 401)
 
-  const segments = new URL(req.url).pathname.split('/')
+  const parsedUrl = new URL(req.url)
+  const segments = parsedUrl.pathname.split('/')
   const id = segments[segments.length - 1]
   if (!id) return apiError('BAD_REQUEST', 'Missing todo ID', 400)
+
+  const groupId = parsedUrl.searchParams.get('group_id')
+  if (!groupId) return apiError('MISSING_GROUP_ID', 'group_id query parameter is required', 400)
 
   const adminClient = createAdminClientUntyped()
   const { error } = await adminClient
     .from('todo_items')
     .delete()
     .eq('id', id)
+    .eq('group_id', groupId)
     .eq('user_id', auth.userId)
 
   if (error) return apiError('DELETE_ERROR', error.message, 500)

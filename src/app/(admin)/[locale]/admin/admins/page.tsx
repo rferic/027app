@@ -2,6 +2,7 @@ import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { getAdminUserList } from '@/lib/use-cases/admin/users'
 import { getUserWithRole } from '@/lib/auth/helpers'
 import { getGroupSettings } from '@/lib/use-cases/settings'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { AdminUserTable } from '@/components/admin-user-table'
 
 interface Props {
@@ -13,13 +14,21 @@ export default async function AdminAdminsPage({ params }: Props) {
   setRequestLocale(locale)
   const t = await getTranslations('admin.admins')
 
-  const [users, currentUser, settings] = await Promise.all([
+  const adminClient = createAdminClient()
+
+  const [users, currentUser, settings, groupMembersResult] = await Promise.all([
     getAdminUserList(),
     getUserWithRole(),
     getGroupSettings(),
+    adminClient.from('group_members').select('user_id'),
   ])
 
   const admins = users.filter((user) => user.role === 'admin')
+
+  const groupCounts = new Map<string, number>()
+  for (const gm of (groupMembersResult.data ?? [])) {
+    groupCounts.set(gm.user_id, (groupCounts.get(gm.user_id) ?? 0) + 1)
+  }
 
   return (
     <main className="p-6 max-w-5xl mx-auto">
@@ -27,7 +36,7 @@ export default async function AdminAdminsPage({ params }: Props) {
         <h1 className="text-xl font-semibold text-slate-900">{t('title')}</h1>
         <p className="text-sm text-slate-400 mt-1">{admins.length === 1 ? t('subtitle', { count: admins.length }) : t('subtitlePlural', { count: admins.length })}</p>
       </div>
-      <AdminUserTable users={admins} currentUserId={currentUser!.userId} locale={locale} availableLocales={settings.activeLocales} />
+      <AdminUserTable users={admins} currentUserId={currentUser!.userId} locale={locale} availableLocales={settings.activeLocales} groupCounts={groupCounts} />
     </main>
   )
 }

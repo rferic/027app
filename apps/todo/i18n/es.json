@@ -12,5 +12,11 @@
   "admin_title": "Tareas — Admin",
   "admin_subtitle": "{total} en total · {pending} pendientes · {done} completadas",
   "admin_empty": "No se encontraron tareas.",
-  "limit_reached": "Has alcanzado el máximo de {max} tareas."
+  "limit_reached": "Has alcanzado el máximo de {max} tareas.",
+  "visibility": "Visibilidad",
+  "visibility_private": "Privada",
+  "visibility_public": "Pública",
+  "assigned_to": "Asignado a",
+  "assigned_to_me": "Yo",
+  "assign_to_me": "Asignarme"
 }

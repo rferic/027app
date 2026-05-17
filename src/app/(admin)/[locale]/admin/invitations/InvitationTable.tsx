@@ -67,6 +67,9 @@ function InviteRow({ inv, baseUrl }: { inv: Invitation; baseUrl: string }) {
       <td className="px-4 py-3 text-sm text-gray-500 hidden md:table-cell">
         {inv.email ?? <span className="text-gray-300 italic">{t('table.any')}</span>}
       </td>
+      <td className="px-4 py-3 text-sm text-gray-500 hidden lg:table-cell">
+        {inv.groupIds.length}
+      </td>
       <td className="px-4 py-3">
         <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${STATUS_STYLES[status]}`}>
           {t(`status.${status}`)}
@@ -174,6 +177,7 @@ export function InvitationTable({ invitations, baseUrl }: Props) {
             <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">{t('table.title')}</th>
             <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden sm:table-cell">{t('table.role')}</th>
             <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">{t('table.email')}</th>
+            <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden lg:table-cell">{t('table.groups')}</th>
             <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">{t('table.status')}</th>
             <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden lg:table-cell">{t('table.expires')}</th>
             <th className="px-4 py-3" />

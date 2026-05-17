@@ -5,31 +5,27 @@ import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { updateAppVisibilityAction, grantAppAccessAction, revokeAppAccessAction } from '@/lib/apps/actions'
 
-interface Member {
-  userId: string
-  displayName: string
-  avatarUrl: string | null
+interface GroupAccess {
+  groupId: string
+  groupName: string
+  groupSlug: string
   hasAccess: boolean
 }
 
 interface Props {
   slug: string
   visibility: 'public' | 'private'
-  members: Member[]
+  groups: GroupAccess[]
 }
 
-function initials(name: string) {
-  return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?'
-}
-
-export function AdminAppPermissions({ slug, visibility: initialVisibility, members: initialMembers }: Props) {
+export function AdminAppPermissions({ slug, visibility: initialVisibility, groups: initialGroups }: Props) {
   const t = useTranslations('apps')
   const [visibilityPending, startVisibilityTransition] = useTransition()
   const [optimisticVisibility, updateOptimisticVisibility] = useOptimistic(initialVisibility)
-  const [optimisticMembers, updateOptimistic] = useOptimistic(
-    initialMembers,
-    (state, { userId, hasAccess }: { userId: string; hasAccess: boolean }) =>
-      state.map(m => m.userId === userId ? { ...m, hasAccess } : m)
+  const [optimisticGroups, updateOptimistic] = useOptimistic(
+    initialGroups,
+    (state, { groupId, hasAccess }: { groupId: string; hasAccess: boolean }) =>
+      state.map(g => g.groupId === groupId ? { ...g, hasAccess } : g)
   )
   const [accessPending, startAccessTransition] = useTransition()
 
@@ -45,13 +41,13 @@ export function AdminAppPermissions({ slug, visibility: initialVisibility, membe
     })
   }
 
-  function handleToggleAccess(userId: string, currentAccess: boolean) {
+  function handleToggleAccess(groupId: string, currentAccess: boolean) {
     const newAccess = !currentAccess
     startAccessTransition(async () => {
-      updateOptimistic({ userId, hasAccess: newAccess })
+      updateOptimistic({ groupId, hasAccess: newAccess })
       const result = newAccess
-        ? await grantAppAccessAction(slug, userId)
-        : await revokeAppAccessAction(slug, userId)
+        ? await grantAppAccessAction(slug, groupId)
+        : await revokeAppAccessAction(slug, groupId)
       if ('error' in result) {
         toast.error(result.error)
       } else {
@@ -93,38 +89,26 @@ export function AdminAppPermissions({ slug, visibility: initialVisibility, membe
         <p className="text-sm text-slate-500">{t('permissions.visibility_description_public')}</p>
       ) : (
         <div className="space-y-2">
-          {optimisticMembers.length === 0 ? (
-            <p className="text-sm text-slate-500">{t('permissions.no_members')}</p>
+          {optimisticGroups.length === 0 ? (
+            <p className="text-sm text-slate-500">No groups available.</p>
           ) : (
-            optimisticMembers.map(member => (
-              <div key={member.userId} className="flex items-center justify-between py-2">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden flex-shrink-0">
-                    {member.avatarUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={member.avatarUrl} alt={member.displayName} className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="text-xs font-medium text-slate-600">{initials(member.displayName)}</span>
-                    )}
-                  </div>
-                  <span className="text-sm text-gray-800">{member.displayName}</span>
-                  {member.hasAccess && (
-                    <span className="bg-emerald-50 text-emerald-700 text-xs font-medium px-2 py-0.5 rounded-full">
-                      {t('permissions.has_access')}
-                    </span>
-                  )}
+            optimisticGroups.map(group => (
+              <div key={group.groupId} className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-slate-50">
+                <div>
+                  <span className="text-sm font-medium text-slate-700">{group.groupName}</span>
+                  <span className="text-xs text-slate-400 ml-2">{group.groupSlug}</span>
                 </div>
                 <button
                   type="button"
                   disabled={accessPending}
-                  onClick={() => handleToggleAccess(member.userId, member.hasAccess)}
-                  className={`inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-lg border transition-colors disabled:opacity-50 ${
-                    member.hasAccess
-                      ? 'border border-red-200 bg-red-50 text-red-700 hover:bg-red-100'
-                      : 'border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                  onClick={() => handleToggleAccess(group.groupId, group.hasAccess)}
+                  className={`px-2.5 py-1 text-xs font-medium rounded-lg border transition-colors disabled:opacity-50 ${
+                    group.hasAccess
+                      ? 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'
+                      : 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100'
                   }`}
                 >
-                  {member.hasAccess ? t('permissions.revoke_access') : t('permissions.grant_access')}
+                  {group.hasAccess ? t('permissions.revoke_access') : t('permissions.grant_access')}
                 </button>
               </div>
             ))

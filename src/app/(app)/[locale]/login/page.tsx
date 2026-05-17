@@ -1,12 +1,37 @@
+import { redirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
+import { createClient } from '@/lib/supabase/server'
 import { AppLoginForm } from '@/components/auth/AppLoginForm'
 import { LocaleSwitcher } from '@/components/locale-switcher'
 import { getGroupSettings } from '@/lib/use-cases/settings'
+import { getUserGroups, getLastGroupCookie } from '@/lib/groups/context'
 
 type Props = { params: Promise<{ locale: string }> }
 
 export default async function LoginPage({ params }: Props) {
   const { locale } = await params
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (user) {
+    const groups = await getUserGroups(user.id)
+
+    // Intentar redirigir al último grupo visitado (cookie last_group)
+    if (groups.length > 0) {
+      const lastGroupSlug = await getLastGroupCookie()
+      const targetGroup = lastGroupSlug
+        ? groups.find(g => g.slug === lastGroupSlug)
+        : null
+
+      if (targetGroup) {
+        redirect(`/${locale}/${targetGroup.slug}/dashboard`)
+      }
+      // Fallback al primer grupo si la cookie no coincide o no existe
+      redirect(`/${locale}/${groups[0].slug}/dashboard`)
+    }
+    redirect(`/${locale}/dashboard`)
+  }
+
   const [t, settings] = await Promise.all([
     getTranslations('auth'),
     getGroupSettings(),

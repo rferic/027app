@@ -18,6 +18,7 @@ import {
   Key,
   X,
   Package,
+  Building2,
 } from 'lucide-react'
 import { useAdminMobile } from './admin-mobile-context'
 
@@ -152,6 +153,22 @@ export function AdminSidebar({ locale, initialCollapsed }: Props) {
                 )}
               </div>
 
+              {/* Groups */}
+              <div
+                className="relative"
+                onMouseEnter={() => handleMenuEnter('groups')}
+                onMouseLeave={handleMenuLeave}
+              >
+                <Link href={`${base}/groups`} className={collapsedLinkCls(`${base}/groups`)}>
+                  <Building2 size={18} />
+                </Link>
+                {hoveredMenu === 'groups' && (
+                  <div className="absolute left-full top-1 ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap z-50">
+                    {t('groups')}
+                  </div>
+                )}
+              </div>
+
               {/* Users submenu */}
               <div
                 className="relative"
@@ -242,6 +259,12 @@ export function AdminSidebar({ locale, initialCollapsed }: Props) {
               <Link href={`${base}/apps`} className={linkCls(`${base}/apps`)}>
                 <Package size={16} className="flex-shrink-0" />
                 {t('apps')}
+              </Link>
+
+              {/* Groups */}
+              <Link href={`${base}/groups`} className={linkCls(`${base}/groups`)}>
+                <Building2 size={16} className="flex-shrink-0" />
+                {t('groups')}
               </Link>
 
               {/* Users */}

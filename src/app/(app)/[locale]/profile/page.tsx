@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
+import { getUserGroups } from '@/lib/groups/context'
 import { ProfileForm } from '@/components/profile-form'
 
 interface Props {
@@ -22,11 +23,16 @@ export default async function ProfilePage({ params }: Props) {
     .eq('id', user.id)
     .single()
 
+  const groups = await getUserGroups(user.id)
+  const backHref = groups.length > 0
+    ? `/${locale}/${groups[0].slug}/dashboard`
+    : `/${locale}/`
+
   return (
     <main className="max-w-sm mx-auto px-4 py-10">
       <div className="mb-8">
         <Link
-          href={`/${locale}/`}
+          href={backHref}
           className="text-sm text-slate-400 hover:text-slate-700 transition-colors"
         >
           ← Back

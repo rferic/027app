@@ -11,6 +11,7 @@ interface Props {
   children: React.ReactNode
   navItems: NavItem[]
   locale: string
+  currentGroupSlug?: string | null
 }
 
 function usePrefersReducedMotion(): boolean {
@@ -27,7 +28,7 @@ function usePrefersReducedMotion(): boolean {
   return reduced
 }
 
-export function AppShell({ children, navItems, locale }: Props) {
+export function AppShell({ children, navItems, locale, currentGroupSlug }: Props) {
   const pathname = usePathname()
   const reduced = usePrefersReducedMotion()
 
@@ -42,7 +43,7 @@ export function AppShell({ children, navItems, locale }: Props) {
       >
         {children}
       </motion.div>
-      <AppBottomNav navItems={navItems} locale={locale} />
+      <AppBottomNav navItems={navItems} locale={locale} currentGroupSlug={currentGroupSlug} />
     </div>
   )
 }

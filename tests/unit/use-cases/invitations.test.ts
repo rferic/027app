@@ -1,5 +1,5 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { createAdminClient, createAdminClientUntyped } from '@/lib/supabase/admin'
 import {
   getInvitationStatus,
   getAdminInvitationList,
@@ -58,6 +58,7 @@ const baseInvitation: Invitation = {
   title: 'Test Invitation',
   role: 'member',
   email: null,
+  groupIds: [],
   invitedBy: 'admin-user',
   acceptedBy: null,
   acceptedAt: null,
@@ -177,6 +178,7 @@ describe('createInvitation', () => {
       email: null,
       expiresAt: null,
       invitedBy: 'admin-id',
+      groupIds: [],
     })
     expect(result).toEqual({ token: 'new-token' })
   })
@@ -189,6 +191,7 @@ describe('createInvitation', () => {
       email: null,
       expiresAt: null,
       invitedBy: 'admin-id',
+      groupIds: [],
     })
     expect(result).toEqual({ error: 'DB error' })
   })

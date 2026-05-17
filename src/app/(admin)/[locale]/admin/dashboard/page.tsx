@@ -38,8 +38,9 @@ export default async function AdminDashboard({ params }: Props) {
         <h1 className="text-xl font-semibold text-slate-900">{t('title')}</h1>
         <p className="text-sm text-slate-400 mt-1">{t('subtitle')}</p>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         <StatCard label={t('statsPending')} value={stats.pendingInvitations} href={`${base}/invitations`} />
+        <StatCard label={t('statsGroups')} value={stats.totalGroups} href={`${base}/groups`} />
         <StatCard label={t('statsMembers')} value={stats.members} href={`${base}/users`} />
         <StatCard label={t('statsAdmins')} value={stats.admins} href={`${base}/admins`} />
         <StatCard label={t('statsApps')} value={stats.installedApps} href={`${base}/apps`} sublabel={`${stats.totalApps} ${t('statsAppsSublabel')}`} />

@@ -15,6 +15,7 @@ export interface NavItem {
 interface Props {
   navItems: NavItem[]
   locale: string
+  currentGroupSlug?: string | null
 }
 
 function NavLink({ href, label, icon: Icon, active, onClick }: { href: string; label: string; icon: React.ElementType; active: boolean; onClick?: () => void }) {
@@ -32,11 +33,20 @@ function NavLink({ href, label, icon: Icon, active, onClick }: { href: string; l
   )
 }
 
-export function AppBottomNav({ navItems, locale }: Props) {
+export function AppBottomNav({ navItems, locale, currentGroupSlug }: Props) {
   const t = useTranslations('app')
   const pathname = usePathname()
   const [overflowOpen, setOverflowOpen] = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
+
+  // Derivar group-slug de la URL: /es/mi-familia/dashboard → mi-familia
+  // Fallback al prop si no se puede extraer de la URL
+  const segments = pathname.split('/').filter(Boolean)
+  const slugFromUrl =
+    segments.length >= 2 && segments[1] !== 'login' && segments[1] !== 'profile'
+      ? segments[1]
+      : null
+  const effectiveSlug = slugFromUrl ?? currentGroupSlug ?? null
 
   useEffect(() => {
     if (!overflowOpen) return
@@ -49,8 +59,12 @@ export function AppBottomNav({ navItems, locale }: Props) {
     return () => document.removeEventListener('mousedown', handleMouseDown)
   }, [overflowOpen])
 
+  const homeHref = effectiveSlug
+    ? `/${locale}/${effectiveSlug}/dashboard`
+    : `/${locale}/dashboard`
+
   const fixedItems = [
-    { slug: 'home', label: t('nav.home'), href: `/${locale}/dashboard`, icon: Home },
+    { slug: 'home', label: t('nav.home'), href: homeHref, icon: Home },
     { slug: 'profile', label: t('nav.profile'), href: `/${locale}/profile`, icon: User },
   ]
 

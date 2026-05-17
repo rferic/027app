@@ -8,12 +8,13 @@ interface AppProviderProps {
   slug: string
   manifest: AppManifest
   config: ResolvedAppConfig
+  groupId?: string
   children: ReactNode
 }
 
-export default function AppProvider({ slug, manifest, config, children }: AppProviderProps) {
+export default function AppProvider({ slug, manifest, config, groupId, children }: AppProviderProps) {
   return (
-    <AppContext.Provider value={{ slug, manifest, config }}>
+    <AppContext.Provider value={{ slug, manifest, config, groupId }}>
       {children}
     </AppContext.Provider>
   )

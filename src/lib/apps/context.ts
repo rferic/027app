@@ -7,6 +7,7 @@ export interface AppContextValue {
   slug: string
   manifest: AppManifest
   config: ResolvedAppConfig
+  groupId?: string
 }
 
 export const AppContext = createContext<AppContextValue | null>(null)

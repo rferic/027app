@@ -38,6 +38,8 @@ Este sprint implementa el modelo completo:
 | Rol admin | Platform-wide (no por grupo) |
 | Crear grupo | Solo admins, con wizard de onboarding |
 | Multi-grupo | Un usuario puede estar en varios grupos; switcher en header + URL |
+| Visibilidad de TODOs | Cada TODO tiene `visibility` (private/public), `assigned_to` (opcional) y `user_id` como creador |
+| Rutas API de apps | Se añade `[group-slug]` en el path de la API como commit separado al final del sprint |
 
 ---
 
@@ -71,12 +73,27 @@ Cada app que gestiona datos debe añadir `group_id` a sus tablas. Para la app `t
 
 ```sql
 alter table public.todo_items add column group_id uuid references public.groups(id) on delete cascade;
--- Asignar grupo por defecto a registros existentes (ver TASK-47)
-update public.todo_items set group_id = (select id from public.groups limit 1) where group_id is null;
 alter table public.todo_items alter column group_id set not null;
 ```
 
 El contrato de `migrations.sql` de cada app debe incluir `group_id` desde ahora.
+
+### TODO items: visibilidad y asignación
+
+Se añaden dos campos a `todo_items` para soportar el modelo de visibilidad:
+
+```sql
+alter table public.todo_items
+  add column visibility   text not null default 'private'
+    check (visibility in ('private', 'public'));
+alter table public.todo_items
+  add column assigned_to  uuid references auth.users(id) on delete set null;
+```
+
+**Lógica de visibilidad:**
+- `private` → solo `user_id` (creador) puede ver/editar/borrar (comportamiento actual)
+- `public` sin `assigned_to` → cualquiera en el grupo puede ver, auto-asignarse o marcar como hecha
+- `public` con `assigned_to` → cualquiera en el grupo ve, pero solo el creador o el asignado pueden marcar como hecha
 
 ---
 
@@ -111,9 +128,9 @@ El contrato de `migrations.sql` de cada app debe incluir `group_id` desde ahora.
 
 ---
 
-### TASK-47 — Migración de schema (DB)
+### TASK-48 — Migración de schema (DB)
 
-**Archivos:** `supabase/migrations/20260515000001_group_multitenant.sql`
+**Archivos:** `supabase/migrations/20260516000001_group_multitenant.sql`
 
 ```sql
 -- 1. Tabla group_app_access (reemplaza app_permissions para acceso por grupo)
@@ -127,10 +144,13 @@ create table public.group_app_access (
 
 alter table public.group_app_access enable row level security;
 
--- SELECT: admin siempre, member solo si pertenece al grupo
+-- SELECT: admin siempre, member solo si pertenece al grupo específico
 create policy "group_app_access_select" on public.group_app_access
   for select to authenticated using (
-    exists (select 1 from public.group_members gm where gm.user_id = auth.uid())
+    exists (
+      select 1 from public.group_members gm
+      where gm.user_id = auth.uid() and gm.group_id = group_app_access.group_id
+    )
   );
 
 -- INSERT/DELETE: solo service_role (via admin client)
@@ -144,29 +164,87 @@ drop table if exists public.app_permissions cascade;
 alter table public.todo_items
   add column group_id uuid references public.groups(id) on delete cascade;
 
--- Asignar grupo existente a registros huérfanos
-update public.todo_items
-  set group_id = (select id from public.groups order by created_at limit 1)
-  where group_id is null;
-
 alter table public.todo_items alter column group_id set not null;
 
--- Actualizar RLS de todo_items para filtrar por grupo
+-- 4. visibility y assigned_to en todo_items
+alter table public.todo_items
+  add column visibility  text not null default 'private'
+    check (visibility in ('private', 'public'));
+alter table public.todo_items
+  add column assigned_to uuid references auth.users(id) on delete set null;
+
+-- 5. Reemplazar RLS de todo_items
+drop policy if exists "Users can read own todos" on public.todo_items;
+drop policy if exists "Users can insert own todos" on public.todo_items;
+drop policy if exists "Users can update own todos" on public.todo_items;
+drop policy if exists "Users can delete own todos" on public.todo_items;
 drop policy if exists "todo_items_select" on public.todo_items;
+
+-- SELECT:
+--   private: solo user_id (creador)
+--   public: cualquier miembro del grupo
 create policy "todo_items_select" on public.todo_items
   for select to authenticated using (
-    exists (
-      select 1 from public.group_members gm
-      where gm.user_id = auth.uid() and gm.group_id = todo_items.group_id
+    user_id = auth.uid()
+    or (
+      visibility = 'public'
+      and exists (
+        select 1 from public.group_members gm
+        where gm.user_id = auth.uid() and gm.group_id = todo_items.group_id
+      )
     )
   );
+
+-- INSERT: el user_id debe ser el usuario actual
+create policy "todo_items_insert" on public.todo_items
+  for insert to authenticated
+  with check (user_id = auth.uid());
+
+-- UPDATE:
+--   private: solo user_id
+--   public sin assigned_to: cualquier miembro del grupo
+--   public con assigned_to: solo user_id o assigned_to
+create policy "todo_items_update" on public.todo_items
+  for update to authenticated
+  using (
+    user_id = auth.uid()
+    or (
+      visibility = 'public'
+      and exists (
+        select 1 from public.group_members gm
+        where gm.user_id = auth.uid() and gm.group_id = todo_items.group_id
+      )
+      and (assigned_to is null or assigned_to = auth.uid())
+    )
+  );
+
+-- DELETE: solo user_id (creador)
+create policy "todo_items_delete" on public.todo_items
+  for delete to authenticated
+  using (user_id = auth.uid());
+
+-- 6. group_ids en invitations
+alter table public.invitations add column group_ids uuid[] not null default '{}';
 ```
 
-**Actualizar `apps/todo/migrations.sql`** para incluir `group_id` en la definición original (para instalaciones desde cero).
+**Actualizar `apps/todo/migrations.sql`** para incluir los campos nuevos en la definición original (para instalaciones desde cero):
+
+```sql
+create table if not exists todo_items (
+  id           uuid primary key default gen_random_uuid(),
+  user_id      uuid not null references auth.users on delete cascade,
+  title        text not null,
+  completed    boolean not null default false,
+  visibility   text not null default 'private' check (visibility in ('private', 'public')),
+  assigned_to  uuid references auth.users on delete set null,
+  group_id     uuid not null references public.groups(id) on delete cascade,
+  created_at   timestamptz not null default now()
+);
+```
 
 ---
 
-### TASK-48 — Reestructuración de rutas: añadir `[group-slug]`
+### TASK-49 — Reestructuración de rutas: añadir `[group-slug]`
 
 **Archivos afectados:**
 - `src/app/(app)/[locale]/layout.tsx` → mover a `src/app/(app)/[locale]/[group-slug]/layout.tsx`
@@ -188,7 +266,7 @@ create policy "todo_items_select" on public.todo_items
 
 ---
 
-### TASK-49 — Group context: resolución y propagación
+### TASK-50 — Group context: resolución y propagación
 
 **Archivo:** `src/lib/groups/context.ts`
 
@@ -222,7 +300,7 @@ export function setLastGroupCookie(slug: string): void
 
 ---
 
-### TASK-50 — Group switcher en el header
+### TASK-51 — Group switcher en el header
 
 **Archivo:** `src/components/group-switcher.tsx` (`'use client'`)
 
@@ -230,7 +308,7 @@ Componente que:
 - Muestra el nombre del grupo actual con un chevron
 - Al pulsar: abre un dropdown con todos los grupos del usuario
 - Cada ítem: nombre del grupo + slug + indicador visual si es el activo
-- "Crear grupo" al final (solo si el usuario es admin) — abre el wizard (TASK-52)
+- "Crear grupo" al final (solo si el usuario es admin) — abre el wizard (TASK-53)
 - Al seleccionar: navega a `/{locale}/{group-slug}/dashboard`
 - Guarda en cookie `last_group` el slug seleccionado
 
@@ -238,7 +316,7 @@ Componente que:
 - Sustituir el nombre del grupo actual (si lo hay) por `<GroupSwitcher>`
 - Si el usuario pertenece a un solo grupo: mostrar el nombre sin dropdown (sin opción de cambio)
 
-**i18n** (añadir en TASK-55):
+**i18n** (añadir en TASK-58):
 ```json
 {
   "groups": {
@@ -250,7 +328,7 @@ Componente que:
 
 ---
 
-### TASK-51 — Admin: gestión de grupos (`/admin/groups`)
+### TASK-52 — Admin: gestión de grupos (`/admin/groups`)
 
 **Archivos:**
 - `src/app/(admin)/[locale]/admin/groups/page.tsx`
@@ -260,7 +338,7 @@ Componente que:
 
 **Lista de grupos** (`/admin/groups`):
 - Tabla con: nombre, slug, nº de miembros, nº de apps activas, fecha creación
-- Botón "Nuevo grupo" → abre wizard (TASK-52)
+- Botón "Nuevo grupo" → abre wizard (TASK-53)
 - Click en fila → navega a `/admin/groups/[id]`
 
 **Detalle de grupo** (`/admin/groups/[id]`):
@@ -273,7 +351,7 @@ Componente que:
 
 ---
 
-### TASK-52 — Admin: wizard de creación de grupos
+### TASK-53 — Admin: wizard de creación de grupos
 
 **Archivos:** `src/app/(admin)/[locale]/admin/groups/new/page.tsx` o componente modal multi-step
 
@@ -303,7 +381,7 @@ Componente que:
 
 ---
 
-### TASK-57 — Admin: invitaciones con asignación a N grupos
+### TASK-54 — Admin: invitaciones con asignación a N grupos
 
 **Problema actual:** Al crear una invitación, el usuario invitado entra a la plataforma pero no se le asigna a ningún grupo específico (o solo al grupo por defecto). Con el modelo multi-grupo, el admin debe poder asignar el usuario a uno o más grupos en el momento de la invitación.
 
@@ -344,7 +422,7 @@ export async function createInvitation(
 
 **Schema — añadir `groups` a la tabla de invitaciones:**
 
-En la migración TASK-47 o en una migración separada:
+En la migración TASK-48 o en una migración separada:
 ```sql
 alter table public.invitations add column group_ids uuid[] not null default '{}';
 ```
@@ -353,9 +431,9 @@ alter table public.invitations add column group_ids uuid[] not null default '{}'
 
 ---
 
-### TASK-58 — Admin: editar grupos de un usuario existente
+### TASK-55 — Admin: editar grupos de un usuario existente
 
-**Problema:** Una vez que un usuario está en la plataforma, el admin no puede cambiar a qué grupos pertenece. Solo existe la opción de eliminarlo del grupo desde el detalle del grupo (TASK-51), pero no hay una vista centrada en el usuario que muestre y permita editar todos sus grupos.
+**Problema:** Una vez que un usuario está en la plataforma, el admin no puede cambiar a qué grupos pertenece. Solo existe la opción de eliminarlo del grupo desde el detalle del grupo (TASK-52), pero no hay una vista centrada en el usuario que muestre y permita editar todos sus grupos.
 
 **Archivos afectados:**
 - `src/app/(admin)/[locale]/admin/users/[id]/page.tsx` (o crear si no existe)
@@ -401,7 +479,7 @@ export async function removeUserFromGroupAction(
 
 ---
 
-### TASK-53 — Actualizar app todo para usar `group_id`
+### TASK-56 — Actualizar app todo para usar `group_id`
 
 **Archivos:** `apps/todo/view.tsx`, `apps/todo/widget.tsx`, `apps/todo/admin.tsx`, `apps/todo/routes/`
 
@@ -425,7 +503,7 @@ export interface AppContextValue {
 
 ---
 
-### TASK-54 — Acceso a apps privadas: `group_app_access`
+### TASK-57 — Acceso a apps privadas: `group_app_access`
 
 **Archivos:**
 - `src/lib/apps/access.ts` — lógica de verificación de acceso
@@ -451,11 +529,11 @@ export async function grantGroupAppAccessAction(groupId: string, appSlug: string
 export async function revokeGroupAppAccessAction(groupId: string, appSlug: string): Promise<void>
 ```
 
-**Integrar en `GroupAppsSection`** (TASK-51): el toggle de apps privadas llama a estas actions.
+**Integrar en `GroupAppsSection`** (TASK-52): el toggle de apps privadas llama a estas actions.
 
 ---
 
-### TASK-55 — i18n: claves nuevas para grupos
+### TASK-58 — i18n: claves nuevas para grupos
 
 **Archivos:** `src/i18n/messages/[locale].json` para los 6 idiomas
 
@@ -510,7 +588,7 @@ Traducir a los 6 idiomas (en, es, it, ca, fr, de).
 
 ---
 
-### TASK-56 — Tests
+### TASK-59 — Tests
 
 **Archivos en `tests/`:**
 
@@ -558,29 +636,60 @@ Traducir a los 6 idiomas (en, es, it, ca, fr, de).
 
 ---
 
+### TASK-60 — API routes con `[group-slug]` en el path
+
+> ⚠️ **Commit separado al final del sprint.** Si el sprint se alarga, puede omitirse para un sprint posterior sin afectar al core del multi-grupo.
+
+**Problema:** Las rutas API de las apps viven en `/api/v1/apps/{slug}/...` sin contexto de grupo, pero ahora los datos están filtrados por `group_id`. Sin el `group-slug` en el path, no hay forma de saber a qué grupo pertenece la petición sin pasarlo como header/query param, lo que rompe la consistencia REST.
+
+**Solución:** Reestructurar las rutas API para incluir `[group-slug]`:
+
+```
+Antes:     /api/v1/apps/{slug}/...
+Después:   /api/v1/[group-slug]/apps/{slug}/...
+```
+
+**Archivos afectados:**
+
+- Sistema de rutas de apps (`src/lib/apps/routes.ts` o donde se registren las rutas)
+- Cada app con rutas API en `apps/{slug}/routes/` (actualizar base path)
+- Llamadas al cliente API desde el frontend (actualizar URLs)
+- Tests de API
+
+**Implementación:**
+
+1. **Router de apps:** Actualizar el registro de rutas para que acepten el prefijo `/api/v1/[group-slug]/apps/{slug}/...`
+2. **Cada app** con rutas: cambiar la definición de path (ej. de `/api/v1/apps/todo/items` a `/api/v1/[group-slug]/apps/todo/items`). El `group-slug` se resuelve en el handler y se usa para filtrar datos.
+3. **Cliente API frontend:** Actualizar el `apiClient` o fetch helper que construye las URLs para que inyecte `group-slug` desde el contexto actual.
+4. **Tests:** Actualizar rutas en tests de API y e2e.
+
+**Nota:** Las rutas globales de descubrimiento (`/api/v1/apps`) se mantienen sin `group-slug`.
+
+---
+
 ## Orden de ejecución recomendado
 
 ```
-TASK-47 (schema migration) ← PRIMERO — base para todo
+TASK-48 (schema migration) ← PRIMERO — base para todo
     ↓
-TASK-48 → TASK-49          ← routing + context (en orden, dependientes)
+TASK-49 → TASK-50          ← routing + context (en orden, dependientes)
     ↓
-TASK-50    TASK-53          ← en paralelo: switcher + actualizar todo
+TASK-51    TASK-52 → TASK-53    ← switcher, admin groups + wizard
+    ↓        ↓
+TASK-56    TASK-57    TASK-54    TASK-55   ← todo, app access, invitations, user groups
     ↓
-TASK-51 → TASK-52           ← en orden: lista grupos + wizard
+TASK-58                     ← i18n (puede ir antes, en paralelo con lo anterior)
     ↓
-TASK-54    TASK-57    TASK-58   ← en paralelo: acceso apps + invitaciones grupos + editar grupos usuario
+TASK-59                     ← tests
     ↓
-TASK-55                     ← i18n (puede ir antes, en paralelo con todo lo anterior)
-    ↓
-TASK-56                     ← tests (al final)
+TASK-60                     ← API routes con [group-slug] (commit separado al final)
 ```
 
 ---
 
 ## Notas para el agente implementador
 
-1. **La migración (TASK-47) es irreversible.** `app_permissions` se elimina. Asegurarse de que no hay código que la referencie antes de aplicarla.
+1. **La migración (TASK-48) es irreversible.** `app_permissions` se elimina. Asegurarse de que no hay código que la referencie antes de aplicarla.
 
 2. **El cambio de URL es breaking.** Todos los links hardcodeados a `/dashboard`, `/apps/[slug]` en la web pública deben actualizarse para incluir el group-slug. El middleware debe redirigir las URLs viejas.
 
@@ -594,4 +703,57 @@ TASK-56                     ← tests (al final)
 
 7. **AppContext incluye `groupId` desde este sprint.** Cualquier app nueva debe usarlo. El contrato de `apps/{slug}/view.tsx` ahora puede asumir que `useAppContext().groupId` está disponible.
 
-8. **El wizard de onboarding (TASK-52)** puede simplificarse a MVP: solo Paso 1 (datos) es obligatorio. Pasos 2 y 3 pueden marcarse como "puedes completar esto después" y redirigir al detalle del grupo.
+8. **El wizard de onboarding (TASK-53)** puede simplificarse a MVP: solo Paso 1 (datos) es obligatorio. Pasos 2 y 3 pueden marcarse como "puedes completar esto después" y redirigir al detalle del grupo.
+
+9. **La limpieza de referencias a `app_permissions` en el código** (TASK-57 de acceso a apps privadas) debe hacerse ANTES o junto con la migración. Archivos afectados:
+   - `src/lib/apps/actions.ts` — `grantAppAccessAction`, `revokeAppAccessAction`, `getAppPermissionsAction`
+   - `src/app/(app)/[locale]/apps/[slug]/layout.tsx` — verificación de acceso
+   - `src/app/(app)/[locale]/page.tsx` — dashboard público
+
+10. **API routes con `[group-slug]` (TASK-60)** se implementa como el último commit del sprint, después de que todo el multi-grupo funcione en frontend. Si el sprint se alarga, puede omitirse y hacerlo en un sprint posterior sin afectar al core del multi-grupo.
+
+---
+
+## Post-implementación: Bugs corregidos
+
+Tras la implementación inicial se corrigieron los siguientes bugs (formato B{N} — Bug reportado por el usuario):
+
+| Bug | Descripción | Archivos |
+|-----|------------|----------|
+| **B1** | Group-switcher no se actualiza al cambiar de grupo — el layout siempre usaba `userGroups[0]` como `currentGroupSlug` ignorando el slug de la URL | `layout.tsx`, `middleware.ts`, `proxy.ts` |
+| **B2** | Wizard textos en inglés — pospuesto a sprint de traducción | — |
+| **B3** | Traducciones raw keys en UserGroupsSection — pospuesto a sprint de traducción | — |
+| **B4** | Falta editar grupo (nombre/slug) — creado modal EditGroupModal + server action updateGroupAction | `EditGroupModal.tsx`, `EditGroupButton.tsx`, `actions.ts` |
+| **B5** | Añadir/quitar miembros desde grupo y usuario — verificado por Ingeniero, funciona | — |
+| **B6** | Login redirige al primer grupo en vez de al último visitado — ahora lee cookie `last_group` | `login/page.tsx` |
+| **B7** | Falta Group Info Drawer — creado drawer con miembros + apps del grupo actual | `group-info-drawer.tsx`, `group-info-button.tsx`, `app-header.tsx` |
+| **B8** | Faltan cards de grupos en admin dashboard — añadido `statsGroups` | `dashboard/page.tsx`, `users.ts`, 6x locale JSON |
+| **B9** | Select sin estilo en UserGroupsSection — estilizado con SVG chevron | `UserGroupsSection.tsx` |
+| **B10** | `x-invoke-path` nunca se setea — creado middleware que lo establece y fusionado con proxy | `middleware.ts`, `proxy.ts` |
+| **B11** | `formData.get` null explosion en wizard actions — validación typeof string antes de .trim() | `actions.ts` |
+| **B12** | `totalUsers` cuenta filas de group_members no usuarios únicos — cambiado a Set | `users.ts` |
+| **B13** | `.single()` sin fila → crash en actions — cambiado a `.maybeSingle()` | `actions.ts`, `auth.ts` |
+| **B14** | Inconsistencia `gray-*` en vez de `slate-*` — 6 ocurrencias corregidas | `EditGroupModal.tsx`, `groups/[id]/page.tsx` |
+
+### Archivos nuevos creados
+- `src/middleware.ts` — Middleware global que setea `x-invoke-path`
+- `src/components/group-info-drawer.tsx` — Drawer info grupo (área pública)
+- `src/components/group-info-button.tsx` — Botón info + estado drawer
+- `src/app/(admin)/[locale]/admin/groups/[id]/EditGroupModal.tsx` — Modal edición grupo
+- `src/app/(admin)/[locale]/admin/groups/[id]/EditGroupButton.tsx` — Wrapper botón+modal
+
+### Estado de endpoints API
+
+| Endpoint | Método | Estado | Notas |
+|----------|--------|--------|-------|
+| `/api/v1/` | GET | ✅ | Base |
+| `/api/v1/apps` | GET | ⚠️ | Retorna `[]`, TODO Sprint 1 |
+| `/api/v1/apps/[slug]/[[...path]]` | ALL | ✅ | Sin `[group-slug]` en path — usa `?group_id=` (TASK-60 pendiente) |
+| `/api/v1/apps/[slug]/assets/[filename]` | GET | ✅ | Sirve assets de apps |
+| `/api/v1/locales` | GET | ✅ | Usa `groupId` del auth context |
+| `/api/v1/me` | GET | ✅ | Retorna datos del usuario autenticado |
+| `/api/debug` | GET | ✅ | Debug de conexión Supabase |
+
+**Issue pendiente (TASK-60):** Las rutas API de apps (`/api/v1/apps/{slug}/...`) NO incluyen `[group-slug]`. El contexto de grupo se pasa como query param `?group_id=`. Para multi-tenant real, deberían ser `/api/v1/[group-slug]/apps/{slug}/...`. Pendiente para sprint futuro.
+
+**Auth multi-grupo en API:** `validateJwt()` ahora consulta TODOS los memberships (no `.maybeSingle()`). El `role` se determina como admin si algún membership tiene role='admin'. El `groupId` devuelto es el primer grupo — las rutas deben usar `?group_id=` si necesitan otro contexto.

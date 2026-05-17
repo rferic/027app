@@ -12,5 +12,11 @@
   "admin_title": "Da fare — Admin",
   "admin_subtitle": "{total} totale · {pending} in sospeso · {done} completati",
   "admin_empty": "Nessun compito trovato.",
-  "limit_reached": "Hai raggiunto il massimo di {max} compiti."
+  "limit_reached": "Hai raggiunto il massimo di {max} compiti.",
+  "visibility": "Visibilità",
+  "visibility_private": "Privata",
+  "visibility_public": "Pubblica",
+  "assigned_to": "Assegnato a",
+  "assigned_to_me": "Io",
+  "assign_to_me": "Assegnami"
 }

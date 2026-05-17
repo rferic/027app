@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import type { AdminUser } from '@/lib/use-cases/admin/users'
 import { AdminUserActions } from './admin-user-actions'
@@ -11,6 +12,7 @@ interface Props {
   currentUserId: string
   locale: string
   availableLocales: string[]
+  groupCounts?: Map<string, number>
 }
 
 function formatDate(iso: string): string {
@@ -41,7 +43,7 @@ function initials(name: string): string {
     .slice(0, 2)
 }
 
-export function AdminUserTable({ users, currentUserId, locale, availableLocales }: Props) {
+export function AdminUserTable({ users, currentUserId, locale, availableLocales, groupCounts }: Props) {
   const t = useTranslations('admin.table')
   const [editingUser, setEditingUser] = useState<AdminUser | null>(null)
 
@@ -70,6 +72,9 @@ export function AdminUserTable({ users, currentUserId, locale, availableLocales 
             <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden lg:table-cell">
               {t('locale')}
             </th>
+            <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+              {t('groups')}
+            </th>
             <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden lg:table-cell">
               {t('lastLogin')}
             </th>
@@ -88,7 +93,9 @@ export function AdminUserTable({ users, currentUserId, locale, availableLocales 
                   </div>
                   <div>
                     <p className="font-medium text-gray-900">
-                      {user.displayName}
+                      <Link href={`/${locale}/admin/users/${user.id}`} className="hover:underline">
+                        {user.displayName}
+                      </Link>
                       {user.isBlocked && (
                         <span className="ml-2 text-[10px] font-semibold text-red-500 uppercase">{t('blockedBadge')}</span>
                       )}
@@ -111,6 +118,9 @@ export function AdminUserTable({ users, currentUserId, locale, availableLocales 
               </td>
               <td className="px-4 py-3 text-gray-400 text-xs hidden lg:table-cell">
                 {user.locale ?? '—'}
+              </td>
+              <td className="px-4 py-3 text-gray-500 text-sm font-medium">
+                {groupCounts?.get(user.id) ?? 0}
               </td>
               <td className="px-4 py-3 text-gray-400 text-xs hidden lg:table-cell">
                 {user.lastLoginAt ? formatRelative(user.lastLoginAt) : formatDate(user.joinedAt)}

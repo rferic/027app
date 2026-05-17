@@ -12,6 +12,7 @@ export type Invitation = {
   revokedAt: string | null
   expiresAt: string | null
   createdAt: string
+  groupIds: string[]
 }
 
 export type InvitationStatus = 'pending' | 'accepted' | 'expired' | 'revoked'
@@ -30,18 +31,19 @@ export async function getAdminInvitationList(): Promise<Invitation[]> {
     .select('*')
     .order('created_at', { ascending: false })
 
-  return (data ?? []).map(row => ({
-    id: row.id,
-    token: row.token,
-    title: row.title,
+  return (data ?? []).map((row: Record<string, unknown>) => ({
+    id: row.id as string,
+    token: row.token as string,
+    title: row.title as string,
     role: row.role as 'admin' | 'member',
-    email: row.email ?? null,
-    invitedBy: row.invited_by,
-    acceptedBy: row.accepted_by ?? null,
-    acceptedAt: row.accepted_at ?? null,
-    revokedAt: row.revoked_at ?? null,
-    expiresAt: row.expires_at ?? null,
-    createdAt: row.created_at,
+    email: (row.email as string) ?? null,
+    invitedBy: row.invited_by as string,
+    acceptedBy: (row.accepted_by as string) ?? null,
+    acceptedAt: (row.accepted_at as string) ?? null,
+    revokedAt: (row.revoked_at as string) ?? null,
+    expiresAt: (row.expires_at as string) ?? null,
+    createdAt: row.created_at as string,
+    groupIds: (row.group_ids as string[]) ?? [],
   }))
 }
 
@@ -51,6 +53,7 @@ export async function createInvitation(data: {
   email: string | null
   expiresAt: string | null
   invitedBy: string
+  groupIds: string[]
 }): Promise<{ token: string } | { error: string }> {
   const supabase = createAdminClient()
   const { data: row, error } = await supabase
@@ -61,7 +64,8 @@ export async function createInvitation(data: {
       email: data.email || null,
       expires_at: data.expiresAt || null,
       invited_by: data.invitedBy,
-    })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any)
     .select('token')
     .single()
 
@@ -98,18 +102,21 @@ export async function getInvitationByToken(token: string): Promise<Invitation | 
     .single()
 
   if (!data) return null
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const row = data as any
   return {
-    id: data.id,
-    token: data.token,
-    title: data.title,
-    role: data.role as 'admin' | 'member',
-    email: data.email ?? null,
-    invitedBy: data.invited_by,
-    acceptedBy: data.accepted_by ?? null,
-    acceptedAt: data.accepted_at ?? null,
-    revokedAt: data.revoked_at ?? null,
-    expiresAt: data.expires_at ?? null,
-    createdAt: data.created_at,
+    id: row.id,
+    token: row.token,
+    title: row.title,
+    role: row.role as 'admin' | 'member',
+    email: row.email ?? null,
+    invitedBy: row.invited_by,
+    acceptedBy: row.accepted_by ?? null,
+    acceptedAt: row.accepted_at ?? null,
+    revokedAt: row.revoked_at ?? null,
+    expiresAt: row.expires_at ?? null,
+    createdAt: row.created_at,
+    groupIds: row.group_ids ?? [],
   }
 }
 
@@ -142,19 +149,33 @@ export async function acceptInvitation(
   // el perfil antes de que lleguemos aquí. El upsert garantiza el nombre correcto.
   await supabase.from('profiles').upsert({ id: userId, display_name: data.displayName })
 
-  const { data: group } = await supabase
-    .from('groups')
-    .select('id')
-    .limit(1)
-    .single()
+  const groupIds = invitation.groupIds && invitation.groupIds.length > 0
+    ? [...invitation.groupIds]
+    : [] as string[]
 
-  if (group) {
-    await supabase.from('group_members').insert({
-      group_id: group.id,
-      user_id: userId,
-      role: invitation.role,
-      invited_by: invitation.invitedBy,
-    })
+  if (groupIds.length === 0) {
+    // Fallback for legacy invitations without group_ids: use first group found
+    const { data: group } = await supabase
+      .from('groups')
+      .select('id')
+      .limit(1)
+      .single()
+    if (group) groupIds.push(group.id)
+  }
+
+  for (const gid of groupIds) {
+    const { error: memberError } = await supabase
+      .from('group_members')
+      .insert({
+        group_id: gid,
+        user_id: userId,
+        role: invitation.role,
+        invited_by: invitation.invitedBy,
+      })
+    // If already exists (unique constraint), ignore the error
+    if (memberError && !memberError.message.includes('duplicate')) {
+      console.error('Failed to add user to group:', memberError.message)
+    }
   }
 
   await supabase

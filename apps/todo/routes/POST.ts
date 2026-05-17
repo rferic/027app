@@ -18,15 +18,18 @@ export default async function handler(req: NextRequest) {
   if (typeof body !== 'object' || body === null) {
     return apiError('BAD_REQUEST', 'Body must be an object', 400)
   }
-  const { title } = body as Record<string, unknown>
+  const { title, group_id } = body as Record<string, unknown>
   if (typeof title !== 'string' || !title.trim()) {
     return apiError('VALIDATION_ERROR', 'title is required', 422)
+  }
+  if (typeof group_id !== 'string' || !group_id.trim()) {
+    return apiError('VALIDATION_ERROR', 'group_id is required', 422)
   }
 
   const adminClient = createAdminClientUntyped()
   const { data, error } = await adminClient
     .from('todo_items')
-    .insert({ user_id: auth.userId, title: title.trim() })
+    .insert({ user_id: auth.userId, title: title.trim(), group_id: group_id.trim(), visibility: 'private' })
     .select('id, title, completed, created_at')
     .single()
 

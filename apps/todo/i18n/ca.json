@@ -12,5 +12,11 @@
   "admin_title": "Tasques — Admin",
   "admin_subtitle": "{total} total · {pending} pendents · {done} completades",
   "admin_empty": "No s'han trobat tasques.",
-  "limit_reached": "Has assolit el màxim de {max} tasques."
+  "limit_reached": "Has assolit el màxim de {max} tasques.",
+  "visibility": "Visibilitat",
+  "visibility_private": "Privada",
+  "visibility_public": "Pública",
+  "assigned_to": "Assignat a",
+  "assigned_to_me": "Jo",
+  "assign_to_me": "Assigna'm"
 }
